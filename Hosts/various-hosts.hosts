@@ -1,0 +1,73 @@
+##
+# Host Database
+#
+# localhost is used to configure the loopback interface
+# when the system is booting.  Do not change this entry.
+##
+127.0.0.1	localhost
+255.255.255.255	broadcasthost
+::1             localhost
+
+0.0.0.0 swcdn.apple.com
+0.0.0.0 swdist.apple.com
+0.0.0.0 swdownload.apple.com
+0.0.0.0 swquery.apple.com
+0.0.0.0 swscan.apple.com
+
+0.0.0.0 t.me
+0.0.0.0 www.t.me
+
+0.0.0.0 youtube.com
+0.0.0.0 www.youtube.com
+
+# Invidious
+0.0.0.0 inv.bp.projectsegfau.lt
+0.0.0.0 inv.odyssey346.dev
+0.0.0.0 inv.riverside.rocks
+0.0.0.0 inv.zzls.xyz
+0.0.0.0 invidious.0011.lt
+0.0.0.0 invidious.baczek.me
+0.0.0.0 invidious.esmailelbob.xyz
+0.0.0.0 invidious.flokinet.to
+0.0.0.0 invidious.kavin.rocks
+0.0.0.0 invidious.lunar.icu
+0.0.0.0 invidious.nerdvpn.de
+0.0.0.0 invidious.privacydev.net
+0.0.0.0 invidious.projectsegfau.lt
+0.0.0.0 invidious.sethforprivacy.com
+0.0.0.0 invidious.slipfox.xyz
+0.0.0.0 invidious.snopyta.org
+0.0.0.0 invidious.tiekoetter.com
+0.0.0.0 invidious.vpsburti.com
+0.0.0.0 iv.ggtyler.dev
+0.0.0.0 iv.melmac.space
+0.0.0.0 vid.priv.au
+0.0.0.0 vid.puffyan.us
+0.0.0.0 y.com.sb
+0.0.0.0 yewtu.be
+0.0.0.0 yt.artemislena.eu
+0.0.0.0 yt.funami.tech
+
+# Piped
+0.0.0.0 api-piped.mha.fi
+0.0.0.0 api.piped.privacydev.net
+0.0.0.0 api.piped.projectsegfau.lt
+0.0.0.0 api.yt.jae.fi
+0.0.0.0 p.plibre.com
+0.0.0.0 pa.il.ax
+0.0.0.0 pa.mint.lgbt
+0.0.0.0 piped-api.garudalinux.org
+0.0.0.0 piped-api.privacy.com.de
+0.0.0.0 pipedapi-libre.kavin.rocks
+0.0.0.0 pipedapi.adminforge.de
+0.0.0.0 pipedapi.aeong.one
+0.0.0.0 pipedapi.esmailelbob.xyz
+0.0.0.0 pipedapi.kavin.rocks
+0.0.0.0 pipedapi.moomoo.me
+0.0.0.0 pipedapi.palveluntarjoaja.eu
+0.0.0.0 pipedapi.qdi.fi
+0.0.0.0 pipedapi.rivo.lol
+0.0.0.0 pipedapi.smnz.de
+0.0.0.0 pipedapi.syncpundit.io
+0.0.0.0 pipedapi.tokhmi.xyz
+0.0.0.0 watchapi.whatever.social

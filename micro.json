@@ -1,0 +1,20 @@
+{
+    "autosu": true,
+    "colorcolumn": 80,
+    "colorscheme": "geany",
+    "diffgutter": true,
+    "ftoptions": false,
+    "hlsearch": true,
+    "hltaberrors": true,
+    "hltrailingws": true,
+    "mkparents": true,
+    "reload": "auto",
+    "rmtrailingws": true,
+    "savecursor": true,
+    "saveundo": true,
+    "softwrap": true,
+    "tabhighlight": true,
+    "tabmovement": true,
+    "tabstospaces": true,
+    "wordwrap": true
+}

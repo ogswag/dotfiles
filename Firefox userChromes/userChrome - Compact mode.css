@@ -1,0 +1,47 @@
+/* no spacing between titlebar and window border */
+.titlebar-spacer{
+  display: none;
+}
+
+.titlebar-buttonbox-container{
+  margin-right: 4px !important;
+}
+
+#tabbrowser-tabs{
+  padding: 3px !important;
+  margin-left: 2px !important;
+  margin-right: 2px !important;
+}
+
+/* set max tab height and width */
+:root {
+  --tab-min-height: 22px !important;
+  --tab-max-height: 22px !important;
+}
+
+.tabbrowser-tab:not([pinned])
+{
+  max-width: 140px !important;
+  min-width: 10px !important;
+}
+
+/* this configuration portion is needed otherwise tabs lag and large gaps appear when new tabs are closed */
+.tabbrowser-tab:not([fadein])
+{
+ max-width: 1px !important;
+ min-width: 1px !important;
+ max-width: 1px;
+ min-width: 1px;
+}
+
+/* tab button fixes */
+.tab-close-button{
+  height: 15px !important;
+  width: 15px !important;
+  padding: 2px !important;
+}
+
+.tab-throbber-tabslist, .tab-throbber, .tab-icon-pending, .tab-icon-image, .tab-sharing-icon-overlay, .tab-icon-overlay {
+    height: 14px !important;
+    width: 14px !important;
+}
