@@ -14,6 +14,7 @@
 (load "~/.emacs.d/lisp/completion.el")
 (load "~/.emacs.d/lisp/snippets.el")
 (load "~/.emacs.d/lisp/git.el")
+(load "~/.emacs.d/lisp/rss.el")
 
 ;; Store automatic customisation options elsewhere
 (setq custom-file (locate-user-emacs-file "custom.el"))

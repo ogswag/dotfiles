@@ -18,12 +18,14 @@ set nowrap
 " set showbreak=↳↳ " Line break symbols
 set virtualedit=block " Enable free-range cursor
 set display+=lastline " Always try to show a paragraph's last line
+set laststatus=2      " Always show status line
+set ruler             " Show line and column info in status line
 
 " set colorcolumn=90
 " set textwidth=90
 
 syntax on
-colors lunaperche
+colors sorbet
 " set cursorline " Highlight cursor line
 set showmatch  " highlight matching brace
 set nu         " Turn on the line numbers
@@ -44,6 +46,9 @@ set expandtab " Use spaces instead of tabs
 
 autocmd BufNewFile,BufRead,BufWinEnter,FileType,OptionSet * set formatoptions-=t formatoptions-=l formatoptions-=c formatoptions-=r formatoptions-=o formatoptions-=q
 autocmd BufNewFile,BufRead,BufWinEnter,FileType,OptionSet * setlocal formatoptions-=t formatoptions-=l formatoptions-=c formatoptions-=r formatoptions-=o formatoptions-=q
+augroup vimStartup | au!
+    autocmd BufRead * call setpos('.', getpos("'\""))
+augroup end
 
 set smartindent " Enable smart-indent
 set autoindent  " Auto-indent new lines

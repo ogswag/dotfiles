@@ -46,8 +46,14 @@
 (use-package markdown-mode
   :ensure t)
 
+(use-package russian-techwriter
+  :ensure t)
+(setq-default default-input-method 'russian-techwriter)
+
 (use-package jinx
   :ensure t)
 ;; Enable Jinx per mode
 (dolist (hook '(text-mode-hook prog-mode-hook conf-mode-hook))
   (add-hook hook #'jinx-mode))
+
+(setq-default jinx-languages "en_US ru")

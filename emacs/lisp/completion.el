@@ -11,7 +11,14 @@
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs
 			   '(python-mode . ("ruff-lsp"))))
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               '(LaTeX-mode . ("texlab"))))
+
+(add-hook 'LaTeX-mode-hook #'eglot-ensure)
 (add-hook 'python-mode-hook #'eglot-ensure)
+  
 
 ;;; Inline static analysis
 
@@ -91,7 +98,7 @@
 ;;; Completion framework for minibuffer
 (use-package vertico
   :custom
-  (vertico-count 13)                    ; Number of candidates to display
+  (vertico-count 15)                    ; Number of candidates to display
   (vertico-resize t)
   (vertico-cycle t) ; Go from last to first candidate and first to last (cycle)
   :config
