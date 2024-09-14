@@ -30,7 +30,7 @@ require("lazy").setup({
     version = false, -- always use the latest git commit
     -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
-  install = { colorscheme = { "tokyonight", "habamax" } },
+  install = { colorscheme = { "tokyonight", "habamax", "catpuccin" } },
   checker = {
     enabled = true, -- check for plugin updates periodically
     notify = false, -- notify on update
@@ -58,19 +58,10 @@ auto_dark_mode.setup({
   update_interval = 1000,
   set_dark_mode = function()
     vim.api.nvim_set_option_value("background", "dark", {})
-    vim.cmd("colorscheme habamax")
+    vim.cmd("colorscheme nord")
   end,
   set_light_mode = function()
     vim.api.nvim_set_option_value("background", "light", {})
     vim.cmd("colorscheme hadalized")
   end,
 })
-
--- local lspconfig = require("lspconfig")
--- lspconfig.clangd.setup({
---   name = "clangd",
---   cmd = { "clangd", "--background-index", "--clang-tidy", "--log=verbose" },
---   initialization_options = {
---     fallback_flags = { "-std=c++17" },
---   },
--- })

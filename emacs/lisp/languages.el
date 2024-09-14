@@ -46,14 +46,19 @@
 (use-package markdown-mode
   :ensure t)
 
-(use-package russian-techwriter
-  :ensure t)
-(setq-default default-input-method 'russian-techwriter)
-
 (use-package jinx
   :ensure t)
 ;; Enable Jinx per mode
 (dolist (hook '(text-mode-hook prog-mode-hook conf-mode-hook))
   (add-hook hook #'jinx-mode))
+"ещё её ей"
+(setq-default jinx-languages "en_US ru-yo")
 
-(setq-default jinx-languages "en_US ru")
+;; (use-package typst-ts-mode
+;;   :quelpa (typst-ts-mode :fetcher codeberg :repo "meow_king/typst-ts-mode"))
+;; 
+;; (use-package websocket
+;;   :ensure t)
+;; 
+;; (use-package typst-preview
+;;   :quelpa (typst-preview :fetcher github :repo "havarddj/typst-preview.el"))

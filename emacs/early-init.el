@@ -10,3 +10,5 @@
 (pixel-scroll-precision-mode t)
 
 (setq native-comp-async-report-warnings-errors 'silent)
+
+(load-theme 'wombat t)

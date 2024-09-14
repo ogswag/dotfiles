@@ -1,3 +1,14 @@
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin()
+Plug 'https://github.com/tpope/vim-commentary'
+Plug 'arzg/vim-colors-xcode'
+call plug#end()
+
 " ---------- GENERAL SETTINGS  ----------
 filetype plugin indent on
 
@@ -24,11 +35,34 @@ set ruler             " Show line and column info in status line
 " set colorcolumn=90
 " set textwidth=90
 
+let g:jellybeans_overrides = {
+\    'background': { 'ctermbg': 'none', '256ctermbg': 'none', 'ctermfg': 'White', '256ctermfg': 'White'},
+\}
+if has('termguicolors') && &termguicolors
+    let g:jellybeans_overrides['background']['guibg'] = 'none'
+endif
+
+" ChangeBackground changes the background mode based on macOS's `Appearance`
+" setting. We also refresh the statusline colors to reflect the new mode.
+function! ChangeBackground()
+  if system("defaults read -g AppleInterfaceStyle") =~ '^Dark'
+    colors jellybeans
+    set background=dark   " for the dark version of the theme
+  else
+    colors xcodelighthc
+    set background=light  " for the light version of the theme
+  endif
+endfunction
+
+" initialize the colorscheme for the first run
+call ChangeBackground()
+
+" " change the color scheme if we receive a SigUSR1
+" autocmd SigUSR1 * call ChangeBackground()
 syntax on
-colors sorbet
 " set cursorline " Highlight cursor line
 set showmatch  " highlight matching brace
-set nu         " Turn on the line numbers
+set nonu         " Turn on the line numbers
 
 set hlsearch     " Highlight all search results
 set smartcase    " Enable smart-case search
@@ -56,6 +90,7 @@ set smarttab    " Enable smart-tabs
 
 set autochdir   " Change working directory to open buffer
 set autoread    " Auomatically read files modified elsewhere
+set hidden      " Hide buffer instead of closing when loading a new one
 
 set backspace=indent,eol,start  " Backspace behaviour
 
@@ -73,6 +108,8 @@ if has('autocmd')
 endif
 
 set undolevels=1000 " Number of undo levels
+
+set clipboard=unnamed,unnamedplus
 
 if !isdirectory($HOME."/.config/vim/vim-undodir")
     call mkdir($HOME."/.config/vim/vim-undodir", "", 0700)

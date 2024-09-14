@@ -1,20 +1,41 @@
 ;;; Personal configuration -*- lexical-binding: t -*-
 
-;; Save the contents of this file under ~/.emacs.d/init.el
-;; Do not forget to use Emacs' built-in help system:
-;; Use C-h C-h to get an overview of all help commands.  All you
-;; need to know about Emacs (what commands exist, what functions do,
-;; what variables specify), the help system can provide.
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;; INITIALIZE PACKAGES ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(package-initialize)
+(require 'package)
+(add-to-list 'package-archives '("gnu"	 . "https://elpa.gnu.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+;; (use-package quelpa
+;;   :ensure t)
+;; 
+;; (use-package quelpa-use-package
+;;   :ensure t)
 
 (load "~/.emacs.d/lisp/general.el")
 (load "~/.emacs.d/lisp/themes.el")
 (load "~/.emacs.d/lisp/languages.el")
+(load "~/.emacs.d/lisp/keys-layout.el")
 (load "~/.emacs.d/lisp/latex.el")
-(load "~/.emacs.d/lisp/completion.el")
-(load "~/.emacs.d/lisp/snippets.el")
-(load "~/.emacs.d/lisp/git.el")
-(load "~/.emacs.d/lisp/rss.el")
+
+(require 'diminish)
+
+(diminish 'company-mode)
+(diminish 'jinx-mode)
+(diminish 'eldoc-mode)
+(diminish 'visual-line-mode)
+(diminish 'xah-fly-keys)
+(diminish 'helm-mode)
+(diminish 'which-key-mode)
+(diminish 'auto-dark-mode)
+(diminish 'undo-tree-mode)
+(diminish 'yas/minor-mode)
 
 ;; Store automatic customisation options elsewhere
 (setq custom-file (locate-user-emacs-file "custom.el"))
