@@ -73,9 +73,9 @@ set shortmess-=S " Show search count message, e.g. [1/5]
 nnoremap n nzz
 nnoremap N Nzz
 
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
 set expandtab " Use spaces instead of tabs
 
 autocmd BufNewFile,BufRead,BufWinEnter,FileType,OptionSet * set formatoptions-=t formatoptions-=l formatoptions-=c formatoptions-=r formatoptions-=o formatoptions-=q
@@ -111,8 +111,8 @@ set undolevels=1000 " Number of undo levels
 
 set clipboard=unnamed,unnamedplus
 
-if !isdirectory($HOME."/.config/vim/vim-undodir")
-    call mkdir($HOME."/.config/vim/vim-undodir", "", 0700)
+if !isdirectory($HOME."/.config/vim-undodir")
+    call mkdir($HOME."/.config/vim-undodir", "", 0700)
 endif
 set undodir=~/.config/vim/vim-undodir
 set undofile
