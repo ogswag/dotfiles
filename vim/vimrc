@@ -5,8 +5,10 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
 endif
 
 call plug#begin()
-Plug 'https://github.com/tpope/vim-commentary'
-Plug 'arzg/vim-colors-xcode'
+  Plug 'tpope/vim-commentary'
+  Plug 'arzg/vim-colors-xcode'
+  Plug 'nanotech/jellybeans.vim'
+  Plug 'ignu/Spacegray.vim'
 call plug#end()
 
 " ---------- GENERAL SETTINGS  ----------
@@ -24,9 +26,9 @@ set splitbelow splitright " Sane splitting
 set title      " Set title of a window to filename
 set noswapfile " Prevent vim from creating .swp files
 
-set nowrap
-" set linebreak    " Break lines at word (requires Wrap lines)
-" set showbreak=↳↳ " Line break symbols
+set wrap
+set linebreak    " Break lines at word (requires Wrap lines)
+set showbreak=↳↳ " Line break symbols
 set virtualedit=block " Enable free-range cursor
 set display+=lastline " Always try to show a paragraph's last line
 set laststatus=2      " Always show status line
@@ -49,6 +51,7 @@ function! ChangeBackground()
     colors jellybeans
     set background=dark   " for the dark version of the theme
   else
+    let g:xcodelighthc_green_comments = 1
     colors xcodelighthc
     set background=light  " for the light version of the theme
   endif
@@ -57,21 +60,44 @@ endfunction
 " initialize the colorscheme for the first run
 call ChangeBackground()
 
-" " change the color scheme if we receive a SigUSR1
-" autocmd SigUSR1 * call ChangeBackground()
+if has("gui_running")
+  set guifont=SF\ Mono:h12
+  set go-=r
+  set go-=l
+  function! ChangeBackgroundGui()
+    if system("defaults read -g AppleInterfaceStyle") =~ '^Dark'
+      colors spacegray
+      set background=dark   " for the dark version of the theme
+    else
+      let g:xcodelighthc_green_comments = 1
+      colors xcodelighthc
+      set background=light  " for the light version of the theme
+    endif
+  endfunction
+call ChangeBackgroundGui()
+endif
+
 syntax on
-" set cursorline " Highlight cursor line
+set cursorline " Highlight cursor line
+set cursorlineopt=number
 set showmatch  " highlight matching brace
-set nonu         " Turn on the line numbers
+set nu         " Turn on the line numbers
 
 set hlsearch     " Highlight all search results
 set smartcase    " Enable smart-case search
 set ignorecase   " Always case-insensitive
 set incsearch    " Searches for strings incrementally
 set shortmess-=S " Show search count message, e.g. [1/5]
+
 " Center search results on screen
 nnoremap n nzz
 nnoremap N Nzz
+
+nnoremap w vw
+vnoremap i A
+
+nnoremap j gj
+nnoremap k gk
 
 set tabstop=2
 set softtabstop=2

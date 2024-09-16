@@ -42,7 +42,9 @@ bindkey -M emacs '^P' history-substring-search-up
 bindkey -M emacs '^N' history-substring-search-down
 
 
-# Completion enhancements
+  # ┌──────────────────────────────────────────────────────────────────────────┐
+  # │ Completion enhancements                                                  │
+  # └──────────────────────────────────────────────────────────────────────────┘
 
 if [[ ${TERM} == dumb ]]; then
   return 1
@@ -184,6 +186,11 @@ zstyle ':completion:*:manuals.(^1*)' insert-sections true
 
 unset glob_case_sensitivity completion_case_sensitivity
 
+
+  # ┌──────────────────────────────────────────────────────────────────────────┐
+  # │ Personal config                                                          │
+  # └──────────────────────────────────────────────────────────────────────────┘
+
 export PS1="%n@%m %F{89}%1~%f %% "
 
 GPG_TTY=$(tty)
@@ -193,4 +200,9 @@ export PATH="/usr/local/sbin:$PATH"
 export PATH="/usr/local/opt/llvm/bin:$PATH"
 export PATH="$HOME/git-personal/scripts:$PATH"
 
+# export PATH="/usr/local/opt/m4/bin:$PATH"
+
 alias ll="gls --group-directories-first -Flh --color=auto"
+
+export PATH="/usr/local/opt/m4/bin:$PATH"
+alias gm4='m4'

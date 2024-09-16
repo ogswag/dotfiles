@@ -40,6 +40,8 @@
 
 (delete-selection-mode 1) ;; Paste over selected region
 
+;; >> UNDO-TREE <<
+;; much better undo setup for emacs
 (use-package undo-tree
   :ensure t)
 (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
@@ -135,6 +137,7 @@
   (dired-listing-switches "-lh --group-directories-first --dired")
   :hook
   (dired-mode . dired-hide-details-mode))
+
 (use-package diminish
   :ensure t)
 

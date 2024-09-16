@@ -51,14 +51,4 @@
 ;; Enable Jinx per mode
 (dolist (hook '(text-mode-hook prog-mode-hook conf-mode-hook))
   (add-hook hook #'jinx-mode))
-"ещё её ей"
 (setq-default jinx-languages "en_US ru-yo")
-
-;; (use-package typst-ts-mode
-;;   :quelpa (typst-ts-mode :fetcher codeberg :repo "meow_king/typst-ts-mode"))
-;; 
-;; (use-package websocket
-;;   :ensure t)
-;; 
-;; (use-package typst-preview
-;;   :quelpa (typst-preview :fetcher github :repo "havarddj/typst-preview.el"))
