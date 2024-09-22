@@ -1,26 +1,30 @@
+# ┌──────────────────────────────────────────────────────────────────────────┐
+# │ Plugins Initialization                                                   │
+# └──────────────────────────────────────────────────────────────────────────┘
+
 # where should we download your Zsh plugins?
 #ZPLUGINDIR=$ZDOTDIR/plugins
 
 ##? Clone a plugin, identify its init file, source it, and add it to your fpath.
 function plugin-load {
-  local repo plugdir initfile initfiles=()
-  : ${ZPLUGINDIR:=${ZDOTDIR:-~/.config/zsh}/plugins}
-  for repo in $@; do
-    plugdir=$ZPLUGINDIR/${repo:t}
-    initfile=$plugdir/${repo:t}.plugin.zsh
-    if [[ ! -d $plugdir ]]; then
-      echo "Cloning $repo..."
-      git clone -q --depth 1 --recursive --shallow-submodules \
-        https://github.com/$repo $plugdir
-    fi
-    if [[ ! -e $initfile ]]; then
-      initfiles=($plugdir/*.{plugin.zsh,zsh-theme,zsh,sh}(N))
-      (( $#initfiles )) || { echo >&2 "No init file found '$repo'." && continue }
-      ln -sf $initfiles[1] $initfile
-    fi
-    fpath+=$plugdir
-    (( $+functions[zsh-defer] )) && zsh-defer . $initfile || . $initfile
-  done
+local repo plugdir initfile initfiles=()
+: ${ZPLUGINDIR:=${ZDOTDIR:-~/.config/zsh}/plugins}
+for repo in $@; do
+  plugdir=$ZPLUGINDIR/${repo:t}
+  initfile=$plugdir/${repo:t}.plugin.zsh
+  if [[ ! -d $plugdir ]]; then
+    echo "Cloning $repo..."
+    git clone -q --depth 1 --recursive --shallow-submodules \
+      https://github.com/$repo $plugdir
+  fi
+  if [[ ! -e $initfile ]]; then
+    initfiles=($plugdir/*.{plugin.zsh,zsh-theme,zsh,sh}(N))
+    (( $#initfiles )) || { echo >&2 "No init file found '$repo'." && continue }
+    ln -sf $initfiles[1] $initfile
+  fi
+  fpath+=$plugdir
+  (( $+functions[zsh-defer] )) && zsh-defer . $initfile || . $initfile
+done
 }
 
 # make a github repo plugins list
@@ -28,7 +32,7 @@ plugins=(
   zsh-users/zsh-autosuggestions
   zsh-users/zsh-history-substring-search
   zsh-users/zsh-completions
-
+  ael-code/zsh-colored-man-pages
   # load these at hypersonic load speeds with zsh-defer
   romkatv/zsh-defer
   olets/zsh-abbr
@@ -42,10 +46,10 @@ bindkey -M emacs '^P' history-substring-search-up
 bindkey -M emacs '^N' history-substring-search-down
 
 
-  # ┌──────────────────────────────────────────────────────────────────────────┐
-  # │ Completion enhancements                                                  │
-  # └──────────────────────────────────────────────────────────────────────────┘
 
+# ┌──────────────────────────────────────────────────────────────────────────┐
+# │ Completion enhancements                                                  │
+# └──────────────────────────────────────────────────────────────────────────┘
 if [[ ${TERM} == dumb ]]; then
   return 1
 fi
@@ -55,7 +59,7 @@ if (( ${+_comps} )); then
 fi
 
 () {
-  builtin emulate -L zsh -o EXTENDED_GLOB
+builtin emulate -L zsh -o EXTENDED_GLOB
 
   # Check if dumpfile is up-to-date by comparing the full path and
   # last modification time of all the completion functions in fpath.
@@ -72,8 +76,8 @@ fi
     zmodload -F zsh/system b:sysread
     sysread -s ${#znew_dat} zold_dat <${zdumpfile}.dat
     if [[ ${zold_dat} == ${znew_dat} ]] zdump_dat=0
-  fi
-  if (( zdump_dat )) command rm -f ${zdumpfile}(|.dat|.zwc(|.old))(N)
+    fi
+    if (( zdump_dat )) command rm -f ${zdumpfile}(|.dat|.zwc(|.old))(N)
 
   # Load and initialize the completion system
   autoload -Uz compinit && compinit -C -d ${zdumpfile}
@@ -83,10 +87,10 @@ fi
   fi
   # Compile the completion dumpfile; significant speedup
   if [[ ! ${zdumpfile}.zwc -nt ${zdumpfile} ]] zcompile ${zdumpfile}
-}
+  }
 
-functions[compinit]=$'print -u2 \'warning: compinit being called again after completion module at \'${funcfiletrace[1]}
-'${functions[compinit]}
+  functions[compinit]=$'print -u2 \'warning: compinit being called again after completion module at \'${funcfiletrace[1]}
+  '${functions[compinit]}
 
 #
 #
@@ -159,10 +163,10 @@ zstyle ':completion:*:history-words' menu yes
 
 # Populate hostname completion.
 zstyle -e ':completion:*:hosts' hosts 'reply=(
-  ${=${=${=${${(f)"$(cat {/etc/ssh/ssh_,~/.ssh/}known_hosts{,2} 2>/dev/null)"}%%[#| ]*}//\]:[0-9]*/ }//,/ }//\[/ }
-  ${=${(f)"$(cat /etc/hosts 2>/dev/null; (( ${+commands[ypcat]} )) && ypcat hosts 2>/dev/null)"}%%(\#)*}
+${=${=${=${${(f)"$(cat {/etc/ssh/ssh_,~/.ssh/}known_hosts{,2} 2>/dev/null)"}%%[#| ]*}//\]:[0-9]*/ }//,/ }//\[/ }
+${=${(f)"$(cat /etc/hosts 2>/dev/null; (( ${+commands[ypcat]} )) && ypcat hosts 2>/dev/null)"}%%(\#)*}
   ${=${${${${(@M)${(f)"$(cat ~/.ssh/config{,.d/*(N)} 2>/dev/null)"}:#Host *}#Host }:#*\**}:#*\?*}}
-)'
+  )'
 
 # Don't complete uninteresting users...
 zstyle ':completion:*:*:*:users' ignored-patterns \
@@ -187,11 +191,11 @@ zstyle ':completion:*:manuals.(^1*)' insert-sections true
 unset glob_case_sensitivity completion_case_sensitivity
 
 
-  # ┌──────────────────────────────────────────────────────────────────────────┐
-  # │ Personal config                                                          │
-  # └──────────────────────────────────────────────────────────────────────────┘
 
-export PS1="%n@%m %F{89}%1~%f %% "
+# ┌──────────────────────────────────────────────────────────────────────────┐
+# │ Personal config                                                          │
+# └──────────────────────────────────────────────────────────────────────────┘
+export PS1="%n@%m %F{125}%1~%f %% "
 
 GPG_TTY=$(tty)
 export GPG_TTY
@@ -204,5 +208,29 @@ export PATH="$HOME/git-personal/scripts:$PATH"
 
 alias ll="gls --group-directories-first -Flh --color=auto"
 
-export PATH="/usr/local/opt/m4/bin:$PATH"
-alias gm4='m4'
+
+
+# ┌──────────────────────────────────────────────────────────────────────────┐
+# │ Custom Functions                                                         │
+# └──────────────────────────────────────────────────────────────────────────┘
+mkcd(){
+  mkdir $1;
+  cd $1;
+}
+
+up(){                                 # Go up X directories (default 1)
+  if [[ "$#" -ne 1 ]]; then
+    cd ..
+  elif ! [[ $1 =~ '^[0-9]+$' ]]; then
+    echo "Error: up should be called with the number of directories to go up. The default is 1."
+  else
+    local d=""
+    limit=$1
+    for ((i=1 ; i <= limit ; i++))
+    do
+      d=$d/..
+    done
+    d=$(echo $d | sed 's/^\///')
+    cd $d
+  fi
+}

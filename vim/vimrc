@@ -5,11 +5,19 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
 endif
 
 call plug#begin()
-  Plug 'tpope/vim-commentary'
-  Plug 'arzg/vim-colors-xcode'
-  Plug 'nanotech/jellybeans.vim'
-  Plug 'ignu/Spacegray.vim'
+Plug 'tpope/vim-commentary'
+Plug 'arzg/vim-colors-xcode'
+Plug 'nanotech/jellybeans.vim'
+Plug 'vim-autoformat/vim-autoformat'
 call plug#end()
+
+" Format on save
+au BufWrite * :Autoformat
+
+" Tab completion
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
 
 " ---------- GENERAL SETTINGS  ----------
 filetype plugin indent on
@@ -38,10 +46,10 @@ set ruler             " Show line and column info in status line
 " set textwidth=90
 
 let g:jellybeans_overrides = {
-\    'background': { 'ctermbg': 'none', '256ctermbg': 'none', 'ctermfg': 'White', '256ctermfg': 'White'},
-\}
+      \    'background': { 'ctermbg': 'none', '256ctermbg': 'none', 'ctermfg': 'White', '256ctermfg': 'White'},
+      \}
 if has('termguicolors') && &termguicolors
-    let g:jellybeans_overrides['background']['guibg'] = 'none'
+  let g:jellybeans_overrides['background']['guibg'] = 'none'
 endif
 
 " ChangeBackground changes the background mode based on macOS's `Appearance`
@@ -64,6 +72,7 @@ if has("gui_running")
   set guifont=SF\ Mono:h12
   set go-=r
   set go-=l
+  set go-=L
   function! ChangeBackgroundGui()
     if system("defaults read -g AppleInterfaceStyle") =~ '^Dark'
       colors spacegray
@@ -74,7 +83,7 @@ if has("gui_running")
       set background=light  " for the light version of the theme
     endif
   endfunction
-call ChangeBackgroundGui()
+  call ChangeBackgroundGui()
 endif
 
 syntax on
@@ -107,7 +116,7 @@ set expandtab " Use spaces instead of tabs
 autocmd BufNewFile,BufRead,BufWinEnter,FileType,OptionSet * set formatoptions-=t formatoptions-=l formatoptions-=c formatoptions-=r formatoptions-=o formatoptions-=q
 autocmd BufNewFile,BufRead,BufWinEnter,FileType,OptionSet * setlocal formatoptions-=t formatoptions-=l formatoptions-=c formatoptions-=r formatoptions-=o formatoptions-=q
 augroup vimStartup | au!
-    autocmd BufRead * call setpos('.', getpos("'\""))
+  autocmd BufRead * call setpos('.', getpos("'\""))
 augroup end
 
 set smartindent " Enable smart-indent
@@ -138,7 +147,29 @@ set undolevels=1000 " Number of undo levels
 set clipboard=unnamed,unnamedplus
 
 if !isdirectory($HOME."/.config/vim-undodir")
-    call mkdir($HOME."/.config/vim-undodir", "", 0700)
+  call mkdir($HOME."/.config/vim-undodir", "", 0700)
 endif
 set undodir=~/.config/vim/vim-undodir
 set undofile
+
+if !exists('g:native_sidebar_shortcut') | let g:native_sidebar_shortcut = '<c-b>' | en
+
+exe 'nnoremap <silent> ' g:native_sidebar_shortcut ' :Lexplore %:p:h<cr>'
+exe 'vnoremap <silent> ' g:native_sidebar_shortcut ' :Lexplore %:p:h<cr>'
+exe 'inoremap <silent> ' g:native_sidebar_shortcut ' <esc>:Lexplore %:p:h<cr>'
+
+augroup netrw_mapping
+  autocmd!
+  autocmd filetype netrw call NetrwMapping()
+augroup END
+
+function! NetrwMapping()
+  nmap <buffer> <c-l> <c-w>l
+endfunction
+
+let g:netrw_altv=1
+let g:netrw_banner=0
+let g:netrw_winsize=20
+let g:netrw_liststyle=0
+let g:netrw_browse_split=0
+let g:netrw_list_hide='.*\.git/$,'.netrw_gitignore#Hide()
