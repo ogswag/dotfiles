@@ -56,7 +56,7 @@ endif
 " setting. We also refresh the statusline colors to reflect the new mode.
 function! ChangeBackground()
   if system("defaults read -g AppleInterfaceStyle") =~ '^Dark'
-    colors jellybeans
+    colors zaibatsu
     set background=dark   " for the dark version of the theme
   else
     let g:xcodelighthc_green_comments = 1

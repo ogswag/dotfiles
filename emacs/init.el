@@ -1,11 +1,18 @@
 ;;; Personal configuration -*- lexical-binding: t -*-
 
+;; ┌──────────────────────────────────────────────────────────────────────┐
+;; │ Store automatic customisation options elsewhere                      │
+;; └──────────────────────────────────────────────────────────────────────┘
+(setq custom-file (locate-user-emacs-file "custom.el"))
+(when (file-exists-p custom-file)
+  (load custom-file))
+
 ;; ┌─────────────────────────────────────────────────────────────────────────┐
 ;; │ INITIALIZE PACKAGES                                                     │
 ;; └─────────────────────────────────────────────────────────────────────────┘
 (package-initialize)
 (require 'package)
-(add-to-list 'package-archives '("gnu"	 . "https://elpa.gnu.org/packages/"))
+(add-to-list 'package-archives '("gnu"   . "https://elpa.gnu.org/packages/"))
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -22,7 +29,7 @@
             '(
               (tool-bar-lines . 0)
               (width . 100) ; chars
-              (height . 55) ; lines
+              (height . 45) ; lines
               ))
       (setq default-frame-alist
             '(
@@ -32,6 +39,11 @@
   (progn
     (setq initial-frame-alist '( (tool-bar-lines . 0)))
     (setq default-frame-alist '( (tool-bar-lines . 0)))))
+
+(use-package ns-auto-titlebar
+  :ensure t)
+(when (eq system-type 'darwin) (ns-auto-titlebar-mode))
+(when (eq system-type 'darwin) (add-to-list 'default-frame-alist '(undecorated-round . t)))
 
 ;; Resize frames and windows by pixels, not by chars
 (setq window-resize-pixelwise t)
@@ -45,13 +57,13 @@
   (xterm-mouse-mode 1))
 
 (blink-cursor-mode 0) ;; Stop cursor blinking
-(setq-default cursor-type 'bar) ;; Cursor shape = |
+(setq-default cursor-type 'box) ;; Cursor shape = |
 
 ;; Enable column numbering in `prog-mode'
 (add-hook 'prog-mode-hook #'column-number-mode)
 
 ;; Enable line numbering for a few major modes
-(dolist (hook '(prog-mode-hook LaTeX-mode-hook toml-ts-mode-hook))
+(dolist (hook '(prog-mode-hook LaTeX-mode-hook toml-ts-mode-hook yaml-mode-hook))
   (add-hook hook #'display-line-numbers-mode))
 ;; do not decrease line number width, results in less shifting
 (setq-default display-line-numbers-grow-only t)
@@ -63,7 +75,9 @@
 (dolist (hook '(prog-mode-hook LaTeX-mode-hook text-mode-hook toml-ts-mode-hook))
   (add-hook hook #'visual-line-mode))
 
-;; "Adaptive prefix" - lines are aligned when visually wrapped
+(setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
+
+;; "Adaptive prefix" - lines maintain alignment position when visually wrapped
 (use-package adaptive-wrap
   :ensure t
   :hook (prog-mode . adaptive-wrap-prefix-mode))
@@ -86,7 +100,7 @@
 ;; Simplified dired setup
 (use-package dired
   :custom
-  (dired-kill-when-opening-new-dired-buffer t "Удалять буфер при переходе в другой каталог.")
+  (dired-kill-when-opening-new-dired-buffer t)
   (dired-listing-switches "-lh --group-directories-first --dired")
   :hook
   (dired-mode . dired-hide-details-mode))
@@ -101,41 +115,146 @@
 (cond
  ((eq system-type 'windows-nt)
   (when (member "Consolas" (font-family-list))
-	  (set-frame-font "Consolas 12" t t)))
+    (set-frame-font "Consolas 12" t t)))
  ((eq system-type 'darwin) ; macOS
-  (when (member "SF Mono" (font-family-list))
-	  (set-frame-font "SF Mono 12" t t)))
+  (when (member "Iosevka Custom Ligatures" (font-family-list))
+    (set-frame-font "Iosevka Custom Ligatures Light 14" t t)
+    (set-face-attribute 'fixed-pitch nil :family "SF Mono")
+    (set-face-attribute 'variable-pitch nil :family "SF Pro")))
  ((eq system-type 'gnu/linux)
   (when (member "DejaVu Sans Mono" (font-family-list))
-	  (set-frame-font "DejaVu Sans Mono 12" t t))))
+    (set-frame-font "DejaVu Sans Mono 12" t t))))
+
 
 ;; >> INSTALL CUSTOM THEMES <<
 (use-package one-themes
   :ensure t)
-(use-package nimbus-theme
+(use-package wildcharm-light-theme
   :ensure t)
-(use-package color-theme-sanityinc-tomorrow
-  :ensure t)
-(use-package monokai-theme
-  :ensure t)
-(use-package standard-themes
+(use-package ef-themes
+  :vc (:url "https://github.com/protesilaos/ef-themes"
+            :rev newest)
   :ensure t)
 
+(setq-default modus-themes-italic-constructs t)
+
+(setq modus-operandi-palette-overrides ;; this is the light theme
+      '((cursor "#FB8718")
+        (bg-main "#FFFFFF")
+        (fg-main "#323232")
+        (bg-mode-line-active "#E3F4FF")
+        (fg-mode-line-active "#427498")
+        (border-mode-line-active "#427498")
+        (bg-line-number-inactive bg-main)
+        (fg-line-number-inactive "#AAAAAA")
+        (bg-line-number-active bg-main)
+        (fg-line-number-active "#1D50A8")
+        ;; icons in the fringe
+        (fg-prominent-err "#A93939")
+        (bg-prominent-err "#FFD1D1")
+        (fg-prominent-warning "#AE7504")
+        (bg-prominent-warning "#FFF1BA")
+        (fg-prominent-note "#0063A9")
+        (bg-prominent-note "#D2ECFF")
+        ;; parenthesis match
+        (bg-paren-match "#721045")
+        (fg-paren-match bg-main)
+        ;; selection
+        (bg-region bg-mark-select)
+        (fg-region fg-mark-select)
+        ))
+
+(setq ef-frost-palette-overrides
+      '(
+
+        (bg-paren "#FFEA00")
+
+        (variable fg-main)
+        (string "#00006A")
+        (keyword "#1154B0")
+        (builtin fg-main)
+        (fnname  fg-main)
+        (type    fg-main)
+        (name    keyword)
+
+        (bg-hover bg-cyan-intense)
+        (bg-mode-line "#C1E6FF")
+
+        (bg-region cyan-faint)
+        (fg-region bg-main)
+
+        (comment "#008895")
+        ))
+(setq ef-tritanopia-dark-palette-overrides
+      '((bg-paren "#0000BA")
+        (fg-main "#FF3B3B")
+        (comment "#BB5F5F")
+
+        (bg-region "#010055")
+        (fg-region "#7785CB")
+
+        (bg-hover bg-removed-refine)
+
+        (accent-0 red-cooler)
+        (accent-2 red-faint)
+        (accent-3 red-cooler)
+
+        (link red-warmer)
+
+        (prompt red-warmer)
+        (docstring red-faint)
+        (info red-faint)
+
+        (underline-warning yellow-warmer)
+        (unerline-info cyan-cooler)
+
+        (variable fg-main)
+        (keyword "#D85D5D")
+        (builtin "#D85D5D")
+        (fnname  "#D85D5D")
+        (type    "#D85D5D")
+        (name    "#D85D5D")
+        (string  "#D85D5D")))
+
 ;; >> AUTO-DARK <<
-;; Package for syncinng themes with system
+;; Package for syncing themes with system
 (use-package auto-dark
   :ensure t
   :config
-  (setq auto-dark-light-theme 'tango)
-  (setq auto-dark-dark-theme 'nimbus)
-  (setq auto-dark-polling-interval-seconds 5)
+  (setq auto-dark-light-theme 'ef-frost)
+  (setq auto-dark-dark-theme 'ef-tritanopia-dark)
+  (setq auto-dark-polling-interval 3)
   (setq auto-dark-allow-osascript t)
-  (setq auto-dark-allow-powershell t)
-  (auto-dark-mode t))
+  (setq auto-dark-allow-powershell t))
+
+;; (defun my-load-light () ;; this is the light one
+;;   (mapc #'disable-theme custom-enabled-themes)
+;;   (modus-themes-with-colors
+;;     (custom-set-faces
+;;      `(font-lock-comment-face ((t (:inherit modus-themes-slant :background "#E8FDEC" :foreground "#0E8929"))))
+;;      `(font-lock-constant-face ((t (:background "#F8EFF9" :foreground "#8F3799"))))
+;;      ;; `(font-lock-builtin-face ((t (:background "#FDEDF3" :foreground "#D51259"))))
+;;      ))
+;;   (modus-themes-load-theme 'modus-operandi))
+
+;; (defun my-load-dark () ;; this is the dark one
+;;   (mapc #'disable-theme custom-enabled-themes)
+;;   (modus-themes-with-colors
+;;     (custom-set-faces
+;;      `(font-lock-comment-face ((t (:background nil :foreground "#437453"))))
+;;      `(font-lock-constant-face ((t (:background nil :foreground "#7B3A44"))))
+;;      )
+;;     ))
+
+;; Add theme loading with custom colors hooks
+;; (add-hook 'auto-dark-light-mode-hook #'my-load-light)
+;; (add-hook 'auto-dark-dark-mode-hook #'my-load-dark)
 
 (custom-set-faces
- `(fringe ((t (:background nil))))) ; make fringe match the bg
+ ;; set fring to no background for every theme
+ '(fringe ((t (:background nil)))))
 
+(auto-dark-mode t)
 
 ;; ┌────────────────────────────────────────────────────────────────────────┐
 ;; │ EDITOR OPTIONS                                                         │
@@ -234,6 +353,8 @@
 (global-set-key (kbd "<pinch>") 'ignore)
 (global-set-key (kbd "<C-wheel-up>") 'ignore)
 (global-set-key (kbd "<C-wheel-down>") 'ignore)
+(global-set-key (kbd "<C-M-wheel-up>") 'ignore)
+(global-set-key (kbd "<C-M-wheel-down>") 'ignore)
 
 (global-set-key (kbd "s-C-f") #'toggle-frame-maximized)
 (global-set-key (kbd "s-S-C-f") #'toggle-frame-fullscreen)
@@ -247,7 +368,14 @@
 ;; >> FORMAT ALL <<
 ;; easy formatting using unified commands
 (use-package format-all
-  :ensure t)
+  :ensure t
+  :commands format-all-mode
+  :hook (prog-mode . format-all-mode)
+  )
+
+(setq format-all-formatters
+      '(("C++" (clang-format "--style=Google"))
+        ("Python" (ruff))))
 
 ;; >> EXEC PATH FROM SHELL <<
 ;; Make Emacs use the $PATH set up by the user's shell
@@ -259,6 +387,10 @@
 ;; ┌─────────────────────────────────────────────────────────────────────────┐
 ;; │ PROGRAMMING LANGUAGES SETUP                                             │
 ;; └─────────────────────────────────────────────────────────────────────────┘
+;;; Vim Script support
+(use-package vimrc-mode
+  :ensure t)
+
 ;;; Go Support
 (use-package go-mode
   :ensure t)
@@ -307,9 +439,11 @@
 (use-package markdown-mode
   :ensure t)
 
-(use-package auctex
-  :ensure t)
+;; (use-package auctex
+;; :ensure t)
 
+(use-package devdocs
+  :ensure t)
 
 ;; ┌─────────────────────────────────────────────────────────────────────────┐
 ;; │ COMPLETION                                                              │
@@ -397,7 +531,7 @@
 (use-package eglot
   :ensure t)
 ;; Enable LSP support by default in programming buffers
-;; (add-hook 'prog-mode-hook #'eglot-ensure)
+(add-hook 'c++-mode-hook #'eglot-ensure)
 ;; Create a memorable alias for `eglot-ensure'.
 ;; (defalias 'start-lsp-server #'eglot)
 
@@ -418,8 +552,8 @@
   (corfu-quit-at-boundary t)   ;; Never quit at completion boundary
   (corfu-quit-no-match t)      ;; Never quit, even if there is no match
   (corfu-popupinfo-delay 0.2)
-  (corfu-auto-delay  0.7)
-  (corfu-auto-prefix 3)
+  (corfu-auto-delay  0.3)
+  (corfu-auto-prefix 2)
 
   :bind
   ;; Use TAB for cycling, default is `corfu-complete'.
@@ -467,11 +601,3 @@
 (diminish 'which-key-mode)
 (diminish 'auto-dark-mode)
 (diminish 'undo-tree-mode)
-
-
-;; ┌──────────────────────────────────────────────────────────────────────┐
-;; │ Store automatic customisation options elsewhere                      │
-;; └──────────────────────────────────────────────────────────────────────┘
-(setq custom-file (locate-user-emacs-file "custom.el"))
-(when (file-exists-p custom-file)
-  (load custom-file))
