@@ -3,7 +3,7 @@
 # └──────────────────────────────────────────────────────────────────────────┘
 
 # where should we download your Zsh plugins?
-#ZPLUGINDIR=$ZDOTDIR/plugins
+#ZPLUGINDIR=$ZDOTDIR/.zsh_plugins
 
 ##? Clone a plugin, identify its init file, source it, and add it to your fpath.
 function plugin-load {
@@ -195,7 +195,7 @@ unset glob_case_sensitivity completion_case_sensitivity
 # ┌──────────────────────────────────────────────────────────────────────────┐
 # │ Personal config                                                          │
 # └──────────────────────────────────────────────────────────────────────────┘
-export PS1="%n@%m %F{125}%1~%f %% "
+export PS1="%n@%m %F{red}%1~%f %% "
 
 GPG_TTY=$(tty)
 export GPG_TTY
@@ -207,7 +207,7 @@ export PATH="$HOME/git-personal/scripts:$PATH"
 # export PATH="/usr/local/opt/m4/bin:$PATH"
 
 alias ll="gls --group-directories-first -Flh --color=auto"
-
+alias vim="nvim"
 
 
 # ┌──────────────────────────────────────────────────────────────────────────┐

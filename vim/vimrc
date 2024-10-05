@@ -5,19 +5,19 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
 endif
 
 call plug#begin()
-Plug 'tpope/vim-commentary'
-Plug 'arzg/vim-colors-xcode'
-Plug 'nanotech/jellybeans.vim'
-Plug 'vim-autoformat/vim-autoformat'
+    Plug 'tpope/vim-commentary'
+    Plug 'nanotech/jellybeans.vim'
+    Plug 'vim-autoformat/vim-autoformat'
+    Plug 'andreasvc/vim-256noir'
+    Plug 'kxzk/skull-vim'
+    Plug 'Lokaltog/vim-monotone'
+    Plug 'YorickPeterse/vim-paper'
+    Plug 'nikolvs/vim-sunbather'
+    Plug 'ntk148v/komau.vim'
 call plug#end()
 
 " Format on save
-au BufWrite * :Autoformat
-
-" Tab completion
-inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
+" au BufWrite * :Autoformat
 
 " ---------- GENERAL SETTINGS  ----------
 filetype plugin indent on
@@ -34,33 +34,30 @@ set splitbelow splitright " Sane splitting
 set title      " Set title of a window to filename
 set noswapfile " Prevent vim from creating .swp files
 
-set wrap
-set linebreak    " Break lines at word (requires Wrap lines)
-set showbreak=↳↳ " Line break symbols
+set nowrap
+" set linebreak    " Break lines at word (requires Wrap lines)
+" set showbreak=↳  " Line break symbols
 set virtualedit=block " Enable free-range cursor
 set display+=lastline " Always try to show a paragraph's last line
 set laststatus=2      " Always show status line
 set ruler             " Show line and column info in status line
 
-" set colorcolumn=90
-" set textwidth=90
+set colorcolumn=80
+set textwidth=80
 
-let g:jellybeans_overrides = {
-      \    'background': { 'ctermbg': 'none', '256ctermbg': 'none', 'ctermfg': 'White', '256ctermfg': 'White'},
-      \}
-if has('termguicolors') && &termguicolors
-  let g:jellybeans_overrides['background']['guibg'] = 'none'
-endif
+let g:jellybeans_overrides = {'background': { 'ctermbg': 'none', '256ctermbg': 'none', 'ctermfg': 'White', '256ctermfg': 'White'}}
 
-" ChangeBackground changes the background mode based on macOS's `Appearance`
-" setting. We also refresh the statusline colors to reflect the new mode.
+set termguicolors
 function! ChangeBackground()
   if system("defaults read -g AppleInterfaceStyle") =~ '^Dark'
-    colors zaibatsu
+    let g:monotone_color = [0, 53, 85] " Sets theme color 
+    let g:monotone_contrast_factor = 1.1
+    let g:monotone_secondary_hue_offset = 10 " Offset secondary colors by 200 degrees
+    " let g:monotone_emphasize_comments = 1 " Emphasize comments
+    colorscheme monotone
     set background=dark   " for the dark version of the theme
   else
-    let g:xcodelighthc_green_comments = 1
-    colors xcodelighthc
+    colors komau
     set background=light  " for the light version of the theme
   endif
 endfunction
@@ -69,26 +66,15 @@ endfunction
 call ChangeBackground()
 
 if has("gui_running")
-  set guifont=SF\ Mono:h12
+  set guifont=Menlo:h15
   set go-=r
   set go-=l
   set go-=L
-  function! ChangeBackgroundGui()
-    if system("defaults read -g AppleInterfaceStyle") =~ '^Dark'
-      colors spacegray
-      set background=dark   " for the dark version of the theme
-    else
-      let g:xcodelighthc_green_comments = 1
-      colors xcodelighthc
-      set background=light  " for the light version of the theme
-    endif
-  endfunction
-  call ChangeBackgroundGui()
 endif
 
 syntax on
 set cursorline " Highlight cursor line
-set cursorlineopt=number
+" set cursorlineopt=number
 set showmatch  " highlight matching brace
 set nu         " Turn on the line numbers
 
@@ -102,9 +88,6 @@ set shortmess-=S " Show search count message, e.g. [1/5]
 nnoremap n nzz
 nnoremap N Nzz
 
-nnoremap w vw
-vnoremap i A
-
 nnoremap j gj
 nnoremap k gk
 
@@ -115,9 +98,6 @@ set expandtab " Use spaces instead of tabs
 
 autocmd BufNewFile,BufRead,BufWinEnter,FileType,OptionSet * set formatoptions-=t formatoptions-=l formatoptions-=c formatoptions-=r formatoptions-=o formatoptions-=q
 autocmd BufNewFile,BufRead,BufWinEnter,FileType,OptionSet * setlocal formatoptions-=t formatoptions-=l formatoptions-=c formatoptions-=r formatoptions-=o formatoptions-=q
-augroup vimStartup | au!
-  autocmd BufRead * call setpos('.', getpos("'\""))
-augroup end
 
 set smartindent " Enable smart-indent
 set autoindent  " Auto-indent new lines
@@ -151,25 +131,3 @@ if !isdirectory($HOME."/.config/vim-undodir")
 endif
 set undodir=~/.config/vim/vim-undodir
 set undofile
-
-if !exists('g:native_sidebar_shortcut') | let g:native_sidebar_shortcut = '<c-b>' | en
-
-exe 'nnoremap <silent> ' g:native_sidebar_shortcut ' :Lexplore %:p:h<cr>'
-exe 'vnoremap <silent> ' g:native_sidebar_shortcut ' :Lexplore %:p:h<cr>'
-exe 'inoremap <silent> ' g:native_sidebar_shortcut ' <esc>:Lexplore %:p:h<cr>'
-
-augroup netrw_mapping
-  autocmd!
-  autocmd filetype netrw call NetrwMapping()
-augroup END
-
-function! NetrwMapping()
-  nmap <buffer> <c-l> <c-w>l
-endfunction
-
-let g:netrw_altv=1
-let g:netrw_banner=0
-let g:netrw_winsize=20
-let g:netrw_liststyle=0
-let g:netrw_browse_split=0
-let g:netrw_list_hide='.*\.git/$,'.netrw_gitignore#Hide()

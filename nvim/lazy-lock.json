@@ -1,0 +1,23 @@
+{
+  "LuaSnip": { "branch": "master", "commit": "e808bee352d1a6fcf902ca1a71cee76e60e24071" },
+  "auto-dark-mode.nvim": { "branch": "master", "commit": "14cad96b80a07e9e92a0dcbe235092ed14113fb2" },
+  "conform.nvim": { "branch": "master", "commit": "40d4e98fcc3e6f485f0e8924c63734bc7e305967" },
+  "github-colors": { "branch": "main", "commit": "7292749e49e6f870e63879a528bb05c8c8d1a59a" },
+  "gruvbox.nvim": { "branch": "main", "commit": "49d9c0b150ba70efcd831ec7b3cb8ee740067045" },
+  "lazy.nvim": { "branch": "main", "commit": "1159bdccd8910a0fd0914b24d6c3d186689023d9" },
+  "mini.nvim": { "branch": "main", "commit": "61e5d46fc0cf71306c51275383767d996f559a60" },
+  "nord.nvim": { "branch": "main", "commit": "33a928133fd031b9714cb390645b5b01a900d9f9" },
+  "nvim-cmp": { "branch": "main", "commit": "ae644feb7b67bf1ce4260c231d1d4300b19c6f30" },
+  "nvim-treesitter": { "branch": "master", "commit": "45386764cc9535200d2288cab929c5093d33660e" },
+  "playground": { "branch": "master", "commit": "ba48c6a62a280eefb7c85725b0915e021a1a0749" },
+  "plenary.nvim": { "branch": "master", "commit": "2d9b06177a975543726ce5c73fca176cedbffe9d" },
+  "solarized.nvim": { "branch": "main", "commit": "f85f000c3e46714fee52cee3adf9f9661a048e40" },
+  "tabout.nvim": { "branch": "master", "commit": "923aea2613c9e7abf81e099d46086f62c7e54896" },
+  "telescope-file-browser.nvim": { "branch": "master", "commit": "3b8a1e17187cfeedb31decbd625da62398a8ff34" },
+  "telescope-frecency.nvim": { "branch": "master", "commit": "f67baca08423a6fd00167801a54db38e0b878063" },
+  "telescope.nvim": { "branch": "master", "commit": "eae0d8fbde590b0eaa2f9481948cd6fd7dd21656" },
+  "ultimate-autopair.nvim": { "branch": "v0.6", "commit": "ff21db642847840db183b9421ab3d89795a7fbba" },
+  "vim-envy": { "branch": "master", "commit": "e1afb0cd542fc4afeb779f1c894abf5527d965ea" },
+  "vim-monotone": { "branch": "master", "commit": "5393343ff2d639519e4bcebdb54572dfe5c35686" },
+  "which-key.nvim": { "branch": "main", "commit": "8badb359f7ab8711e2575ef75dfe6fbbd87e4821" }
+}
