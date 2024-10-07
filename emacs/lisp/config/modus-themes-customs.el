@@ -94,7 +94,7 @@
 
 (setq modus-operandi-palette-overrides ;; this is the light theme
       '(;; emacs parts
-        (cursor      "#000000")
+        (cursor      "#055C76")
         ;; modeline
         (bg-mode-line-active   bg-active)
         (fg-mode-line-active   fg-main)
@@ -118,7 +118,7 @@
         (fg-paren-match fg-main)
         ;; code parts
         (comment "#1336C2")
-        (string  "#000000")
+        (string  "#2F515B")
         (builtin      fg-main)
         (constant     fg-main)
         (docstring    fg-main)

@@ -83,7 +83,7 @@
 
 ;; Simple and clean whitespace mode setup
 (progn
-  (setq whitespace-style (quote (face spaces tabs newline space-mark tab-mark newline-mark)))
+  (setq whitespace-style (quote (face spaces tabs newline space-mark tab-mark newline-mark)))  
   ;; Make whitespace-mode and whitespace-newline-mode use “¶” for end of line char and “▷” for tab.
   (setq whitespace-display-mappings
         ;; all numbers are unicode codepoint in decimal. e.g. (insert-char 182 1)
