@@ -1,15 +1,15 @@
 ;;; Personal configuration -*- lexical-binding: t -*-
 
-;; ┌──────────────────────────────────────────────────────────────────────┐
-;; │ Store automatic customisation options elsewhere                      │
-;; └──────────────────────────────────────────────────────────────────────┘
+;; ┌──────────────────────────────────────────────────────────────────────────┐
+;; │ Store automatic customisation options elsewhere                          │
+;; └──────────────────────────────────────────────────────────────────────────┘
 (setq custom-file (locate-user-emacs-file "custom.el"))
 (when (file-exists-p custom-file)
   (load custom-file))
 
-;; ┌─────────────────────────────────────────────────────────────────────────┐
-;; │ INITIALIZE PACKAGES                                                     │
-;; └─────────────────────────────────────────────────────────────────────────┘
+;; ┌──────────────────────────────────────────────────────────────────────────┐
+;; │ INITIALIZE PACKAGES                                                      │
+;; └──────────────────────────────────────────────────────────────────────────┘
 (package-initialize)
 (require 'package)
 (add-to-list 'package-archives '("gnu"   . "https://elpa.gnu.org/packages/"))
@@ -18,10 +18,9 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-
-;; ┌─────────────────────────────────────────────────────────────────────────┐
-;; │ THEMES, FONTS AND VISUAL OPTIONS                                        │
-;; └─────────────────────────────────────────────────────────────────────────┘
+;; ┌──────────────────────────────────────────────────────────────────────────┐
+;; │ THEMES, FONTS AND VISUAL OPTIONS                                         │
+;; └──────────────────────────────────────────────────────────────────────────┘
 ;; Default frame size
 (if (display-graphic-p)
     (progn
@@ -37,13 +36,13 @@
               (width . 100)
               (height . 55))))
   (progn
-    (setq initial-frame-alist '( (tool-bar-lines . 0)))
-    (setq default-frame-alist '( (tool-bar-lines . 0)))))
+    (setq initial-frame-alist '((tool-bar-lines . 0)))
+    (setq default-frame-alist '((tool-bar-lines . 0)))))
 
 (use-package ns-auto-titlebar
   :ensure t)
 (when (eq system-type 'darwin) (ns-auto-titlebar-mode))
-(when (eq system-type 'darwin) (add-to-list 'default-frame-alist '(undecorated-round . t)))
+; (when (eq system-type 'darwin) (add-to-list 'default-frame-alist '(undecorated-round . t)))
 
 ;; Resize frames and windows by pixels, not by chars
 (setq window-resize-pixelwise t)
@@ -75,9 +74,9 @@
 (dolist (hook '(prog-mode-hook LaTeX-mode-hook text-mode-hook toml-ts-mode-hook))
   (add-hook hook #'visual-line-mode))
 
-(setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
-
-;; "Adaptive prefix" - lines maintain alignment position when visually wrapped
+;; >>ADAPTIVE WRAP<<
+;; Enables "adaptive prefix" - lines maintain alignment position when visually
+;; wrapped
 (use-package adaptive-wrap
   :ensure t
   :hook (prog-mode . adaptive-wrap-prefix-mode))
@@ -117,27 +116,33 @@
   (when (member "Consolas" (font-family-list))
     (set-frame-font "Consolas 12" t t)))
  ((eq system-type 'darwin) ; macOS
-  (when (member "Iosevka Custom Ligatures" (font-family-list))
-    (set-frame-font "Iosevka Custom Ligatures Light 14" t t)
-    (set-face-attribute 'fixed-pitch nil :family "SF Mono")
-    (set-face-attribute 'variable-pitch nil :family "SF Pro")))
+  (when (member "JetBrains Mono" (font-family-list))
+    (set-frame-font "JetBrains Mono 13" t t)
+    (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono")
+    (set-face-attribute 'variable-pitch nil :family "Arial")))
  ((eq system-type 'gnu/linux)
   (when (member "DejaVu Sans Mono" (font-family-list))
     (set-frame-font "DejaVu Sans Mono 12" t t))))
 
+(load "~/.emacs.d/lisp/packages/ligature.el")
+
 ;; >> INSTALL CUSTOM THEMES <<
-(use-package one-themes
-  :ensure t)
-(use-package wildcharm-light-theme
-  :ensure t)
+(require-theme 'modus-themes)
+
+(setq modus-themes-common-palette-overrides
+      modus-themes-preset-overrides-faint)
+
+(setq-default modus-themes-italic-constructs t)
+
+(load "~/.emacs.d/lisp/config/modus-themes-customs.el")
 
 ;; >> AUTO-DARK <<
 ;; Package for syncing themes with system
 (use-package auto-dark
   :ensure t
   :config
-  (setq auto-dark-light-theme 'wildcharm-light)
-  (setq auto-dark-dark-theme 'one-dark)
+  (setq auto-dark-light-theme 'modus-operandi)
+  (setq auto-dark-dark-theme 'modus-vivendi)
   (setq auto-dark-polling-interval 3)
   (setq auto-dark-allow-osascript t)
   (setq auto-dark-allow-powershell t))
@@ -148,16 +153,19 @@
 
 (auto-dark-mode t)
 
-;; ┌────────────────────────────────────────────────────────────────────────┐
-;; │ EDITOR OPTIONS                                                         │
-;; └────────────────────────────────────────────────────────────────────────┘
+(use-package htmlize
+  :ensure t)
+
+;; ┌────────────────────────────────────────────────────────────────────────────┐
+;; │ EDITOR OPTIONS                                                             │
+;; └────────────────────────────────────────────────────────────────────────────┘
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8-unix)
 
-
-(tool-bar-mode -1)    ;; No toolbar
-(scroll-bar-mode -1)  ;; No scroll bars
-(context-menu-mode 1) ;; Enable right click menus
+;; >> RAINBOW MODE <<
+;; colorize color names in buffers
+(use-package rainbow-mode
+  :ensure t)
 
 ;; >> RESTART-EMACS <<
 ;; package for easy emacs restarting
@@ -191,6 +199,9 @@
 (global-goto-address-mode t) ;; Make links clickable
 
 (setq-default tab-width 2) ;; Set tab length = 2
+
+(setq-default fill-column 80)
+(global-display-fill-column-indicator-mode t)
 
 (setq-default indent-tabs-mode nil) ;; Indent by spaces
 
@@ -262,12 +273,11 @@
 (use-package format-all
   :ensure t
   :commands format-all-mode
-  :hook (prog-mode . format-all-mode)
+  :hook (emacs-lisp-mode . format-all-mode)
   )
-
-(setq format-all-formatters
-      '(("C++" (clang-format "--style=Google"))
-        ("Python" (ruff))))
+;; (setq format-all-formatters
+;;       '(("C++" (clang-format "--style=Google"))
+;;         ("Python" (ruff))))
 
 ;; >> EXEC PATH FROM SHELL <<
 ;; Make Emacs use the $PATH set up by the user's shell
@@ -426,6 +436,17 @@
 (add-hook 'c++-mode-hook #'eglot-ensure)
 ;; Create a memorable alias for `eglot-ensure'.
 ;; (defalias 'start-lsp-server #'eglot)
+
+(with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs
+        '((c-mode c++-mode)
+             . ("clangd"
+                   "--fallback-style=Google"
+                   "--background-index"
+                   "--clang-tidy"
+                   "--completion-style=detailed"
+                   "--pch-storage=memory"
+                   ))))
 
 ;; >> FLYMAKE <<
 ;; Inline static analysis

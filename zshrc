@@ -207,7 +207,6 @@ export PATH="$HOME/git-personal/scripts:$PATH"
 # export PATH="/usr/local/opt/m4/bin:$PATH"
 
 alias ll="gls --group-directories-first -Flh --color=auto"
-alias vim="nvim"
 
 
 # ┌──────────────────────────────────────────────────────────────────────────┐

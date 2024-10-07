@@ -4,10 +4,16 @@ return {
 		"nvim-lua/plenary.nvim",
 		"nvim-telescope/telescope-frecency.nvim",
 		"nvim-telescope/telescope-file-browser.nvim",
+		"natecraddock/telescope-zf-native.nvim",
+		"ghassan0/telescope-glyph.nvim",
+		"xiyaowong/telescope-emoji.nvim",
 	},
 	config = function()
 		require("telescope").load_extension("frecency")
 		require("telescope").load_extension("file_browser")
+		require("telescope").load_extension("zf-native")
+		require("telescope").load_extension("glyph")
+		require("telescope").load_extension("emoji")
 
 		local builtin = require("telescope.builtin")
 		vim.keymap.set("n", "<leader>f", builtin.find_files, { desc = "Telescope find files" })

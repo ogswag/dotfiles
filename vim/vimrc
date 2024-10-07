@@ -8,11 +8,7 @@ call plug#begin()
     Plug 'tpope/vim-commentary'
     Plug 'nanotech/jellybeans.vim'
     Plug 'vim-autoformat/vim-autoformat'
-    Plug 'andreasvc/vim-256noir'
-    Plug 'kxzk/skull-vim'
     Plug 'Lokaltog/vim-monotone'
-    Plug 'YorickPeterse/vim-paper'
-    Plug 'nikolvs/vim-sunbather'
     Plug 'ntk148v/komau.vim'
 call plug#end()
 
@@ -46,27 +42,11 @@ set colorcolumn=80
 set textwidth=80
 
 let g:jellybeans_overrides = {'background': { 'ctermbg': 'none', '256ctermbg': 'none', 'ctermfg': 'White', '256ctermfg': 'White'}}
-
-set termguicolors
-function! ChangeBackground()
-  if system("defaults read -g AppleInterfaceStyle") =~ '^Dark'
-    let g:monotone_color = [0, 53, 85] " Sets theme color 
-    let g:monotone_contrast_factor = 1.1
-    let g:monotone_secondary_hue_offset = 10 " Offset secondary colors by 200 degrees
-    " let g:monotone_emphasize_comments = 1 " Emphasize comments
-    colorscheme monotone
-    set background=dark   " for the dark version of the theme
-  else
-    colors komau
-    set background=light  " for the light version of the theme
-  endif
-endfunction
-
-" initialize the colorscheme for the first run
-call ChangeBackground()
+set bg=dark
+colorscheme jellybeans
 
 if has("gui_running")
-  set guifont=Menlo:h15
+  set guifont=Menlo:h14
   set go-=r
   set go-=l
   set go-=L
@@ -74,7 +54,7 @@ endif
 
 syntax on
 set cursorline " Highlight cursor line
-" set cursorlineopt=number
+set cursorlineopt=number
 set showmatch  " highlight matching brace
 set nu         " Turn on the line numbers
 
