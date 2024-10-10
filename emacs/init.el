@@ -1,5 +1,8 @@
-;;; Personal configuration -*- lexical-binding: t -*-
+;;; init.el --- Personal configuration -*- lexical-binding: t -*-
+;;; Commentary:
+;;;                To conf, or not to conf? That is the question.
 
+;;; Code:
 ;; ┌──────────────────────────────────────────────────────────────────────────┐
 ;; │ Store automatic customisation options elsewhere                          │
 ;; └──────────────────────────────────────────────────────────────────────────┘
@@ -19,7 +22,15 @@
   (package-install 'use-package))
 
 ;; ┌──────────────────────────────────────────────────────────────────────────┐
-;; │ THEMES, FONTS AND VISUAL OPTIONS                                         │
+;; │ STOP EMACS LITTERING                                                     │
+;; └──────────────────────────────────────────────────────────────────────────┘
+(setq
+ make-backup-files nil  ;; disable automatic backup~ file
+ auto-save-default nil
+ create-lockfiles nil)  ;; stop creating #auto-save# files
+
+;; ┌──────────────────────────────────────────────────────────────────────────┐
+;; │ THEMES, FONTS AND GENERAL OPTIONS                                        │
 ;; └──────────────────────────────────────────────────────────────────────────┘
 ;; Default frame size
 (if (display-graphic-p)
@@ -39,17 +50,29 @@
     (setq initial-frame-alist '((tool-bar-lines . 0)))
     (setq default-frame-alist '((tool-bar-lines . 0)))))
 
+(when (window-system)
+  (tool-bar-mode -1)    ;; No toolbar
+  (scroll-bar-mode -1)  ;; No scroll bars
+  (context-menu-mode 1)) ;; Enable right click menus
+
+;; >> DIMINISH <<
+;; Hide modes from the mode line
+;; (has to be installed before everything to work)
+(use-package diminish
+  :ensure t)
+
 (use-package ns-auto-titlebar
   :ensure t)
 (when (eq system-type 'darwin) (ns-auto-titlebar-mode))
-; (when (eq system-type 'darwin) (add-to-list 'default-frame-alist '(undecorated-round . t)))
 
 ;; Resize frames and windows by pixels, not by chars
 (setq window-resize-pixelwise t)
 (setq frame-resize-pixelwise t)
 
-;; Smooth scrolling
-(pixel-scroll-precision-mode t)
+;; Delete trailing whitespace before saving
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
+;; Always ensure new line at the end of the file
+(setq require-final-newline t)
 
 ;; Enable mouse in terminal mode
 (unless (display-graphic-p)
@@ -71,8 +94,17 @@
 
 ;; Do not wrap line by default, unless in specific modes
 (setq-default truncate-lines t)
-(dolist (hook '(prog-mode-hook LaTeX-mode-hook text-mode-hook toml-ts-mode-hook))
-  (add-hook hook #'visual-line-mode))
+(use-package visual-line
+  :diminish visual-line-mode
+  :hook ((LaTeX-mode-hook . visual-line-mode)
+         (toml-ts-mode-hook . visual-line-mode)))
+
+;; Allow right-left scrolling with mouse
+(setq mouse-wheel-tilt-scroll t
+      mouse-wheel-flip-direction t)
+
+;; Smooth scrolling
+(pixel-scroll-precision-mode t)
 
 ;; >>ADAPTIVE WRAP<<
 ;; Enables "adaptive prefix" - lines maintain alignment position when visually
@@ -84,13 +116,12 @@
 ;; Simple and clean whitespace mode setup
 (progn
   (setq whitespace-style (quote (face spaces tabs newline space-mark tab-mark newline-mark)))
-  ;; Make whitespace-mode and whitespace-newline-mode use “¶” for end of line char and “▷” for tab.
   (setq whitespace-display-mappings
         ;; all numbers are unicode codepoint in decimal. e.g. (insert-char 182 1)
         '(
-          (space-mark 32 [183] [46]) ; SPACE 32 「 」, 183 MIDDLE DOT 「·」, 46 FULL STOP 「.」
-          (newline-mark 10 [182 10]) ; LINE FEED,
-          (tab-mark 9 [9655 9] [92 9]) ; tab
+          (space-mark 32 [183] [46])
+          (newline-mark 10 [182 10])
+          (tab-mark 9 [9655 9] [92 9])
           )))
 
 ;; No sounds in emacs
@@ -100,15 +131,8 @@
 (use-package dired
   :custom
   (dired-kill-when-opening-new-dired-buffer t)
-  ;; (dired-listing-switches "-lh --group-directories-first --dired")
   :hook
   (dired-mode . dired-hide-details-mode))
-
-;; Different setup for truncating lines
-;; (defun az-no-line-wrap ()
-;;   (setq truncate-lines t))
-;; (add-hook 'dired-mode-hook 'az-no-line-wrap)
-;; (add-hook 'minibuffer-mode-hook 'az-no-line-wrap)
 
 ;; >> SET DEFAULT FONT FACE <<
 (cond
@@ -124,15 +148,18 @@
   (when (member "DejaVu Sans Mono" (font-family-list))
     (set-frame-font "DejaVu Sans Mono 12" t t))))
 
+;; >> ENABLE LIGATURES <<
 (load "~/.emacs.d/lisp/packages/ligature.el")
 
 ;; >> INSTALL CUSTOM THEMES <<
+(setq custom-safe-themes t)
+
 (require-theme 'modus-themes)
 
 (setq modus-themes-common-palette-overrides
       modus-themes-preset-overrides-faint)
 
-(setq-default modus-themes-italic-constructs t)
+;; (setq-default modus-themes-italic-constructs t)
 
 (load "~/.emacs.d/lisp/config/modus-themes-customs.el")
 
@@ -140,31 +167,22 @@
 ;; Package for syncing themes with system
 (use-package auto-dark
   :ensure t
+  :diminish auto-dark-mode
   :config
   (setq auto-dark-light-theme 'modus-operandi)
   (setq auto-dark-dark-theme 'modus-vivendi)
   (setq auto-dark-polling-interval 3)
   (setq auto-dark-allow-osascript t)
-  (setq auto-dark-allow-powershell t))
+  (setq auto-dark-allow-powershell t)
+  (auto-dark-mode t))
 
 (custom-set-faces
  ;; set fringe to no background for every theme
  '(fringe ((t (:background nil)))))
 
-(auto-dark-mode t)
-
+;; >> HTMLIZE <<
+;; Export to html with code colors and formatting
 (use-package htmlize
-  :ensure t)
-
-;; ┌────────────────────────────────────────────────────────────────────────────┐
-;; │ EDITOR OPTIONS                                                             │
-;; └────────────────────────────────────────────────────────────────────────────┘
-(set-language-environment "UTF-8")
-(set-default-coding-systems 'utf-8-unix)
-
-;; >> RAINBOW MODE <<
-;; colorize color names in buffers
-(use-package rainbow-mode
   :ensure t)
 
 ;; >> RESTART-EMACS <<
@@ -172,52 +190,42 @@
 (use-package restart-emacs
   :ensure t)
 
-(setq create-lockfiles nil)  ;; stop creating #auto-save# files
-(setq make-backup-files nil) ;; disable automatic backup~ file
+;; Persist history over Emacs restarts
+(use-package savehist
+  :init
+  (savehist-mode))
 
-(global-auto-revert-mode 1)  ;; auto revert/refresh file when change detected
+;; auto revert/refresh file when change detected
+(global-auto-revert-mode 1)
 
-;; Automatically pair parentheses
-(dolist (hook '(prog-mode-hook LaTeX-mode-hook text-mode-hook toml-ts-mode-hook))
-  (add-hook hook #'electric-pair-mode))
+;; >> RECENT FILES<<
+(use-package recentf
+  :config
+  (add-to-list 'recentf-exclude "\\elpa")
+  (add-to-list 'recentf-exclude "private/tmp")
+  (recentf-mode))
 
-(electric-indent-mode 1) ;; Automatically indent
-
-;; Guess major mode from file name
-(setq-default major-mode
-              (lambda ()
-                (unless buffer-file-name
-                  (let ((buffer-file-name (buffer-name)))
-                    (set-auto-mode)))))
-
-(recentf-mode t)    ;; Save file history
-
-(save-place-mode t) ;; Save place in buffer
+(setq vc-follow-symlinks t) ;; auto follow symlinkgs without asking
 
 (setq use-short-answers t) ;; Use y-n instead of yes-no
 
 (global-goto-address-mode t) ;; Make links clickable
 
-(setq-default tab-width 2) ;; Set tab length = 2
-
-(setq-default fill-column 80)
-(global-display-fill-column-indicator-mode t)
-
-(setq-default indent-tabs-mode nil) ;; Indent by spaces
-
-(delete-selection-mode 1) ;; Paste over selected region
-
-(setq vc-follow-symlinks t) ;; auto follow symlinkgs without asking
+;; Ignore case in completion
+(setq read-buffer-completion-ignore-case t
+      read-file-name-completion-ignore-case t
+      completion-ignore-case t)
 
 ;; >> UNDO-TREE <<
 ;; much better undo setup for emacs
 (use-package undo-tree
-  :ensure t)
+  :ensure t
+  :diminish undo-tree-mode)
 (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
 (setq undo-tree-auto-save-history t)
 (global-undo-tree-mode)
-(global-set-key (kbd "C-{") #'undo-tree-undo)
-(global-set-key (kbd "C-}") #'undo-tree-redo)
+(keymap-global-set "C-{" #'undo-tree-undo)
+(keymap-global-set "C-}" #'undo-tree-redo)
 
 ;; >> RMSbolt <<
 ;; compiler output viewer
@@ -228,39 +236,42 @@
 ;; Reminds about key combinations
 (use-package which-key
   :ensure t
+  :diminish which-key-mode
   :config (which-key-mode))
 
 ;; >> AVY <<
 ;; Jump to things in Emacs tree-style
 (use-package avy
   :ensure t)   ;; enable avy for quick navigation
-(global-set-key (kbd "C-c z") 'avy-goto-line)
-(global-set-key (kbd "C-c x") 'avy-goto-word-1)
-(global-set-key (kbd "C-c c") 'avy-goto-char)
-(global-set-key (kbd "C-c v") 'avy-resume)
+(keymap-global-set "C-c z" 'avy-goto-line)
+(keymap-global-set "C-c x" 'avy-goto-word-1)
+(keymap-global-set "C-c c" 'avy-goto-char)
+(keymap-global-set "C-c v" 'avy-resume)
 
 ;; >> GOD MODE <<
-;; >> no more RSI
+;; No more RSI
 ;; Minor mode for God-like command entering
-;; (similar to minor modal mode)
+;; (similar to minor modal editing mode)
 (use-package god-mode
   :ensure t)
-(global-set-key (kbd "C-.") #'god-local-mode)
+(keymap-global-set "C-." #'god-local-mode)
 
 ;; Set better `set-mark-command' keybinding
 (global-unset-key (kbd "C-SPC"))
 (global-unset-key (kbd "C-@"))
 (global-unset-key (kbd "C-s"))
-(global-set-key (kbd "C-s") #'set-mark-command)
+(keymap-global-set "C-s" #'set-mark-command)
 
-(global-set-key (kbd "<pinch>") 'ignore)
-(global-set-key (kbd "<C-wheel-up>") 'ignore)
-(global-set-key (kbd "<C-wheel-down>") 'ignore)
-(global-set-key (kbd "<C-M-wheel-up>") 'ignore)
-(global-set-key (kbd "<C-M-wheel-down>") 'ignore)
+;; Stop Emacs from zooming when holding CTRL + Mouse Wheel
+(keymap-global-set "<pinch>" 'ignore)
+(keymap-global-set "C-<wheel-up>" 'ignore)
+(keymap-global-set "C-<wheel-down>" 'ignore)
+(keymap-global-set "C-M-<wheel-up>" 'ignore)
+(keymap-global-set "C-M-<wheel-down>" 'ignore)
 
-(global-set-key (kbd "s-C-f") #'toggle-frame-maximized)
-(global-set-key (kbd "s-S-C-f") #'toggle-frame-fullscreen)
+;; Keybindings for toggling frame maximized and fullscreen
+(keymap-global-set "C-s-f" #'toggle-frame-maximized)
+(keymap-global-set "C-S-s-f" #'toggle-frame-fullscreen)
 
 ;; >> RUSSIAN TECHWRITER <<
 ;; Second input method
@@ -272,9 +283,9 @@
 ;; easy formatting using unified commands
 (use-package format-all
   :ensure t
+  :diminish format-all-mode
   :commands format-all-mode
-  :hook (emacs-lisp-mode . format-all-mode)
-  )
+  :hook (emacs-lisp-mode . format-all-mode))
 ;; (setq format-all-formatters
 ;;       '(("C++" (clang-format "--style=Google"))
 ;;         ("Python" (ruff))))
@@ -286,233 +297,148 @@
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 
+;; >> PROJECTILE <<
+;; Project Interaction Library for Emacs
+(use-package projectile
+  :ensure t
+  :config
+  (setq projectile-project-search-path '("~/Projects/")))
+
+(save-place-mode t) ;; Save place in buffer
+
+;; >> RAINBOW MODE <<
+;; colorize color names in buffers
+(use-package rainbow-mode
+  :ensure t)
+
+
+;; ┌────────────────────────────────────────────────────────────────────────────┐
+;; │ EDITING OPTIONS                                                            │
+;; └────────────────────────────────────────────────────────────────────────────┘
+(set-language-environment "UTF-8")
+(set-default-coding-systems 'utf-8-unix)
+
+(setq-default tab-width 2) ;; Set tab length = 2
+
+;; Fill column = 80
+(setq-default fill-column 80)
+;; Fill column ruler
+(use-package display-fill-column-indicator-mode
+  :hook (prog-mode LaTeX-mode))
+;; (global-display-fill-column-indicator-mode t)
+
+(setq-default indent-tabs-mode nil) ;; Indent by spaces
+
+(delete-selection-mode 1) ;; Paste over selected region
+
+;; Navigate inside camelCaseWords
+(subword-mode t)
+
+;; Smart parenthesis matching
+(use-package smartparens
+  :ensure t
+  :diminish
+  :hook (prog-mode text-mode LaTeX-mode toml-ts-mode markdown-mode)
+  :config
+  ;; load default config
+  (require 'smartparens-config))
+
+(electric-pair-mode 0)
+
+(electric-indent-mode 1) ;; Automatically indent
+
+;; Guess major mode from file name
+(setq-default major-mode
+              (lambda ()
+                (unless buffer-file-name
+                  (let ((buffer-file-name (buffer-name)))
+                    (set-auto-mode)))))
+
+
 ;; ┌─────────────────────────────────────────────────────────────────────────┐
 ;; │ PROGRAMMING LANGUAGES SETUP                                             │
 ;; └─────────────────────────────────────────────────────────────────────────┘
-;;; Vim Script support
+;; Vim Script support
 (use-package vimrc-mode
   :ensure t)
 
-;;; Go Support
+;; Go Support
 (use-package go-mode
   :ensure t)
 
-;;; Haskell Support
+;; Haskell Support
 (use-package haskell-mode
   :ensure t)
 
-;;; JSON Support
+;; JSON Support
 (use-package json-mode
   :ensure t)
 
-;;; Lua Support
+;; Lua Support
 (use-package lua-mode
   :ensure t)
 
-;;; NASM Support
+;; NASM Support
 (use-package nasm-mode
   :ensure t)
 
-;;; PHP Support
+;; PHP Support
 (use-package php-mode
   :ensure t)
 
-;;; Rust Support
+;; Rust Support
 (use-package rust-mode
   :ensure t)
 
-;;; Additional Lisp support
+;; Additional Lisp support
 (use-package sly
   :ensure t)
 
-;;; Swift Support
+;; Swift Support
 (use-package swift-mode
   :ensure t)
 
-;;; Typescript Support
+;; Typescript Support
 (use-package typescript-mode
   :ensure t)
 
-;;; YAML Support
+;; YAML Support
 (use-package yaml-mode
   :ensure t)
 
-;;; Markdown support
+;; Markdown support
 (use-package markdown-mode
   :ensure t)
+
+;; Doxygen highlighting
+(use-package highlight-doxygen
+  :ensure t
+  :hook (c++-mode))
 
 ;; (use-package auctex
 ;; :ensure t)
 
+;; >> ELDOC <<
+;; Show function arglist or variable docstring in echo area
+(use-package eldoc
+  :diminish eldoc-mode)
+
+;; >> DEVDOCS <<
+;; Read documentation from https://devdocs.io offline
 (use-package devdocs
   :ensure t)
 
 ;; ┌─────────────────────────────────────────────────────────────────────────┐
 ;; │ COMPLETION                                                              │
 ;; └─────────────────────────────────────────────────────────────────────────┘
-;; >> VERTICO <<
-;; VERTical Interactive COmpletion
-(use-package vertico
-  :ensure t
-  :custom
-  ;; (vertico-scroll-margin 0) ;; Different scroll margin
-  (vertico-count 20) ;; Show more candidates
-  ;; (vertico-resize t) ;; Grow and shrink the Vertico minibuffer
-  (vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
-  ;; More convenient directory navigation commands
-  :bind (:map vertico-map
-              ("RET" . vertico-directory-enter)
-              ("DEL" . vertico-directory-delete-char)
-              ("M-DEL" . vertico-directory-delete-word))
-  )
-;; Enable completion by narrowing
-(vertico-mode t)
 
-;; Persist history over Emacs restarts. Vertico sorts by history position.
-(use-package savehist
-  :init
-  (savehist-mode))
-
-;; A few more useful configurations...
-(use-package emacs
-  :custom
-  ;; Support opening new minibuffers from inside existing minibuffers.
-  (enable-recursive-minibuffers t)
-  ;; Hide commands in M-x which do not work in the current mode.  Vertico
-  ;; commands are hidden in normal buffers. This setting is useful beyond
-  ;; Vertico.
-  (read-extended-command-predicate #'command-completion-default-include-p)
-  :init
-  ;; Add prompt indicator to `completing-read-multiple'.
-  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                   crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-  ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
-
-;; >> ORDERLESS <<
-;; Optionally use the `orderless' completion style.
-(use-package orderless
-  :ensure t
-  :custom
-  ;; Configure a custom style dispatcher (see the Consult wiki)
-  ;; (orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch))
-  ;; (orderless-component-separator #'orderless-escapable-split-on-space)
-  (completion-styles '(orderless basic))
-  (completion-category-defaults nil)
-  (completion-category-overrides '((file (styles partial-completion)))))
-
-;; >> CONSULT <<
-;; Extended completion utilities
-(use-package consult
-  :ensure t)
-(global-set-key [rebind switch-to-buffer] #'consult-buffer)
-(global-set-key (kbd "C-c l") #'consult-line)
-(global-set-key (kbd "C-c i") #'consult-imenu)
-(setq read-buffer-completion-ignore-case t
-      read-file-name-completion-ignore-case t
-      completion-ignore-case t)
-
-;; >> MARGINALIA <<
-;; Marginalia (documentation and notes) in the minibuffer
-(use-package marginalia
-  :ensure t
-  :init (marginalia-mode))
-
-;; >> EGLOT <<
-;; LSP Support
-(use-package eglot
-  :ensure t)
-;; Enable LSP support by default in programming buffers
-(add-hook 'c++-mode-hook #'eglot-ensure)
-;; Create a memorable alias for `eglot-ensure'.
-;; (defalias 'start-lsp-server #'eglot)
-
-(with-eval-after-load 'eglot
-    (add-to-list 'eglot-server-programs
-        '((c-mode c++-mode)
-             . ("clangd"
-                   "--fallback-style=Google"
-                   "--background-index"
-                   "--clang-tidy"
-                   "--completion-style=detailed"
-                   "--pch-storage=memory"
-                   ))))
-
-;; >> FLYMAKE <<
-;; Inline static analysis
-;; Enabled inline static analysis
-(add-hook 'prog-mode-hook #'flymake-mode)
-
-;; >> CORFU <<
-;; Pop-up completion
-(use-package corfu
-  :ensure t
-  ;; TAB-and-Go customizations
-  :custom
-  (corfu-cycle t)              ;; Enable cycling for `corfu-next/previous'
-  (corfu-preselect 'directory) ;; Always preselect the prompt
-  (corfu-auto t)               ;; Enable auto completion
-  (corfu-quit-at-boundary t)   ;; Never quit at completion boundary
-  (corfu-quit-no-match t)      ;; Never quit, even if there is no match
-  (corfu-popupinfo-delay 0.2)
-  (corfu-auto-delay  0.3)
-  (corfu-auto-prefix 2)
-
-  :bind
-  ;; Use TAB for cycling, default is `corfu-complete'.
-  (:map corfu-map
-        ("TAB" . corfu-next)
-        ([tab] . corfu-next)
-        ("S-TAB" . corfu-previous)
-        ([backtab] . corfu-previous)
-        ("ESC" . corfu-quit)
-        ([escape] . corfu-quit)
-        ))
-(corfu-echo-mode t)
-(corfu-popupinfo-mode t)
-(corfu-history-mode t)
-;; Enable autocompletion by default in programming buffers
-(add-hook 'prog-mode-hook #'corfu-mode)
-
-;; Add extensions
-(use-package cape
-  :ensure t
-  ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
-  ;; Press C-c p ? to for help.
-  :bind ("C-c p" . cape-prefix-map) ;; Alternative keys: M-p, M-+, ...
-  :init
-  (add-hook 'completion-at-point-functions #'cape-dabbrev)     ;; Complete word from current buffers. See also dabbrev-capf on Emacs 29.
-  (add-hook 'completion-at-point-functions #'cape-elisp-block) ;; Complete Elisp in Org or Markdown code block.
-  (add-hook 'completion-at-point-functions #'cape-file)        ;; Complete file name.
-  (add-hook 'completion-at-point-functions #'cape-history)     ;; Complete from Eshell, Comint or minibuffer history.
-  (add-hook 'completion-at-point-functions #'cape-keyword)     ;; Complete programming language keyword.
-  (add-hook 'completion-at-point-functions #'cape-tex)         ;; Complete Unicode char from TeX command, e.g. `\hbar'.
-  )
-
+(load "~/.emacs.d/lisp/packages/completion-bundle.el")
 
 ;; ┌─────────────────────────────────────────────────────────────────────────┐
-;; │ DIMINISH (HIDE) MODES FROM THE MODELINE                                 │
-;; │ (has to be loaded after everything)                                     │
+;; │ OTHER PACKAGES                                                          │
 ;; └─────────────────────────────────────────────────────────────────────────┘
-(use-package diminish
-  :ensure t)
 
-(require 'diminish)
+(load "~/.emacs.d/lisp/packages/magit.el")
 
-(diminish 'eldoc-mode)
-(diminish 'visual-line-mode)
-(diminish 'which-key-mode)
-(diminish 'auto-dark-mode)
-(diminish 'undo-tree-mode)
-(diminish 'eglot)
-(diminish 'format-all-mode)
+(provide 'init)
+;;; init.el ends here
