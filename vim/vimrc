@@ -53,8 +53,8 @@ if has("gui_running")
 endif
 
 syntax on
-set cursorline " Highlight cursor line
-set cursorlineopt=number
+" set cursorline " Highlight cursor line
+" set cursorlineopt=number
 set showmatch  " highlight matching brace
 set nu         " Turn on the line numbers
 

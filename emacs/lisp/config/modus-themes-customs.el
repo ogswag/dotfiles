@@ -96,8 +96,10 @@
       '(;; emacs parts
         (cursor      "#055C76")
         ;; modeline
-        (bg-mode-line-active   bg-active)
-        (fg-mode-line-active   fg-main)
+        (bg-main "#FBF7EE")
+        (fg-main "#281703")
+        (bg-mode-line-active   "#311A01")
+        (fg-mode-line-active   bg-main)
         (bg-mode-line-inactive bg-main)
         (fg-mode-line-inactive fg-dim)
         (border-mode-line-active border)
@@ -107,18 +109,18 @@
         (bg-line-number-active bg-main)
         (fg-line-number-active fg-main)
         ;; icons in the fringe
-        (fg-prominent-err     "#AF1900")
+        (fg-prominent-err     "#9b1a1d")
         (bg-prominent-err bg-main)
-        (fg-prominent-warning "#E19600")
+        (fg-prominent-warning "#ffa93d")
         (bg-prominent-warning bg-main)
-        (fg-prominent-note    "#0063A9")
+        (fg-prominent-note    "#608c5a")
         (bg-prominent-note bg-main)
         ;; parenthesis match
-        (bg-paren-match "#FFE100")
-        (fg-paren-match fg-main)
+        (bg-paren-match "#608c5a")
+        (fg-paren-match bg-main)
         ;; code parts
-        (comment "#1336C2")
-        (string  "#2F515B")
+        (comment "#AA3D3D")
+        (string  "#3A6593")
         (builtin      fg-main)
         (constant     fg-main)
         (docstring    fg-main)

@@ -4,7 +4,7 @@
 
 ;;; Code:
 ;; ┌──────────────────────────────────────────────────────────────────────────┐
-;; │ Store automatic customisation options elsewhere                          │
+;; │ STORE AUTOMATIC CUSTOMISATION OPTIONS ELSEWHERE                          │
 ;; └──────────────────────────────────────────────────────────────────────────┘
 (setq custom-file (locate-user-emacs-file "custom.el"))
 (when (file-exists-p custom-file)
@@ -45,7 +45,7 @@
             '(
               (tool-bar-lines . 0)
               (width . 100)
-              (height . 55))))
+              (height . 45))))
   (progn
     (setq initial-frame-alist '((tool-bar-lines . 0)))
     (setq default-frame-alist '((tool-bar-lines . 0)))))
@@ -85,8 +85,8 @@
 (add-hook 'prog-mode-hook #'column-number-mode)
 
 ;; Enable line numbering for a few major modes
-(dolist (hook '(prog-mode-hook LaTeX-mode-hook toml-ts-mode-hook yaml-mode-hook))
-  (add-hook hook #'display-line-numbers-mode))
+;; (dolist (hook '(prog-mode-hook LaTeX-mode-hook toml-ts-mode-hook yaml-mode-hook))
+;; (add-hook hook #'display-line-numbers-mode))
 ;; do not decrease line number width, results in less shifting
 (setq-default display-line-numbers-grow-only t)
 ;; set line number width to a maximum needed number (no shifting when scrolling)
@@ -96,8 +96,7 @@
 (setq-default truncate-lines t)
 (use-package visual-line
   :diminish visual-line-mode
-  :hook ((LaTeX-mode-hook . visual-line-mode)
-         (toml-ts-mode-hook . visual-line-mode)))
+  :hook (LaTeX-mode toml-ts-mode))
 
 ;; Allow right-left scrolling with mouse
 (setq mouse-wheel-tilt-scroll t
@@ -111,7 +110,7 @@
 ;; wrapped
 (use-package adaptive-wrap
   :ensure t
-  :hook (prog-mode . adaptive-wrap-prefix-mode))
+  :hook ((prog-mode text-mode) . adaptive-wrap-prefix-mode))
 
 ;; Simple and clean whitespace mode setup
 (progn
@@ -141,7 +140,7 @@
     (set-frame-font "Consolas 12" t t)))
  ((eq system-type 'darwin) ; macOS
   (when (member "JetBrains Mono" (font-family-list))
-    (set-frame-font "JetBrains Mono 13" t t)
+    (set-frame-font "JetBrains Mono Light 13" t t)
     (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono")
     (set-face-attribute 'variable-pitch nil :family "Arial")))
  ((eq system-type 'gnu/linux)
@@ -163,6 +162,21 @@
 
 (load "~/.emacs.d/lisp/config/modus-themes-customs.el")
 
+;; >> ALL THE ICONS <<
+(use-package all-the-icons
+  :ensure t
+  :if (display-graphic-p))
+(use-package all-the-icons-dired
+  :ensure t
+  :after all-the-icons
+  :hook  (dired-mode-hook . all-the-icons-dired-mode))
+(use-package all-the-icons-completion
+  :after (marginalia all-the-icons)
+  :hook ((marginalia-mode . all-the-icons-completion-marginalia-setup)
+         (company-mode . all-the-icons-completion-mode))
+  :config
+  (all-the-icons-completion-mode t))
+
 ;; >> AUTO-DARK <<
 ;; Package for syncing themes with system
 (use-package auto-dark
@@ -170,7 +184,7 @@
   :diminish auto-dark-mode
   :config
   (setq auto-dark-light-theme 'modus-operandi)
-  (setq auto-dark-dark-theme 'modus-vivendi)
+  (setq auto-dark-dark-theme 'polar-bear)
   (setq auto-dark-polling-interval 3)
   (setq auto-dark-allow-osascript t)
   (setq auto-dark-allow-powershell t)
@@ -203,7 +217,7 @@
   :config
   (add-to-list 'recentf-exclude "\\elpa")
   (add-to-list 'recentf-exclude "private/tmp")
-  (recentf-mode))
+  (recentf-mode t))
 
 (setq vc-follow-symlinks t) ;; auto follow symlinkgs without asking
 
@@ -220,12 +234,15 @@
 ;; much better undo setup for emacs
 (use-package undo-tree
   :ensure t
-  :diminish undo-tree-mode)
-(setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
-(setq undo-tree-auto-save-history t)
-(global-undo-tree-mode)
-(keymap-global-set "C-{" #'undo-tree-undo)
-(keymap-global-set "C-}" #'undo-tree-redo)
+  :diminish undo-tree-mode
+  :bind (("C-{" . #'undo-tree-undo)
+         ("C-}" . #'undo-tree-redo))
+  :custom
+  (undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-dir")))
+  (undo-tree-auto-save-history t)
+  :config
+  (global-undo-tree-mode t)
+  )
 
 ;; >> RMSbolt <<
 ;; compiler output viewer
@@ -242,53 +259,11 @@
 ;; >> AVY <<
 ;; Jump to things in Emacs tree-style
 (use-package avy
-  :ensure t)   ;; enable avy for quick navigation
-(keymap-global-set "C-c z" 'avy-goto-line)
-(keymap-global-set "C-c x" 'avy-goto-word-1)
-(keymap-global-set "C-c c" 'avy-goto-char)
-(keymap-global-set "C-c v" 'avy-resume)
-
-;; >> GOD MODE <<
-;; No more RSI
-;; Minor mode for God-like command entering
-;; (similar to minor modal editing mode)
-(use-package god-mode
-  :ensure t)
-(keymap-global-set "C-." #'god-local-mode)
-
-;; Set better `set-mark-command' keybinding
-(global-unset-key (kbd "C-SPC"))
-(global-unset-key (kbd "C-@"))
-(global-unset-key (kbd "C-s"))
-(keymap-global-set "C-s" #'set-mark-command)
-
-;; Stop Emacs from zooming when holding CTRL + Mouse Wheel
-(keymap-global-set "<pinch>" 'ignore)
-(keymap-global-set "C-<wheel-up>" 'ignore)
-(keymap-global-set "C-<wheel-down>" 'ignore)
-(keymap-global-set "C-M-<wheel-up>" 'ignore)
-(keymap-global-set "C-M-<wheel-down>" 'ignore)
-
-;; Keybindings for toggling frame maximized and fullscreen
-(keymap-global-set "C-s-f" #'toggle-frame-maximized)
-(keymap-global-set "C-S-s-f" #'toggle-frame-fullscreen)
-
-;; >> RUSSIAN TECHWRITER <<
-;; Second input method
-(use-package russian-techwriter
-  :ensure t)
-(setq-default default-input-method 'russian-techwriter)
-
-;; >> FORMAT ALL <<
-;; easy formatting using unified commands
-(use-package format-all
   :ensure t
-  :diminish format-all-mode
-  :commands format-all-mode
-  :hook (emacs-lisp-mode . format-all-mode))
-;; (setq format-all-formatters
-;;       '(("C++" (clang-format "--style=Google"))
-;;         ("Python" (ruff))))
+  :bind (("C-c z" . #'avy-goto-line)
+         ("C-c x" . #'avy-goto-word-1)
+         ("C-c c" . #'avy-goto-char)
+         ("C-c v" . #'avy-resume)))   ;; enable avy for quick navigation
 
 ;; >> EXEC PATH FROM SHELL <<
 ;; Make Emacs use the $PATH set up by the user's shell
@@ -323,8 +298,8 @@
 ;; Fill column = 80
 (setq-default fill-column 80)
 ;; Fill column ruler
-(use-package display-fill-column-indicator-mode
-  :hook (prog-mode LaTeX-mode))
+;; (use-package display-fill-column-indicator-mode
+;; :hook (prog-mode LaTeX-mode))
 ;; (global-display-fill-column-indicator-mode t)
 
 (setq-default indent-tabs-mode nil) ;; Indent by spaces
@@ -358,6 +333,12 @@
 ;; ┌─────────────────────────────────────────────────────────────────────────┐
 ;; │ PROGRAMMING LANGUAGES SETUP                                             │
 ;; └─────────────────────────────────────────────────────────────────────────┘
+
+;; Python venv support
+(use-package pyvenv
+  :ensure t
+  :config (pyvenv-mode t))
+
 ;; Vim Script support
 (use-package vimrc-mode
   :ensure t)
@@ -413,10 +394,7 @@
 ;; Doxygen highlighting
 (use-package highlight-doxygen
   :ensure t
-  :hook (c++-mode))
-
-;; (use-package auctex
-;; :ensure t)
+  :hook (c++-ts-mode))
 
 ;; >> ELDOC <<
 ;; Show function arglist or variable docstring in echo area
@@ -427,6 +405,24 @@
 ;; Read documentation from https://devdocs.io offline
 (use-package devdocs
   :ensure t)
+
+;; >> FLYMAKE <<
+;; Inline static analysis
+(use-package flymake
+  :diminish flymake-mode
+  :hook (prog-mode))
+(use-package flymake-shell
+  :ensure t)
+
+;; >> FORMAT ALL <<
+;; easy formatting using unified commands
+(use-package format-all
+  :ensure t
+  :diminish
+  :hook (emacs-lisp-mode c++-ts-mode python-ts-mode))
+(setq format-all-formatters
+      '(("C++" (clang-format "--style=Google"))
+        ("Python" (yapf "--style=Google"))))
 
 ;; ┌─────────────────────────────────────────────────────────────────────────┐
 ;; │ COMPLETION                                                              │
@@ -439,6 +435,14 @@
 ;; └─────────────────────────────────────────────────────────────────────────┘
 
 (load "~/.emacs.d/lisp/packages/magit.el")
+(load "~/.emacs.d/lisp/packages/treesitter.el")
+
+
+;;;;;;;;;;;;;;;;;;;;;
+;; KEYMAP SETTINGS ;;
+;;;;;;;;;;;;;;;;;;;;;
+
+(load "~/.emacs.d/lisp/config/keymap.el")
 
 (provide 'init)
 ;;; init.el ends here

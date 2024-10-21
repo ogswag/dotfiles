@@ -2,7 +2,23 @@
 ;;; Commentary:
 ;;; LSP, Minibuffer and other completion related settings in one package
 
-;;; Code:
+;; >> CAPE <<
+;; Add completion extensions
+;; (use-package cape
+;;   :ensure t
+;;   ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
+;;   ;; Press C-c p ? to for help.
+;;   :bind ("C-c p" . cape-prefix-map) ;; Alternative keys: M-p, M-+, ...
+;;   :init
+;;   (add-hook 'completion-at-point-functions #'cape-abbrev)      ;; Complete abbreviation
+;;   (add-hook 'completion-at-point-functions #'cape-dabbrev)     ;; Complete word from current buffers. See also dabbrev-capf on Emacs 29.
+;;   (add-hook 'completion-at-point-functions #'cape-elisp-block) ;; Complete Elisp in Org or Markdown code block.
+;;   (add-hook 'completion-at-point-functions #'cape-file)        ;; Complete file name.
+;;   (add-hook 'completion-at-point-functions #'cape-history)     ;; Complete from Eshell, Comint or minibuffer history.
+;;   (add-hook 'completion-at-point-functions #'cape-keyword)     ;; Complete programming language keyword.
+;;   (add-hook 'completion-at-point-functions #'cape-tex)         ;; Complete Unicode char from TeX command, e.g. `\hbar'.
+;;   )
+
 ;; >> VERTICO <<
 ;; VERTical Interactive COmpletion
 (use-package vertico
@@ -19,6 +35,7 @@
               ("M-DEL" . vertico-directory-delete-word))
   :init (vertico-mode)
   )
+
 
 ;; A few more useful configurations...
 (use-package emacs
@@ -77,89 +94,46 @@
   :ensure t
   :init (marginalia-mode))
 
-;; >> EGLOT <<
-;; LSP Support
-(use-package eglot
+;; >> SNIPPETS (YASNIPPET) <<
+;; the most complete snippet framework for Emacs
+(use-package yasnippet
   :ensure t
-  :diminish eglot
-  :config
-  (setq eglot-ignored-server-capabilities '( :documentHighlightProvider)
-        eglot-send-changes-idle-time 3    ;; be slower sending changes
-        eglot-extend-to-xref t            ;; external files ok
-        eglot-events-buffer-size 100000)  ;; smaller events buffer
-  (add-to-list 'eglot-server-programs '(python-mode . ("pylsp")))
-  (add-to-list 'eglot-server-programs
-               '((c-mode c++-mode)
-                 . ("clangd"
-                    "--fallback-style=Google"
-                    "--background-index"
-                    "--clang-tidy"
-                    "--completion-style=detailed"
-                    "--pch-storage=memory"
-                    )))
-  :hook ((c++-mode . eglot-ensure)
-         (python-mode . eglot-ensure)
-         (c-mode . eglot-ensure))
-  :custom (eglot-autoshutdown t)
-  )
+  :diminish yas-minor-mode
+  :hook ((prog-mode text-mode LaTeX-mode) . yas-minor-mode))
+  ;; :config
+  ;; (define-key yas-minor-mode-map (kbd "<tab>") nil)
+  ;; (define-key yas-minor-mode-map (kbd "TAB") nil)
+  ;; (define-key yas-minor-mode-map (kbd "SPC") yas-maybe-expand))
 
-;; >> FLYMAKE <<
-;; Inline static analysis
-(use-package flymake
-  :diminish flymake-mode
-  :hook (prog-mode-hook . flymake-mode))
-
-;; >> CORFU <<
-;; Pop-up completion
-(use-package corfu
+(use-package yasnippet-snippets
   :ensure t
-  ;; TAB-and-Go customizations
-  :custom
-  (corfu-cycle t)              ;; Enable cycling for `corfu-next/previous'
-  (corfu-preselect 'prompt)    ;; Preselect the candidate
-  (corfu-auto t)               ;; Enable auto completion
-  (corfu-quit-at-boundary t)   ;; (Never) quit at completion boundary
-  (corfu-quit-no-match t)      ;; (Never) quit, even if there is no match
-  (corfu-popupinfo-delay 0.2)
-  (corfu-auto-delay  0.3)
-  (corfu-auto-prefix 2)
+  :diminish)
 
-  :config
-  ;; Unbind RET completely
-  (keymap-unset corfu-map "RET")
-  (corfu-echo-mode t)
-  (corfu-popupinfo-mode t)
-  (corfu-history-mode t)
+;; >> LSP MODE <<
+;; The most complete lsp support for emacs
+;; (use-package lsp-mode
+;;   :ensure t
+;;   :hook ((python-ts-mode c++-ts-mode c-ts-mode) . lsp)
+;;   :custom
+;;   (lsp-enable-symbol-highlighting nil)
+;;   (lsp-ui-doc-enable nil)
+;;   (lsp-lens-enable t)
+;;   (lsp-headerline-breadcrumb-enable nil)
+;;   (lsp-ui-sideline-enable nil)
+;;   (lsp-modeline-code-actions-enable nil)
+;;   (lsp-completion-provider :capf)
+;;   (lsp-completion-show-detail t)
+;;   (lsp-completion-show-kind t)
+;;   )
 
-  :bind
-  ;; Use TAB for cycling, default is `corfu-complete'.
-  (:map corfu-map
-        ("TAB" . corfu-next)
-        ([tab] . corfu-next)
-        ("S-TAB" . corfu-previous)
-        ([backtab] . corfu-previous)
-        ("ESC" . corfu-quit)
-        ([escape] . corfu-quit)
-        )
+;; (use-package flycheck
+;;   :ensure t)
 
-  :hook ((prog-mode . corfu-mode)
-         (toml-ts-mode . corfu-mode)))
-
-;; >> CAPE <<
-;; Add completion extensions
-(use-package cape
+(use-package company
   :ensure t
-  ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
-  ;; Press C-c p ? to for help.
-  :bind ("C-c p" . cape-prefix-map) ;; Alternative keys: M-p, M-+, ...
-  :init
-  (add-hook 'completion-at-point-functions #'cape-dabbrev)     ;; Complete word from current buffers. See also dabbrev-capf on Emacs 29.
-  (add-hook 'completion-at-point-functions #'cape-elisp-block) ;; Complete Elisp in Org or Markdown code block.
-  (add-hook 'completion-at-point-functions #'cape-file)        ;; Complete file name.
-  (add-hook 'completion-at-point-functions #'cape-history)     ;; Complete from Eshell, Comint or minibuffer history.
-  (add-hook 'completion-at-point-functions #'cape-keyword)     ;; Complete programming language keyword.
-  (add-hook 'completion-at-point-functions #'cape-tex)         ;; Complete Unicode char from TeX command, e.g. `\hbar'.
-  )
+  :hook (emacs-lisp-mode))
+;; (use-package dap-mode
+;;   :ensure t)
 
 (provide 'completion-bundle)
 ;;; completion-bundle.el ends here

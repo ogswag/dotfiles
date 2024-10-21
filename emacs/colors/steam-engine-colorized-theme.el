@@ -1,4 +1,4 @@
-;;; steam-engine-theme.el --- Dark theme based on the first Steam client.
+;;; steam-engine-colorized-theme.el --- Dark theme based on the first Steam client.
 
 ;; Copyright (c) 2024 Alexander Zakharov (GNU/GPL Licence)
 
@@ -37,7 +37,7 @@
   (error "Requires Emacs 24 or later"))
 
 (autothemer-deftheme
- steam-engine "ʕ•ᴥ•ʔ Dark theme loosely based on nord-like palette."
+ steam-engine-colorized "ʕ•ᴥ•ʔ Dark theme loosely based on nord-like palette."
  ((((class color) (min-colors #xFFFFFF))) ;; GUI only
 
   ;; Define colors
@@ -120,8 +120,8 @@
   (completions-group-title  (:foreground sten-orange :background 'nil :slant 'normal :height 1.1))
   ;; messages
   (error      (:foreground sten-orange))
-  (success             (:foreground sten-green))
-  (warning             (:foreground sten-yellow))
+  (success    (:foreground sten-green))
+  (warning    (:foreground sten-yellow))
   (next-error (:foreground sten-orange))
   ;; selection
   (region                           (:foreground sten-black :background sten-fg-dim))
@@ -149,39 +149,37 @@
   (font-lock-comment-delimiter-face (:inherit 'font-lock-comment-face))
   (font-lock-comment-face           (:foreground sten-yellow))
   ;; fg-alt
-  (font-lock-string-face            (:foreground sten-fg-alt))
-  (font-lock-constant-face          (:foreground sten-fg-alt))
+  (font-lock-string-face   (:foreground sten-fg-alt))
+  (font-lock-keyword-face  (:foreground sten-fg-alt))
+  (font-lock-constant-face (:foreground sten-fg-alt))
+  (font-lock-punctuation-face   (:foreground sten-fg-alt))
+  ;; (font-lock-bracket-face  (:inherit 'nil :foreground sten-fg-alt)) ;; inherits punctuation-face
+  ;; (font-lock-delimiter-face        (:inherit 'default)) ;; inherits punctuation-face
+  ;; (font-lock-misc-punctuation-face (:inherit 'default)) ;; inherits punctuation-face
+  (font-lock-number-face   (:foreground sten-fg-alt))
+  (font-lock-operator-face (:foreground sten-fg-alt))
   ;; other colors
-  (font-lock-warning-face           (:foreground sten-yellow))
-  (font-lock-negation-char-face     (:inherit 'error))
-  (trailing-whitespace              (:background sten-orange))
-  (escape-glyph                     (:foreground sten-orange))
-  (font-lock-escape-face            (:inherit 'nil :foreground sten-rust))
-  (font-lock-keyword-face           (:foreground sten-fg))
-  (homoglyph                        (:foreground sten-yellow))
-
-  ;; default
-  (font-lock-bracket-face           (:inherit 'default))
-  (font-lock-builtin-face           (:inherit 'default))
-  (font-lock-delimiter-face         (:inherit 'default))
-  (font-lock-doc-face               (:inherit 'default))
-  (font-lock-doc-markup-face        (:inherit 'default))
-  (font-lock-function-call-face     (:inherit 'default))
+  (font-lock-warning-face       (:foreground sten-yellow))
+  (font-lock-negation-char-face (:inherit 'error))
+  (trailing-whitespace          (:background sten-red))
+  (escape-glyph                 (:foreground sten-red))
+  (homoglyph                    (:foreground sten-yellow))
+  (font-lock-builtin-face       (:inherit 'default))
+  (font-lock-preprocessor-face     (:inherit 'nil :foreground sten-green)) ;; inherits builtin-face
+  ;; (font-lock-doc-face              (:inherit 'default)) ;; by default inherits string-face
+  ;; (font-lock-doc-markup-face       (:inherit 'default)) ;; by default inherits constant-face
+  (font-lock-regexp-grouping-backslash  (:inherit 'nil :foreground sten-magenta))
+  (font-lock-escape-face        (:inherit 'nil :foreground sten-magenta)) ;; inherits regexp-grouping-backslash
+  (font-lock-regexp-grouping-construct  (:inherit 'nil :foreground sten-magenta))
+  ;; default colors
   (font-lock-function-name-face    (:inherit 'default))
-  (font-lock-misc-punctuation-face (:inherit 'default))
-  (font-lock-number-face           (:inherit 'default))
-  (font-lock-operator-face         (:inherit 'default))
-  (font-lock-preprocessor-face     (:inherit 'default))
-  (font-lock-property-name-face    (:inherit 'default))
-  (font-lock-property-use-face     (:inherit 'default))
-  (font-lock-punctuation-face      (:inherit 'default))
+  ;; (font-lock-function-call-face    (:inherit 'default)) ;; inherits function-name-face
   (font-lock-variable-name-face    (:inherit 'default))
-  (font-lock-variable-use-face     (:inherit 'default))
+  ;; (font-lock-variable-use-face     (:inherit 'default)) ;; inherits property-name-face
+  ;; (font-lock-property-name-face    (:inherit 'default)) ;; inherits variable-name-face
+  ;; (font-lock-property-use-face     (:inherit 'default)) ;; inherits property-name-face
   (font-lock-type-face             (:inherit 'default))
 
-  ;; bold
-  (font-lock-regexp-grouping-backslash (:inherit 'bold))
-  (font-lock-regexp-grouping-construct (:inherit 'bold))
 
   ;; modeline
   (mode-line           (:box (:line-width 1 :style 'released-button :color sten-bg-dim) :foreground sten-fg :background sten-bg))
@@ -231,6 +229,6 @@
                   (file-name-as-directory
                    (file-name-directory load-file-name))))
 
-(provide-theme 'steam-engine)
+(provide-theme 'steam-engine-colorized)
 
-;;; steam-engine-theme.el ends here
+;;; steam-engine-colorized-theme.el ends here
