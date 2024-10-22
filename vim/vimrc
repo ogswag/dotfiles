@@ -1,113 +1,151 @@
-let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
-if empty(glob(data_dir . '/autoload/plug.vim'))
-  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-endif
+vim9script
 
-call plug#begin()
-    Plug 'tpope/vim-commentary'
-    Plug 'nanotech/jellybeans.vim'
-    Plug 'vim-autoformat/vim-autoformat'
-    Plug 'Lokaltog/vim-monotone'
-    Plug 'ntk148v/komau.vim'
-call plug#end()
+def CheckAndCloneMinpac()
+    var home: string = expand('$HOME')
+    var minpac_dir: string = home .. '/.vim/pack/minpac/opt/minpac'
 
-" Format on save
-" au BufWrite * :Autoformat
+    if !isdirectory(minpac_dir)
+        system('git clone https://github.com/k-takata/minpac.git ' .. minpac_dir)
+        system('curl -fLo ' .. home .. '/.vim/autoload/plugpac.vim --create-dirs https://raw.githubusercontent.com/bennyyip/plugpac.vim/master/plugpac.vim')
+    endif
+enddef
 
-" ---------- GENERAL SETTINGS  ----------
+# Call the function to check and clone minpac if necessary
+CheckAndCloneMinpac()
+
+# Pass opts to `minpac#init()`
+plugpac#Begin({
+  status_open: 'vertical',
+  verbose: 2,
+})
+
+# minpac
+Pack 'k-takata/minpac', {'type': 'opt'}
+
+Pack 'junegunn/vim-easy-align'
+
+Pack 'tpope/vim-commentary'
+
+Pack 'jesseleite/vim-noh'
+
+Pack 'girishji/scope.vim'
+
+Pack 'Eliot00/auto-pairs'
+
+Pack 'fadein/vim-FIGlet'
+plugpac#End()
+
+# ---------- GENERAL SETTINGS  ----------
 filetype plugin indent on
 
-set langmenu=en_US.UTF-8
-language messages en_US
+set clipboard=unnamed,unnamedplus
 
+set ttimeout ttimeoutlen=25
+
+set hidden confirm
+
+set scrolloff=0
+
+set langmenu=en_US.UTF-8
+language messages en_GB
+# ёжик ёжик
 set nocompatible
 set fileformats=unix,mac
 set encoding=utf-8
 set fileencoding=utf-8
 set fileencodings=utf-8
-set splitbelow splitright " Sane splitting
-set title      " Set title of a window to filename
-set noswapfile " Prevent vim from creating .swp files
+set splitbelow splitright # Sane splitting
+set title      # Set title of a window to filename
+set noswapfile # Prevent vim from creating .swp files
+set spell spelllang=en_gb,ru_yo
 
-set nowrap
-" set linebreak    " Break lines at word (requires Wrap lines)
-" set showbreak=↳  " Line break symbols
-set virtualedit=block " Enable free-range cursor
-set display+=lastline " Always try to show a paragraph's last line
-set laststatus=2      " Always show status line
-set ruler             " Show line and column info in status line
+set nowrap breakindent breakindentopt=sbr,list:-1 linebreak nojoinspaces
+set list listchars=tab:›\ ,nbsp:␣,trail:·,extends:…,precedes:… showbreak=↪
+set fillchars=fold:\ ,vert:│
+set sidescroll=1 sidescrolloff=3
+set nostartofline
+set virtualedit=block # Enable free-range cursor
+set display=lastline
+set laststatus=2      # Always show status line
+set ruler             # Show line and column info in status line
+set belloff=all shortmess+=Ic
 
 set colorcolumn=80
 set textwidth=80
 
-let g:jellybeans_overrides = {'background': { 'ctermbg': 'none', '256ctermbg': 'none', 'ctermfg': 'White', '256ctermfg': 'White'}}
+syntax on
 set bg=dark
-colorscheme jellybeans
+augroup colorscheme_change | au!
+    au ColorScheme habamax hi Comment gui=italic cterm=italic
+    au ColorScheme habamax hi Normal ctermbg=NONE 
+    au ColorScheme habamax hi SpellBad cterm=underline ctermfg=88 ctermbg=NONE guibg=red
+augroup END
+colorscheme habamax
+set showmatch  # highlight matching brace
 
 if has("gui_running")
-  set guifont=Menlo:h14
+  set guifont=Input\ Mono:h13
   set go-=r
   set go-=l
   set go-=L
 endif
 
-syntax on
-" set cursorline " Highlight cursor line
-" set cursorlineopt=number
-set showmatch  " highlight matching brace
-set nu         " Turn on the line numbers
+set cursorline # Highlight cursor line
+set cursorlineopt=number
+set nu         # Turn on the line numbers
 
-set hlsearch     " Highlight all search results
-set smartcase    " Enable smart-case search
-set ignorecase   " Always case-insensitive
-set incsearch    " Searches for strings incrementally
-set shortmess-=S " Show search count message, e.g. [1/5]
+set hlsearch incsearch ignorecase smartcase
 
-" Center search results on screen
+# Centre search results on screen
 nnoremap n nzz
 nnoremap N Nzz
 
 nnoremap j gj
 nnoremap k gk
 
-set tabstop=2
-set softtabstop=2
-set shiftwidth=2
-set expandtab " Use spaces instead of tabs
+nnoremap <silent> <C-q> <End>a;<C-c>j
+imap <silent> <C-q> <End>;<Down>
+
+imap <silent> <C-a> <C-o>I
+imap <silent> <C-e> <C-o>A
+
+imap <silent> <C-k> <up>
+imap <silent> <C-j> <down>
+imap <silent> <C-h> <left>
+imap <silent> <C-l> <right>
+
+set autoindent shiftwidth=4 softtabstop=-1 expandtab
 
 autocmd BufNewFile,BufRead,BufWinEnter,FileType,OptionSet * set formatoptions-=t formatoptions-=l formatoptions-=c formatoptions-=r formatoptions-=o formatoptions-=q
 autocmd BufNewFile,BufRead,BufWinEnter,FileType,OptionSet * setlocal formatoptions-=t formatoptions-=l formatoptions-=c formatoptions-=r formatoptions-=o formatoptions-=q
 
-set smartindent " Enable smart-indent
-set autoindent  " Auto-indent new lines
-set smarttab    " Enable smart-tabs
+set smartindent # Enable smart-indent
+set autoindent  # Auto-indent new lines
+set smarttab    # Enable smart-tabs
 
-set autochdir   " Change working directory to open buffer
-set autoread    " Auomatically read files modified elsewhere
-set hidden      " Hide buffer instead of closing when loading a new one
+set autochdir   # Change working directory to open buffer
+set autoread    # Automatically read files modified elsewhere
 
-set backspace=indent,eol,start  " Backspace behaviour
+set backspace=indent,eol,start  # Backspace behaviour
 
-set mouse=a  " Enable mouse in vim
+set mouse=a  # Enable mouse in vim
 
-set wildmenu " cmd line completion
-set wildmode=list:longest,full
+set wildmenu wildoptions=pum,fuzzy pumheight=20
+set wildignore=*.o,*.obj,*.bak,*.exe,*.swp,tags
+set completeopt=menu,popup completepopup=highlight:Pmenu
 
-set confirm " Prompt confirmation dialogs (better quitting)
+def CheckUndoDir()
+    var home: string = expand('$HOME')
+    var undo_dir: string = home .. '/.vimUndoDir'
 
-" Disable visualbell
-set noerrorbells visualbell t_vb=
-if has('autocmd')
-  autocmd GUIEnter * set visualbell t_vb=
-endif
+    if !isdirectory(undo_dir)
+        system('mkdir -p ' .. undo_dir)
+    endif
+enddef
 
-set undolevels=1000 " Number of undo levels
-
-set clipboard=unnamed,unnamedplus
-
-if !isdirectory($HOME."/.config/vim-undodir")
-  call mkdir($HOME."/.config/vim-undodir", "", 0700)
-endif
-set undodir=~/.config/vim/vim-undodir
+# Call the function to check and clone minpac if necessary
+CheckUndoDir()
+set undodir=~/.vimUndoDir
+set undolevels=1000 # Number of undo levels
 set undofile
+set viminfo='200,<500,s32
