@@ -1,4 +1,10 @@
 vim9script
+#  ██╗   ██╗██╗███╗   ███╗██████╗  ██████╗
+#  ██║   ██║██║████╗ ████║██╔══██╗██╔════╝
+#  ██║   ██║██║██╔████╔██║██████╔╝██║     
+#  ╚██╗ ██╔╝██║██║╚██╔╝██║██╔══██╗██║     
+#   ╚████╔╝ ██║██║ ╚═╝ ██║██║  ██║╚██████╗
+#    ╚═══╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝
 
 def CheckAndCloneMinpac()
     var home: string = expand('$HOME')
@@ -32,7 +38,6 @@ Pack 'girishji/scope.vim'
 
 Pack 'Eliot00/auto-pairs'
 
-Pack 'fadein/vim-FIGlet'
 plugpac#End()
 
 # ---------- GENERAL SETTINGS  ----------
@@ -70,8 +75,8 @@ set laststatus=2      # Always show status line
 set ruler             # Show line and column info in status line
 set belloff=all shortmess+=Ic
 
-set colorcolumn=80
-set textwidth=80
+set colorcolumn=110
+set textwidth=110
 
 syntax on
 set bg=dark
