@@ -204,10 +204,7 @@ export PATH="/usr/local/sbin:$PATH"
 export PATH="/usr/local/opt/llvm/bin:$PATH"
 export PATH="$HOME/git-personal/scripts:$PATH"
 
-# export PATH="/usr/local/opt/m4/bin:$PATH"
-
-alias ll="gls --group-directories-first -Flh --color=auto"
-
+alias ll="gls --group-directories-first -FAlh --color=auto"
 
 # ┌──────────────────────────────────────────────────────────────────────────┐
 # │ Custom Functions                                                         │
@@ -217,7 +214,7 @@ mkcd(){
   cd $1;
 }
 
-up(){                                 # Go up X directories (default 1)
+up(){
   if [[ "$#" -ne 1 ]]; then
     cd ..
   elif ! [[ $1 =~ '^[0-9]+$' ]]; then
