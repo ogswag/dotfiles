@@ -1,10 +1,14 @@
 vim9script
-#  ██╗   ██╗██╗███╗   ███╗██████╗  ██████╗
-#  ██║   ██║██║████╗ ████║██╔══██╗██╔════╝
-#  ██║   ██║██║██╔████╔██║██████╔╝██║     
-#  ╚██╗ ██╔╝██║██║╚██╔╝██║██╔══██╗██║     
-#   ╚████╔╝ ██║██║ ╚═╝ ██║██║  ██║╚██████╗
-#    ╚═══╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝
+#  ██▒   █▓ ██▓ ███▄ ▄███▓ ██▀███   ▄████▄
+# ▓██░   █▒▓██▒▓██▒▀█▀ ██▒▓██ ▒ ██▒▒██▀ ▀█
+#  ▓██  █▒░▒██▒▓██    ▓██░▓██ ░▄█ ▒▒▓█    ▄
+#   ▒██ █░░░██░▒██    ▒██ ▒██▀▀█▄  ▒▓▓▄ ▄██▒
+#    ▒▀█░  ░██░▒██▒   ░██▒░██▓ ▒██▒▒ ▓███▀ ░
+#    ░ ▐░  ░▓  ░ ▒░   ░  ░░ ▒▓ ░▒▓░░ ░▒ ▒  ░
+#    ░ ░░   ▒ ░░  ░   ░  ░  ░▒ ░ ▒░  ░  ▒
+#      ░░   ▒ ░░      ░     ░░   ░ ░
+#       ░   ░         ░      ░     ░ ░
+#      ░                           ░
 
 def CheckAndCloneMinpac()
     var home: string = expand('$HOME')
@@ -38,7 +42,29 @@ Pack 'girishji/scope.vim'
 
 Pack 'Eliot00/auto-pairs'
 
+Pack 'rafi/awesome-vim-colorschemes'
+Pack 'catppuccin/vim'
+
+# completion engine
+Pack 'girishji/vimcomplete'
+# lsp client support
+# snippets
+Pack 'hrsh7th/vim-vsnip'
+Pack 'hrsh7th/vim-vsnip-integ'
+Pack 'rafamadriz/friendly-snippets'
+
 plugpac#End()
+
+var options = {
+    completor: { shuffleEqualPriority: true, postfixHighlight: true, triggerWordLen: 2},
+    buffer: { enable: true, priority: 10, urlComplete: true, envComplete: true },
+    abbrev: { enable: true, priority: 10 },
+    lsp: { enable: true, priority: 10, maxCount: 5, filetypes: ['vimscript', 'python', 'javascript', 'typescript', 'c', 'cpp']},
+    omnifunc: { enable: false, priority: 8, filetypes: ['python', 'javascript'] },
+    vsnip: { enable: true, priority: 11 },
+    vimscript: { enable: true, priority: 11 },
+}
+autocmd VimEnter * g:VimCompleteOptionsSet(options)
 
 # ---------- GENERAL SETTINGS  ----------
 filetype plugin indent on
@@ -53,7 +79,7 @@ set scrolloff=0
 
 set langmenu=en_US.UTF-8
 language messages en_GB
-# ёжик ёжик
+
 set nocompatible
 set fileformats=unix,mac
 set encoding=utf-8
@@ -62,7 +88,7 @@ set fileencodings=utf-8
 set splitbelow splitright # Sane splitting
 set title      # Set title of a window to filename
 set noswapfile # Prevent vim from creating .swp files
-set spell spelllang=en_gb,ru_yo
+set nospell spelllang=en_gb,ru_yo
 
 set nowrap breakindent breakindentopt=sbr,list:-1 linebreak nojoinspaces
 set list listchars=tab:›\ ,nbsp:␣,trail:·,extends:…,precedes:… showbreak=↪
@@ -81,11 +107,20 @@ set textwidth=110
 syntax on
 set bg=dark
 augroup colorscheme_change | au!
-    au ColorScheme habamax hi Comment gui=italic cterm=italic
-    au ColorScheme habamax hi Normal ctermbg=NONE 
-    au ColorScheme habamax hi SpellBad cterm=underline ctermfg=88 ctermbg=NONE guibg=red
+    au ColorScheme habamax hi Comment gui=italic cterm=italic ctermfg=148 guifg=#9DCD00
+    # au ColorScheme habamax hi Normal ctermbg=NONE guibg=NONE
+    au ColorScheme habamax hi SpellBad cterm=underline ctermbg=124 ctermfg=NONE guibg=#af0000 gui=underline guifg=NONE
+    au ColorScheme catppuccin_mocha hi Comment gui=italic cterm=italic ctermfg=140 guifg=#9DCD00
+    au ColorScheme catppuccin_mocha hi Visual gui=NONE cterm=NONE ctermfg=NONE guifg=#1E1E2E guibg=#EFCCC5
+    au ColorScheme catppuccin_mocha hi StatusLine gui=NONE cterm=NONE ctermfg=NONE guifg=#CDD6F4 guibg=#3A3A5A
+    au ColorScheme catppuccin_mocha hi SpellBad cterm=underline ctermbg=124 ctermfg=NONE guibg=#af0000 gui=underline guifg=NONE
 augroup END
-colorscheme habamax
+
+if has("termguicolors")
+    set termguicolors
+endif
+
+colorscheme catppuccin_mocha
 set showmatch  # highlight matching brace
 
 if has("gui_running")
@@ -154,3 +189,5 @@ set undodir=~/.vimUndoDir
 set undolevels=1000 # Number of undo levels
 set undofile
 set viminfo='200,<500,s32
+
+source ~/russian.vim
