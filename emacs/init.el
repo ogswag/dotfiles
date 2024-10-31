@@ -144,8 +144,8 @@
     (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono")
     (set-face-attribute 'variable-pitch nil :family "Arial")))
  ((eq system-type 'gnu/linux)
-  (when (member "DejaVu Sans Mono" (font-family-list))
-    (set-frame-font "DejaVu Sans Mono 12" t t))))
+  (when (member "Input Mono Narrow" (font-family-list))
+    (set-frame-font "Input Mono Narrow 11" t t))))
 
 ;; >> ENABLE LIGATURES <<
 (load "~/.emacs.d/lisp/packages/ligature.el")
@@ -153,14 +153,8 @@
 ;; >> INSTALL CUSTOM THEMES <<
 (setq custom-safe-themes t)
 
-(require-theme 'modus-themes)
-
-(setq modus-themes-common-palette-overrides
-      modus-themes-preset-overrides-faint)
-
-;; (setq-default modus-themes-italic-constructs t)
-
-(load "~/.emacs.d/lisp/config/modus-themes-customs.el")
+(use-package catppuccin-theme
+  :ensure t)
 
 ;; >> ALL THE ICONS <<
 (use-package all-the-icons
@@ -183,8 +177,8 @@
   :ensure t
   :diminish auto-dark-mode
   :config
-  (setq auto-dark-light-theme 'modus-operandi)
-  (setq auto-dark-dark-theme 'polar-bear)
+  (setq auto-dark-light-theme 'leuven)
+  (setq auto-dark-dark-theme 'catppuccin)
   (setq auto-dark-polling-interval 3)
   (setq auto-dark-allow-osascript t)
   (setq auto-dark-allow-powershell t)
@@ -295,11 +289,11 @@
 
 (setq-default tab-width 2) ;; Set tab length = 2
 
-;; Fill column = 80
-(setq-default fill-column 80)
+;; Fill column
+(setq-default fill-column 110)
 ;; Fill column ruler
-;; (use-package display-fill-column-indicator-mode
-;; :hook (prog-mode LaTeX-mode))
+(use-package display-fill-column-indicator-mode
+:hook (prog-mode LaTeX-mode))
 ;; (global-display-fill-column-indicator-mode t)
 
 (setq-default indent-tabs-mode nil) ;; Indent by spaces
@@ -434,9 +428,7 @@
 ;; │ OTHER PACKAGES                                                          │
 ;; └─────────────────────────────────────────────────────────────────────────┘
 
-(load "~/.emacs.d/lisp/packages/magit.el")
 (load "~/.emacs.d/lisp/packages/treesitter.el")
-
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;; KEYMAP SETTINGS ;;

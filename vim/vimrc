@@ -78,7 +78,7 @@ set hidden confirm
 set scrolloff=0
 
 set langmenu=en_US.UTF-8
-language messages en_GB
+language messages en_US.UTF-8
 
 set nocompatible
 set fileformats=unix,mac
@@ -110,7 +110,7 @@ augroup colorscheme_change | au!
     au ColorScheme habamax hi Comment gui=italic cterm=italic ctermfg=148 guifg=#9DCD00
     # au ColorScheme habamax hi Normal ctermbg=NONE guibg=NONE
     au ColorScheme habamax hi SpellBad cterm=underline ctermbg=124 ctermfg=NONE guibg=#af0000 gui=underline guifg=NONE
-    au ColorScheme catppuccin_mocha hi Comment gui=italic cterm=italic ctermfg=140 guifg=#9DCD00
+    au ColorScheme catppuccin_mocha hi Comment gui=NONE cterm=NONE ctermfg=140 guifg=#9DCD00
     au ColorScheme catppuccin_mocha hi Visual gui=NONE cterm=NONE ctermfg=NONE guifg=#1E1E2E guibg=#EFCCC5
     au ColorScheme catppuccin_mocha hi StatusLine gui=NONE cterm=NONE ctermfg=NONE guifg=#CDD6F4 guibg=#3A3A5A
     au ColorScheme catppuccin_mocha hi SpellBad cterm=underline ctermbg=124 ctermfg=NONE guibg=#af0000 gui=underline guifg=NONE
@@ -189,5 +189,3 @@ set undodir=~/.vimUndoDir
 set undolevels=1000 # Number of undo levels
 set undofile
 set viminfo='200,<500,s32
-
-source ~/russian.vim

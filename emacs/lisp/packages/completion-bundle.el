@@ -4,20 +4,20 @@
 
 ;; >> CAPE <<
 ;; Add completion extensions
-;; (use-package cape
-;;   :ensure t
-;;   ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
-;;   ;; Press C-c p ? to for help.
-;;   :bind ("C-c p" . cape-prefix-map) ;; Alternative keys: M-p, M-+, ...
-;;   :init
-;;   (add-hook 'completion-at-point-functions #'cape-abbrev)      ;; Complete abbreviation
-;;   (add-hook 'completion-at-point-functions #'cape-dabbrev)     ;; Complete word from current buffers. See also dabbrev-capf on Emacs 29.
-;;   (add-hook 'completion-at-point-functions #'cape-elisp-block) ;; Complete Elisp in Org or Markdown code block.
-;;   (add-hook 'completion-at-point-functions #'cape-file)        ;; Complete file name.
-;;   (add-hook 'completion-at-point-functions #'cape-history)     ;; Complete from Eshell, Comint or minibuffer history.
-;;   (add-hook 'completion-at-point-functions #'cape-keyword)     ;; Complete programming language keyword.
-;;   (add-hook 'completion-at-point-functions #'cape-tex)         ;; Complete Unicode char from TeX command, e.g. `\hbar'.
-;;   )
+(use-package cape
+  :ensure t
+  ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
+  ;; Press C-c p ? to for help.
+  :bind ("C-c p" . cape-prefix-map) ;; Alternative keys: M-p, M-+, ...
+  :init
+  (add-hook 'completion-at-point-functions #'cape-abbrev)      ;; Complete abbreviation
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)     ;; Complete word from current buffers. See also dabbrev-capf on Emacs 29.
+  (add-hook 'completion-at-point-functions #'cape-elisp-block) ;; Complete Elisp in Org or Markdown code block.
+  (add-hook 'completion-at-point-functions #'cape-file)        ;; Complete file name.
+  (add-hook 'completion-at-point-functions #'cape-history)     ;; Complete from Eshell, Comint or minibuffer history.
+  (add-hook 'completion-at-point-functions #'cape-keyword)     ;; Complete programming language keyword.
+  (add-hook 'completion-at-point-functions #'cape-tex)         ;; Complete Unicode char from TeX command, e.g. `\hbar'.
+  )
 
 ;; >> VERTICO <<
 ;; VERTical Interactive COmpletion
@@ -109,29 +109,13 @@
   :ensure t
   :diminish)
 
-;; >> LSP MODE <<
-;; The most complete lsp support for emacs
-;; (use-package lsp-mode
-;;   :ensure t
-;;   :hook ((python-ts-mode c++-ts-mode c-ts-mode) . lsp)
-;;   :custom
-;;   (lsp-enable-symbol-highlighting nil)
-;;   (lsp-ui-doc-enable nil)
-;;   (lsp-lens-enable t)
-;;   (lsp-headerline-breadcrumb-enable nil)
-;;   (lsp-ui-sideline-enable nil)
-;;   (lsp-modeline-code-actions-enable nil)
-;;   (lsp-completion-provider :capf)
-;;   (lsp-completion-show-detail t)
-;;   (lsp-completion-show-kind t)
-;;   )
-
 ;; (use-package flycheck
 ;;   :ensure t)
 
 (use-package company
   :ensure t
   :hook (emacs-lisp-mode))
+
 ;; (use-package dap-mode
 ;;   :ensure t)
 

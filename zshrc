@@ -204,7 +204,18 @@ export PATH="/usr/local/sbin:$PATH"
 export PATH="/usr/local/opt/llvm/bin:$PATH"
 export PATH="$HOME/git-personal/scripts:$PATH"
 
-alias ll="gls --group-directories-first -FAlh --color=auto"
+# Get the operating system name
+OS=$(uname)
+
+# Check if the OS is Linux or macOS
+if [ "$OS"=="Linux" ]; then
+    echo Linux
+    alias l="ls --group-directories-first -FAlh --color=auto"
+elif [ "$OS"=="Darwin" ]; then
+    echo Darwin
+    alias l="gls --group-directories-first -FAlh --color=auto"
+fi
+
 
 # ┌──────────────────────────────────────────────────────────────────────────┐
 # │ Custom Functions                                                         │
