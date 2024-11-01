@@ -1,0 +1,26 @@
+general.import = [
+  "./Catppuccin-Mocha.toml"
+]
+
+[window]
+decorations = "Buttonless"
+
+  [window.dimensions]
+  columns = 110
+  lines = 37
+
+[font]
+size = 16
+
+  [font.normal]
+  family = "FantasqueSansM Nerd Font"
+
+[colors]
+cursor = { text = "CellBackground", cursor = "#f5a97f" }
+
+[cursor]
+thickness = 0.25
+
+  [cursor.style]
+  shape = "Beam"
+  blinking = "On"

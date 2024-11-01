@@ -2,6 +2,9 @@ local global = vim.g
 local o = vim.opt
 local map = vim.api.nvim_set_keymap
 
+o.belloff = 'all'
+o.shortmess = 'Ic'
+
 vim.g.mapleader = ","
 
 map("n", "N", "Nzz", {})
@@ -14,9 +17,6 @@ map("i", "<C-l>", "<Right>", {})
 
 map("i", "<C-a>", "<C-o>I", {})
 map("i", "<C-e>", "<C-o>A", {})
-
--- map("i", "<C-w>", "<S-Left>", {})
--- map("i", "<C-w>", "<S-Left>", {})
 
 map("i", "<C-v>", "<C-o>v", {})
 map("i", "<C-S-v>", "<C-o>V", {})
