@@ -139,8 +139,8 @@
   (when (member "Consolas" (font-family-list))
     (set-frame-font "Consolas 12" t t)))
  ((eq system-type 'darwin) ; macOS
-  (when (member "JetBrains Mono" (font-family-list))
-    (set-frame-font "JetBrains Mono Light 13" t t)
+  (when (member "Menlo" (font-family-list))
+    (set-frame-font "Menlo 13" t t)
     (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono")
     (set-face-attribute 'variable-pitch nil :family "Arial")))
  ((eq system-type 'gnu/linux)
@@ -165,6 +165,7 @@
   :after all-the-icons
   :hook  (dired-mode-hook . all-the-icons-dired-mode))
 (use-package all-the-icons-completion
+  :ensure t
   :after (marginalia all-the-icons)
   :hook ((marginalia-mode . all-the-icons-completion-marginalia-setup)
          (company-mode . all-the-icons-completion-mode))

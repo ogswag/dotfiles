@@ -207,15 +207,20 @@ export PATH="$HOME/git-personal/scripts:$PATH"
 # Get the operating system name
 OS=$(uname)
 
-# Check if the OS is Linux or macOS
-if [ "$OS"=="Linux" ]; then
-    echo Linux
+# Different aliases for ls on different systems
+if [[ "$OS" == "Linux" ]]; then
     alias l="ls --group-directories-first -FAlh --color=auto"
-elif [ "$OS"=="Darwin" ]; then
-    echo Darwin
+elif [[ "$OS" == "Darwin" ]]; then
     alias l="gls --group-directories-first -FAlh --color=auto"
 fi
 
+# Different aliases for (neo)vim on different systems
+if command -v "nvim" > /dev/null 2>&1; then
+    alias vim="nvim"
+    alias v="nvim"
+else
+    alias v="vim"
+fi
 
 # ┌──────────────────────────────────────────────────────────────────────────┐
 # │ Custom Functions                                                         │
