@@ -52,6 +52,7 @@ o.display = "lastline"
 
 o.clipboard = "unnamedplus,unnamed"
 
+o.relativenumber = true
 o.number = true
 
 o.termguicolors = true
@@ -71,6 +72,9 @@ o.autoindent = true
 
 o.cursorline = true
 o.cursorlineopt = "number"
+o.guicursor =
+"n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
+
 
 o.colorcolumn = "110"
 o.textwidth = 110

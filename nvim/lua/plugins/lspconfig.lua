@@ -80,8 +80,8 @@ return {
                     capabilities = capabilities,
                 })
             end,
-            ["pyright"] = function()
-                nvim_lsp["pyright"].setup({
+            ["pylsp"] = function()
+                nvim_lsp["pylsp"].setup({
                     on_attach = on_attach,
                     capabilities = capabilities,
                 })

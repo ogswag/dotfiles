@@ -4,14 +4,16 @@ return {
     priority = 1000,
     config = function()
         require("catppuccin").setup({
-            custom_highlights = function(colors)
-                return {
-                    Comment = { fg = "#9DCD00" },
-                    Visual = { bg = colors.rosewater, fg = colors.base },
-                    StatusLine = { bg = "#3A3A5A", fg = "#CDD6F4" },
-                    TabLineSel = { bg = colors.lavender, fg = colors.base }
-                }
-            end,
+            highlight_overrides = {
+                mocha = function(mocha)
+                    return {
+                        Comment = { fg = "#9DCD00" },
+                        Visual = { bg = mocha.rosewater, fg = mocha.base },
+                        StatusLine = { bg = "#3A3A5A", fg = "#CDD6F4" },
+                        TabLineSel = { bg = mocha.lavender, fg = mocha.base }
+                    }
+                end,
+            },
             transparent_background = false, -- disables setting the background color.
             show_end_of_buffer = false,     -- shows the '~' characters after the end of buffers
             term_colors = false,            -- sets terminal colors (e.g. `g:terminal_color_0`)
@@ -26,16 +28,16 @@ return {
             styles = {         -- Handles the styles of general hi groups (see `:h highlight-args`):
                 comments = {}, -- Change the style of comments
                 conditionals = {},
-                loops = {},
-                functions = {},
-                keywords = {},
-                strings = {},
-                variables = {},
-                numbers = {},
-                booleans = {},
-                properties = {},
-                types = {},
-                operators = {},
+                -- loops = {},
+                -- functions = {},
+                -- keywords = {},
+                -- strings = {},
+                -- variables = {},
+                -- numbers = {},
+                -- booleans = {},
+                -- properties = {},
+                -- types = {},
+                -- operators = {},
                 -- miscs = {}, -- Uncomment to turn off hard-coded styles
             },
         })

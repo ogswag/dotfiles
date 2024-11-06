@@ -43,7 +43,6 @@ Pack 'girishji/scope.vim'
 Pack 'Eliot00/auto-pairs'
 
 Pack 'rafi/awesome-vim-colorschemes'
-Pack 'catppuccin/vim'
 
 # completion engine
 Pack 'girishji/vimcomplete'
@@ -107,20 +106,11 @@ set textwidth=110
 syntax on
 set bg=dark
 augroup colorscheme_change | au!
-    au ColorScheme habamax hi Comment gui=italic cterm=italic ctermfg=148 guifg=#9DCD00
-    # au ColorScheme habamax hi Normal ctermbg=NONE guibg=NONE
-    au ColorScheme habamax hi SpellBad cterm=underline ctermbg=124 ctermfg=NONE guibg=#af0000 gui=underline guifg=NONE
-    au ColorScheme catppuccin_mocha hi Comment gui=NONE cterm=NONE ctermfg=140 guifg=#9DCD00
-    au ColorScheme catppuccin_mocha hi Visual gui=NONE cterm=NONE ctermfg=NONE guifg=#1E1E2E guibg=#EFCCC5
-    au ColorScheme catppuccin_mocha hi StatusLine gui=NONE cterm=NONE ctermfg=NONE guifg=#CDD6F4 guibg=#3A3A5A
-    au ColorScheme catppuccin_mocha hi SpellBad cterm=underline ctermbg=124 ctermfg=NONE guibg=#af0000 gui=underline guifg=NONE
+    au ColorScheme habamax hi Normal ctermbg=NONE guibg=NONE
+    au ColorScheme habamax hi SpellBad cterm=underline ctermfg=124 ctermbg=NONE guifg=#af0000 gui=underline guibg=NONE
 augroup END
 
-if has("termguicolors")
-    set termguicolors
-endif
-
-colorscheme catppuccin_mocha
+colorscheme habamax
 set showmatch  # highlight matching brace
 
 if has("gui_running")

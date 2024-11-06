@@ -4,16 +4,19 @@ general.import = [
 
 [window]
 decorations = "Buttonless"
+  [window.padding]
+  x = 0
+  y = 0
 
   [window.dimensions]
   columns = 110
-  lines = 37
+  lines = 38
 
 [font]
-size = 16
+size = 15
 
   [font.normal]
-  family = "FantasqueSansM Nerd Font"
+  family = "IosevkaCustomTerminal Nerd Font Mono"
 
 [colors]
 cursor = { text = "CellBackground", cursor = "#f5a97f" }

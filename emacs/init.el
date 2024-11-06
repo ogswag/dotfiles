@@ -71,8 +71,6 @@
 
 ;; Delete trailing whitespace before saving
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
-;; Always ensure new line at the end of the file
-(setq require-final-newline t)
 
 ;; Enable mouse in terminal mode
 (unless (display-graphic-p)
@@ -86,7 +84,8 @@
 
 ;; Enable line numbering for a few major modes
 ;; (dolist (hook '(prog-mode-hook LaTeX-mode-hook toml-ts-mode-hook yaml-mode-hook))
-;; (add-hook hook #'display-line-numbers-mode))
+;;   (add-hook hook #'display-line-numbers-mode))
+
 ;; do not decrease line number width, results in less shifting
 (setq-default display-line-numbers-grow-only t)
 ;; set line number width to a maximum needed number (no shifting when scrolling)
@@ -139,13 +138,13 @@
   (when (member "Consolas" (font-family-list))
     (set-frame-font "Consolas 12" t t)))
  ((eq system-type 'darwin) ; macOS
-  (when (member "Menlo" (font-family-list))
-    (set-frame-font "Menlo 13" t t)
-    (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono")
+  (when (member "IosevkaCustomTerminal Nerd Font Mono" (font-family-list))
+    (set-frame-font "IosevkaCustomTerminal Nerd Font Mono 18" t t)
+    (set-face-attribute 'fixed-pitch nil :family "IosevkaCustomTerminal Nerd Font Mono")
     (set-face-attribute 'variable-pitch nil :family "Arial")))
  ((eq system-type 'gnu/linux)
-  (when (member "Input Mono Narrow" (font-family-list))
-    (set-frame-font "Input Mono Narrow 11" t t))))
+  (when (member "IosevkaCustomTerminal Nerd Font Mono" (font-family-list))
+    (set-frame-font "IosevkaCustomTerminal Nerd Font Mono 14" t t))))
 
 ;; >> ENABLE LIGATURES <<
 (load "~/.emacs.d/lisp/packages/ligature.el")
@@ -156,21 +155,7 @@
 (use-package catppuccin-theme
   :ensure t)
 
-;; >> ALL THE ICONS <<
-(use-package all-the-icons
-  :ensure t
-  :if (display-graphic-p))
-(use-package all-the-icons-dired
-  :ensure t
-  :after all-the-icons
-  :hook  (dired-mode-hook . all-the-icons-dired-mode))
-(use-package all-the-icons-completion
-  :ensure t
-  :after (marginalia all-the-icons)
-  :hook ((marginalia-mode . all-the-icons-completion-marginalia-setup)
-         (company-mode . all-the-icons-completion-mode))
-  :config
-  (all-the-icons-completion-mode t))
+(load "~/.emacs.d/lisp/packages/treesitter.el")
 
 ;; >> AUTO-DARK <<
 ;; Package for syncing themes with system
@@ -419,17 +404,6 @@
       '(("C++" (clang-format "--style=Google"))
         ("Python" (yapf "--style=Google"))))
 
-;; ┌─────────────────────────────────────────────────────────────────────────┐
-;; │ COMPLETION                                                              │
-;; └─────────────────────────────────────────────────────────────────────────┘
-
-(load "~/.emacs.d/lisp/packages/completion-bundle.el")
-
-;; ┌─────────────────────────────────────────────────────────────────────────┐
-;; │ OTHER PACKAGES                                                          │
-;; └─────────────────────────────────────────────────────────────────────────┘
-
-(load "~/.emacs.d/lisp/packages/treesitter.el")
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;; KEYMAP SETTINGS ;;
