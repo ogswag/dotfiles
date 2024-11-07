@@ -12,6 +12,22 @@
   :ensure t
   :bind (("C-." . #'god-local-mode)))
 
+;; >> WHICH-KEY <<
+;; Reminds about key combinations
+(use-package which-key
+  :ensure t
+  :diminish which-key-mode
+  :config (which-key-mode))
+
+;; >> AVY <<
+;; Jump to things in Emacs tree-style
+(use-package avy
+  :ensure t
+  :bind (("C-c z" . #'avy-goto-line)
+         ("C-c x" . #'avy-goto-word-1)
+         ("C-c c" . #'avy-goto-char)
+         ("C-c v" . #'avy-resume)))   ;; enable avy for quick navigation
+
 ;; Unset default undo keys
 (keymap-global-unset "C-_")
 (keymap-global-unset "C-z")
@@ -32,7 +48,6 @@
 ;; Keybindings for toggling frame maximized and fullscreen
 (keymap-global-set "C-M-f" #'toggle-frame-maximized)
 (keymap-global-set "C-M-S-f" #'toggle-frame-fullscreen)
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CHANGE MACOS-SPECIFIC KEYS ;;

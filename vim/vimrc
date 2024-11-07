@@ -1,71 +1,15 @@
-vim9script
-#  ██▒   █▓ ██▓ ███▄ ▄███▓ ██▀███   ▄████▄
-# ▓██░   █▒▓██▒▓██▒▀█▀ ██▒▓██ ▒ ██▒▒██▀ ▀█
-#  ▓██  █▒░▒██▒▓██    ▓██░▓██ ░▄█ ▒▒▓█    ▄
-#   ▒██ █░░░██░▒██    ▒██ ▒██▀▀█▄  ▒▓▓▄ ▄██▒
-#    ▒▀█░  ░██░▒██▒   ░██▒░██▓ ▒██▒▒ ▓███▀ ░
-#    ░ ▐░  ░▓  ░ ▒░   ░  ░░ ▒▓ ░▒▓░░ ░▒ ▒  ░
-#    ░ ░░   ▒ ░░  ░   ░  ░  ░▒ ░ ▒░  ░  ▒
-#      ░░   ▒ ░░      ░     ░░   ░ ░
-#       ░   ░         ░      ░     ░ ░
-#      ░                           ░
+"  ██▒   █▓ ██▓ ███▄ ▄███▓ ██▀███   ▄████▄
+" ▓██░   █▒▓██▒▓██▒▀█▀ ██▒▓██ ▒ ██▒▒██▀ ▀█
+"  ▓██  █▒░▒██▒▓██    ▓██░▓██ ░▄█ ▒▒▓█    ▄
+"   ▒██ █░░░██░▒██    ▒██ ▒██▀▀█▄  ▒▓▓▄ ▄██▒
+"    ▒▀█░  ░██░▒██▒   ░██▒░██▓ ▒██▒▒ ▓███▀ ░
+"    ░ ▐░  ░▓  ░ ▒░   ░  ░░ ▒▓ ░▒▓░░ ░▒ ▒  ░
+"    ░ ░░   ▒ ░░  ░   ░  ░  ░▒ ░ ▒░  ░  ▒
+"      ░░   ▒ ░░      ░     ░░   ░ ░
+"       ░   ░         ░      ░     ░ ░
+"      ░                           ░
 
-def CheckAndCloneMinpac()
-    var home: string = expand('$HOME')
-    var minpac_dir: string = home .. '/.vim/pack/minpac/opt/minpac'
-
-    if !isdirectory(minpac_dir)
-        system('git clone https://github.com/k-takata/minpac.git ' .. minpac_dir)
-        system('curl -fLo ' .. home .. '/.vim/autoload/plugpac.vim --create-dirs https://raw.githubusercontent.com/bennyyip/plugpac.vim/master/plugpac.vim')
-    endif
-enddef
-
-# Call the function to check and clone minpac if necessary
-CheckAndCloneMinpac()
-
-# Pass opts to `minpac#init()`
-plugpac#Begin({
-  status_open: 'vertical',
-  verbose: 2,
-})
-
-# minpac
-Pack 'k-takata/minpac', {'type': 'opt'}
-
-Pack 'junegunn/vim-easy-align'
-
-Pack 'tpope/vim-commentary'
-
-Pack 'jesseleite/vim-noh'
-
-Pack 'girishji/scope.vim'
-
-Pack 'Eliot00/auto-pairs'
-
-Pack 'rafi/awesome-vim-colorschemes'
-
-# completion engine
-Pack 'girishji/vimcomplete'
-# lsp client support
-# snippets
-Pack 'hrsh7th/vim-vsnip'
-Pack 'hrsh7th/vim-vsnip-integ'
-Pack 'rafamadriz/friendly-snippets'
-
-plugpac#End()
-
-var options = {
-    completor: { shuffleEqualPriority: true, postfixHighlight: true, triggerWordLen: 2},
-    buffer: { enable: true, priority: 10, urlComplete: true, envComplete: true },
-    abbrev: { enable: true, priority: 10 },
-    lsp: { enable: true, priority: 10, maxCount: 5, filetypes: ['vimscript', 'python', 'javascript', 'typescript', 'c', 'cpp']},
-    omnifunc: { enable: false, priority: 8, filetypes: ['python', 'javascript'] },
-    vsnip: { enable: true, priority: 11 },
-    vimscript: { enable: true, priority: 11 },
-}
-autocmd VimEnter * g:VimCompleteOptionsSet(options)
-
-# ---------- GENERAL SETTINGS  ----------
+" ---------- GENERAL SETTINGS  ----------
 filetype plugin indent on
 
 set clipboard=unnamed,unnamedplus
@@ -84,9 +28,9 @@ set fileformats=unix,mac
 set encoding=utf-8
 set fileencoding=utf-8
 set fileencodings=utf-8
-set splitbelow splitright # Sane splitting
-set title      # Set title of a window to filename
-set noswapfile # Prevent vim from creating .swp files
+set splitbelow splitright " Sane splitting
+set title      " Set title of a window to filename
+set noswapfile " Prevent vim from creating .swp files
 set nospell spelllang=en_gb,ru_yo
 
 set nowrap breakindent breakindentopt=sbr,list:-1 linebreak nojoinspaces
@@ -94,10 +38,10 @@ set list listchars=tab:›\ ,nbsp:␣,trail:·,extends:…,precedes:… showbrea
 set fillchars=fold:\ ,vert:│
 set sidescroll=1 sidescrolloff=3
 set nostartofline
-set virtualedit=block # Enable free-range cursor
+set virtualedit=block " Enable free-range cursor
 set display=lastline
-set laststatus=2      # Always show status line
-set ruler             # Show line and column info in status line
+set laststatus=2      " Always show status line
+set ruler             " Show line and column info in status line
 set belloff=all shortmess+=Ic
 
 set colorcolumn=110
@@ -107,11 +51,12 @@ syntax on
 set bg=dark
 augroup colorscheme_change | au!
     au ColorScheme habamax hi Normal ctermbg=NONE guibg=NONE
+    au ColorScheme habamax hi Comment ctermfg=95 guifg=NONE
     au ColorScheme habamax hi SpellBad cterm=underline ctermfg=124 ctermbg=NONE guifg=#af0000 gui=underline guibg=NONE
 augroup END
 
 colorscheme habamax
-set showmatch  # highlight matching brace
+set showmatch  " highlight matching brace
 
 if has("gui_running")
   set guifont=Input\ Mono:h13
@@ -120,13 +65,13 @@ if has("gui_running")
   set go-=L
 endif
 
-set cursorline # Highlight cursor line
+set cursorline " Highlight cursor line
 set cursorlineopt=number
-set nu         # Turn on the line numbers
+set nu rnu     " Turn on the line numbers
 
 set hlsearch incsearch ignorecase smartcase
 
-# Centre search results on screen
+" Centre search results on screen
 nnoremap n nzz
 nnoremap N Nzz
 
@@ -149,33 +94,34 @@ set autoindent shiftwidth=4 softtabstop=-1 expandtab
 autocmd BufNewFile,BufRead,BufWinEnter,FileType,OptionSet * set formatoptions-=t formatoptions-=l formatoptions-=c formatoptions-=r formatoptions-=o formatoptions-=q
 autocmd BufNewFile,BufRead,BufWinEnter,FileType,OptionSet * setlocal formatoptions-=t formatoptions-=l formatoptions-=c formatoptions-=r formatoptions-=o formatoptions-=q
 
-set smartindent # Enable smart-indent
-set autoindent  # Auto-indent new lines
-set smarttab    # Enable smart-tabs
+set smartindent " Enable smart-indent
+set autoindent  " Auto-indent new lines
+set smarttab    " Enable smart-tabs
 
-set autochdir   # Change working directory to open buffer
-set autoread    # Automatically read files modified elsewhere
+set autochdir   " Change working directory to open buffer
+set autoread    " Automatically read files modified elsewhere
 
-set backspace=indent,eol,start  # Backspace behaviour
+set backspace=indent,eol,start  " Backspace behaviour
 
-set mouse=a  # Enable mouse in vim
+set mouse=a  " Enable mouse in vim
 
 set wildmenu wildoptions=pum,fuzzy pumheight=20
 set wildignore=*.o,*.obj,*.bak,*.exe,*.swp,tags
 set completeopt=menu,popup completepopup=highlight:Pmenu
 
-def CheckUndoDir()
-    var home: string = expand('$HOME')
-    var undo_dir: string = home .. '/.vimUndoDir'
+function! CheckUndoDir()
+    let l:home = expand('$HOME')
+    let l:undo_dir = l:home . '/.vimUndoDir'
 
-    if !isdirectory(undo_dir)
-        system('mkdir -p ' .. undo_dir)
+    if !isdirectory(l:undo_dir)
+        call system('mkdir -p ' . l:undo_dir)
     endif
-enddef
+endfunction
 
-# Call the function to check and clone minpac if necessary
-CheckUndoDir()
+" Call the function to check and clone minpac if necessary
+call CheckUndoDir()
 set undodir=~/.vimUndoDir
-set undolevels=1000 # Number of undo levels
+
+set undolevels=1000 " Number of undo levels
 set undofile
 set viminfo='200,<500,s32
