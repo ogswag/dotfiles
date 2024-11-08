@@ -12,14 +12,12 @@
   (when (member "IosevkaCustomTerminal Nerd Font Mono" (font-family-list))
     (set-frame-font "IosevkaCustomTerminal Nerd Font Mono 14" t t))))
 
-;; >> ENABLE LIGATURES <<
-(load "~/.emacs.d/lisp/packages/ligature.el")
-
 ;; >> INSTALL CUSTOM THEMES <<
 (setq custom-safe-themes t)
 
 (use-package catppuccin-theme
   :ensure t)
+
 (use-package nimbus-theme
   :ensure t)
 
@@ -39,4 +37,3 @@
 (custom-set-faces
  ;; set fringe to no background for every theme
  '(fringe ((t (:background nil)))))
-

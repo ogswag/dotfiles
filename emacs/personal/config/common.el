@@ -45,9 +45,11 @@
 ;; Enable column numbering in `prog-mode'
 (add-hook 'prog-mode-hook #'column-number-mode)
 
+(setq display-line-numbers 'relative)
+(setq display-line-numbers-type 'relative)
 ;; Enable line numbering for a few major modes
-;; (dolist (hook '(prog-mode-hook LaTeX-mode-hook toml-ts-mode-hook yaml-mode-hook))
-;;   (add-hook hook #'display-line-numbers-mode))
+(use-package display-line-numbers-mode
+  :hook (prog-mode-hook))
 
 ;; do not decrease line number width, results in less shifting
 (setq-default display-line-numbers-grow-only t)
@@ -139,4 +141,3 @@
   :config
   (global-undo-tree-mode t)
   )
-

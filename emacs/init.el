@@ -21,31 +21,30 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(add-to-list 'load-path "~/.emacs.d/personal/config")
-(add-to-list 'load-path "~/.emacs.d/personal/packages")
-
 ;; personal/packages:
 ;; (load "treesitter")
-(load "code-analysis")
+(load "~/.emacs.d/personal/packages/code-analysis.el")
 ;; (load "formatter")
-(load "languages")
-(load "ligature")
-(load "macos-path")
-(load "rainbow-mode")
-;; (load "rmsbolt")
+(load "~/.emacs.d/personal/packages/languages.el")
+(load "~/.emacs.d/personal/packages/ligature.el")
+(load "~/.emacs.d/personal/packages/macos-path.el")
+(load "~/.emacs.d/personal/packages/rainbow-mode.el")
+(load "~/.emacs.d/personal/packages/rmsbolt.el")
+(load "~/.emacs.d/personal/packages/completion-bundle.el")
 ;; completion-bundle.el
 ;; documentation.el
 ;; magit.el
 
 ;; personal/config
-(load "common")
-(load "keymap")
-(load "dired")
-(load "modus-themes-customs")
-(load "windows-frames")
-(load "fonts-themes")
+(load "~/.emacs.d/personal/config/common.el")
+(load "~/.emacs.d/personal/config/project-management.el")
+(load "~/.emacs.d/personal/config/keymap.el")
+(load "~/.emacs.d/personal/config/dired.el")
+(load "~/.emacs.d/personal/config/modus-themes-customs.el")
+(load "~/.emacs.d/personal/config/windows-frames.el")
+(load "~/.emacs.d/personal/config/fonts-themes.el")
 
-(load "modeline")
+(load "~/.emacs.d/personal/config/modeline.el")
 
 (provide 'init)
 ;;; init.el ends here
