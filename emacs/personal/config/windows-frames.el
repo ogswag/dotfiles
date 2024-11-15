@@ -19,6 +19,7 @@
 (tool-bar-mode 0)    ;; No toolbar
 (scroll-bar-mode 0)  ;; No scroll bars
 (context-menu-mode 1) ;; Enable right click menus
+(setq fringe-mode 'minimal)
 
 (use-package ns-auto-titlebar
   :ensure t)

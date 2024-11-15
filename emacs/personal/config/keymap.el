@@ -127,7 +127,18 @@
    ;; '("X" . meow-goto-line)
    '("y" . kill-ring-save)
    '("'" . repeat)
-   '("<escape>" . ignore)))
+   '("<escape>" . ignore))
+  (meow-motion-overwrite-define-key
+   '("-" . kill-buffer-and-window)
+   '("0" . delete-window)
+   '("9" . kill-current-buffer)
+   '("1" . delete-other-windows)
+   '("2" . other-window)
+   '("3" . split-window-horizontally)
+   '("4" . split-window-vertically)
+   '("5" . switch-to-prev-buffer)
+   '("6" . switch-to-next-buffer)
+   '("=" . balance-windows)))
 
 (require 'meow)
 (meow-setup)
@@ -159,7 +170,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; unset mouse key
-(keymap-global-unset "<drag-mouse-1>")
+;; (keymap-global-unset "<drag-mouse-1>")
 (keymap-global-unset "C-M-<drag-mouse-1>")
 (keymap-global-unset "C-<drag-mouse-1>")
 (keymap-global-unset "M-<drag-mouse-1>")
@@ -195,7 +206,7 @@
 (keymap-global-unset "s-D") ;; dired
 (keymap-global-unset "s-E") ;; edit-abbrevs
 (keymap-global-unset "s-F") ;; isearch-backward
-(keymap-global-unset "s-H") ;; ns-do-hide-others
+;; (keymap-global-unset "s-H") ;; ns-do-hide-others
 (keymap-global-unset "s-L") ;; shell-command
 (keymap-global-unset "s-M") ;; manual-entry
 (keymap-global-unset "s-S") ;; ns-write-file-using-panel

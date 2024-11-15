@@ -24,7 +24,7 @@
 ;; personal/packages:
 ;; (load "treesitter")
 (load "~/.emacs.d/personal/packages/code-analysis.el")
-;; (load "formatter")
+(load "~/.emacs.d/personal/packages/formatter.el")
 (load "~/.emacs.d/personal/packages/languages.el")
 (load "~/.emacs.d/personal/packages/ligature.el")
 (load "~/.emacs.d/personal/packages/macos-path.el")

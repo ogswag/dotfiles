@@ -10,8 +10,6 @@
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8-unix)
 
-(setq-default tab-width 4) ;; Set tab length = 2
-
 ;; Guess major mode from file name
 (setq-default major-mode
               (lambda ()
@@ -26,6 +24,10 @@
 ;; (global-display-fill-column-indicator-mode t)
 
 (setq-default indent-tabs-mode nil) ;; Indent by spaces
+(setq-default tab-width 4)          ;; Set tab length = N
+(setq-default c-basic-offset 4)     ;; Set default offset for C-like modes
+(setq-default python-indent-guess-indent-offset nil)
+(electric-indent-mode nil)          ;; Automatically indent
 
 (delete-selection-mode 1) ;; Paste over selected region
 
@@ -36,8 +38,6 @@
   (xterm-mouse-mode 1))
 
 (electric-pair-mode 1)
-
-(electric-indent-mode 1) ;; Automatically indent
 
 (blink-cursor-mode 1) ;; Stop (or don't) cursor blinking
 (setq-default cursor-type 'box) ;; Set cursor shape
@@ -61,6 +61,8 @@
 (use-package visual-line
   :diminish visual-line-mode
   :hook (LaTeX-mode toml-ts-mode))
+
+(global-hl-line-mode t)
 
 ;; Allow right-left scrolling with mouse
 (setq mouse-wheel-tilt-scroll t
