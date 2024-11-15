@@ -1,28 +1,5 @@
 ;;; tango-now-theme.el --- Theme
 
-;; Copyright (C) 2022 , Vernon Grant
-
-;; Author: Vernon Grant
-;; Version: 1.0
-;; Package-Requires: ((emacs "24"))
-;; Created with ThemeCreator, https://github.com/mswift42/themecreator.
-
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program. If not, see <http://www.gnu.org/licenses/>.
-
-;; This file is not part of Emacs.
-
 ;;; Commentary:
 
 ;; Based on the Tango Desktop Project's colors:
@@ -89,10 +66,10 @@
    `(cursor ((,class (:background ,func))))
    `(show-paren-match-face ((,class (:background ,warning))))
    `(isearch ((,class (:bold t :foreground ,warning :background ,bg3))))
-   `(mode-line ((,class (:box (:line-width 1 :color nil) :bold t :foreground ,fg3 :background ,bg2))))
+   `(mode-line ((,class (:box (:line-width 1 :color nil) :foreground ,fg3 :background ,bg2))))
    `(mode-line-inactive ((,class (:box (:line-width 1 :color nil :style pressed-button) :foreground ,bg4 :background ,bg1 :weight normal))))
-   `(mode-line-buffer-id ((,class (:bold t :foreground ,func :background nil))))
-   `(mode-line-highlight ((,class (:foreground ,keyword :box nil :weight bold))))
+   ;; `(mode-line-buffer-id ((,class (:bold t :foreground ,func :background nil))))
+   `(mode-line-highlight ((,class (:inherit mode-line :background ,bg1 :bold t))))
    `(mode-line-emphasis ((,class (:foreground ,fg1))))
    `(vertical-border ((,class (:foreground ,fg3))))
    `(minibuffer-prompt ((,class (:bold t :foreground ,keyword))))

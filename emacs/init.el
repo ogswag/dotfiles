@@ -31,7 +31,6 @@
 (load "~/.emacs.d/personal/packages/rainbow-mode.el")
 (load "~/.emacs.d/personal/packages/rmsbolt.el")
 (load "~/.emacs.d/personal/packages/completion-bundle.el")
-;; completion-bundle.el
 ;; documentation.el
 ;; magit.el
 
