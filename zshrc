@@ -202,7 +202,7 @@ elif [[ "$OS" == "Darwin" ]]; then
         brew install eza
     fi
     if command -v "eza" > /dev/null 2>&1; then
-        alias l="eza --group-directories-first -lhU --icons --git --time-style='long-iso'"
+        alias l="eza --group-directories-first -lhU --icons --time-style='long-iso'"
     fi
 fi
 

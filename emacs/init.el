@@ -22,7 +22,6 @@
   (package-install 'use-package))
 
 ;; personal/packages:
-;; (load "treesitter")
 (load "~/.emacs.d/personal/packages/code-analysis.el")
 (load "~/.emacs.d/personal/packages/formatter.el")
 (load "~/.emacs.d/personal/packages/languages.el")
@@ -31,8 +30,6 @@
 (load "~/.emacs.d/personal/packages/rainbow-mode.el")
 (load "~/.emacs.d/personal/packages/rmsbolt.el")
 (load "~/.emacs.d/personal/packages/completion-bundle.el")
-;; documentation.el
-;; magit.el
 
 ;; personal/config
 (load "~/.emacs.d/personal/config/common.el")

@@ -4,8 +4,8 @@
   (when (member "Consolas" (font-family-list))
     (set-frame-font "Consolas 12" t t)))
  ((eq system-type 'darwin) ; macOS
-  (when (member "Victor Mono" (font-family-list))
-    (set-frame-font "Victor Mono 15" t t)
+  (when (member "Iosevka Sans" (font-family-list))
+    (set-frame-font "Iosevka Sans 14" t t)
     (set-face-attribute 'fixed-pitch nil :family "Ubuntu Mono")
     (set-face-attribute 'variable-pitch nil :family "Arial")))
  ((eq system-type 'gnu/linux)
@@ -28,12 +28,12 @@
   :diminish auto-dark-mode
   :config
   (setq auto-dark-light-theme 'tango-now-light)
-  (setq auto-dark-dark-theme 'tango-now)
+  (setq auto-dark-dark-theme 'shanty-themes-dark)
   (setq auto-dark-polling-interval 3)
   (setq auto-dark-allow-osascript t)
   (setq auto-dark-allow-powershell t)
   (auto-dark-mode t))
 
 (custom-set-faces
- ;; set fringe to no background for every theme
+ ;; make fringe transparent for any theme
  '(fringe ((t (:background nil)))))

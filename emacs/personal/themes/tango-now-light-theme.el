@@ -24,7 +24,7 @@
       (fg1 "#101010")       ;; Slate
       (fg2 "#2e3436")
       (fg3 "#555753")
-      (fg4 "#888a85")
+      (fg4 "#A1A39F")
       (bg1 "#EEEEEC")       ;; A lighter version of Orange
       (bg2 "#DEDEDA")
       (bg3 "#d3d7cf")
@@ -60,7 +60,7 @@
    `(font-lock-variable-name-face ((,class (:foreground ,var))))
    `(font-lock-warning-face ((,class (:foreground ,warning :background ,bg2))))
    `(term-color-black ((,class (:foreground ,fg2 :background nil))))
-   `(region ((,class (:background ,fg1 :foreground ,bg1))))
+   `(region ((,class (:background ,fg3 :foreground ,bg1))))
    `(highlight ((,class (:foreground ,fg3 :background ,bg3))))
    `(hl-line ((,class (:background  ,bg2))))
    `(fringe ((,class (:background ,bg2 :foreground ,fg4))))
@@ -242,8 +242,8 @@
   (when (>= emacs-major-version 26)
     (custom-theme-set-faces
      'tango-now-light
-     `(line-number ((t (:inherit default :foreground ,fg2))))
-     `(line-number-current-line ((t (:inherit default :foreground "black" :background ,bg3))))))
+     `(line-number ((t (:inherit default :foreground ,fg4))))
+     `(line-number-current-line ((t (:inherit default :background ,bg4))))))
   ;; emacs >= 27.1
   (when (>= emacs-major-version 27)
     (custom-theme-set-faces

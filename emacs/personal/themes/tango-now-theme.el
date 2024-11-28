@@ -26,7 +26,7 @@
       (fg1 "#eeeeec")      ;; Aluminium
       (fg2 "#dbdbd9")
       (fg3 "#c8c8c6")
-      (fg4 "#b5b5b3")
+      (fg4 "#8F8F8D")
       (bg1 "#2e3436")      ;; Slate
       (bg2 "#3f4446")
       (bg3 "#4f5456")
@@ -242,8 +242,8 @@
     (custom-theme-set-faces
      'tango-now
 
-     `(line-number ((t (:inherit default))))
-     `(line-number-current-line ((t (:inherit default :background "#4f5456" :foreground "seashell"))))))
+     `(line-number ((t (:inherit default :foreground ,fg4))))
+     `(line-number-current-line ((t (:inherit default :background ,bg4 :foreground "seashell"))))))
   ;; emacs >= 27.1
   (when (>= emacs-major-version 27)
     (custom-theme-set-faces

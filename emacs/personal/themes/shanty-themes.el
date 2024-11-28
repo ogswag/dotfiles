@@ -127,7 +127,7 @@ or 'shanty-dark"
      ;; TODO: Not working properly -> mayb rainbow-delimiter
      `(show-paren-mismatch ((t (:background ,red))))
      `(shadow ((t (:foreground ,(shanty-themes--li-da fg-1 fg-2)))))
-     `(font-lock-comment-face ((t (:inherit shadow))))
+     `(font-lock-comment-face ((t (:foreground ,fg-1))))
      `(font-lock-doc-face ((t (:foreground ,magenta))))
      `(font-lock-keyword-face ((t (:foreground ,yellow :weight bold))))
      `(font-lock-builtin-face ((t (:foreground ,yellow))))

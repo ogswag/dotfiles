@@ -206,7 +206,7 @@
 (keymap-global-unset "s-D") ;; dired
 (keymap-global-unset "s-E") ;; edit-abbrevs
 (keymap-global-unset "s-F") ;; isearch-backward
-;; (keymap-global-unset "s-H") ;; ns-do-hide-others
+(keymap-global-unset "s-H") ;; ns-do-hide-others
 (keymap-global-unset "s-L") ;; shell-command
 (keymap-global-unset "s-M") ;; manual-entry
 (keymap-global-unset "s-S") ;; ns-write-file-using-panel
@@ -218,15 +218,12 @@
 (keymap-global-unset "s-e") ;; isearch-yank-kill
 (keymap-global-unset "s-f") ;; isearch-forward
 (keymap-global-unset "s-g") ;; isearch-repeat-forward
-(keymap-global-unset "s-h") ;; ns-do-hide-emacs
 (keymap-global-unset "s-j") ;; exchange-point-and-mark
 (keymap-global-unset "s-k") ;; kill-current-buffer
 (keymap-global-unset "s-l") ;; goto-line
-(keymap-global-unset "s-m") ;; iconify-frame
 (keymap-global-unset "s-n") ;; make-frame
 (keymap-global-unset "s-o") ;; ns-open-file-using-panel
 (keymap-global-unset "s-p") ;; ns-print-buffer
-(keymap-global-unset "s-q") ;; save-buffers-kill-emacs
 (keymap-global-unset "s-s") ;; disable save-buffer
 (keymap-global-unset "s-t") ;; menu-set-font
 (keymap-global-unset "s-u") ;; revert-buffer
@@ -237,3 +234,6 @@
 (keymap-global-unset "s-z") ;; disable undo
 (keymap-global-unset "s-|") ;; shell-command-on-region
 (keymap-global-unset "s-~") ;; ns-prev-frame
+;; (keymap-global-unset "s-h") ;; ns-do-hide-emacs
+;; (keymap-global-unset "s-m") ;; iconify-frame
+(keymap-global-set "s-q" 'ns-do-hide-emacs) ;; save-buffers-kill-emacs
