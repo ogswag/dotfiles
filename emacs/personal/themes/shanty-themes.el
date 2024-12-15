@@ -64,7 +64,7 @@ or 'shanty-dark"
          (yellow-1   (gethash 'yellow-1  colors))
          (yellow     (gethash 'yellow    colors))
          (yellow+1   (gethash 'yellow+1  colors))
-         ;; (orange-1   (gethash 'orange-1  colors))
+         (orange-1   (gethash 'orange-1  colors))
          (orange     (gethash 'orange    colors))
          (orange+1   (gethash 'orange+1  colors))
          ;; (red-2      (gethash 'red-2     colors))
@@ -107,7 +107,7 @@ or 'shanty-dark"
      `(cursor ((t (:background ,white))))
      ;; TODO: Add support to disable
      `(hl-line ((t (:background ,bg+1))))
-     `(region ((t (:background ,(shanty-themes--li-da bg-2 bg+2)))))
+     `(region ((t (:background ,(shanty-themes--li-da bg-2 fg+1) :foreground ,(shanty-themes--li-da fg bg)))))
      `(link ((t (:foreground ,green :underline t))))
      `(link-visited ((t (:foreground ,magenta+1 :underline t))))
      ;; `(button ((t (:foreground ,fg :background ,green))))
@@ -597,7 +597,7 @@ or 'shanty-dark"
 
      ;;;; linum
      `(line-number ((t (:inherit shadow))))
-     `(line-number-current-line ((t (:inherit shadow))))
+     `(line-number-current-line ((t (:foreground ,yellow+1))))
      `(line-number-major-tick ((t (:foreground ,fg :weight bold))))
      `(line-number-minor-tick ((t (:foreground ,fg-1 :weight bold))))
 

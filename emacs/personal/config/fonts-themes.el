@@ -4,8 +4,8 @@
   (when (member "Consolas" (font-family-list))
     (set-frame-font "Consolas 12" t t)))
  ((eq system-type 'darwin) ; macOS
-  (when (member "Iosevka Sans" (font-family-list))
-    (set-frame-font "Iosevka Sans 14" t t)
+  (when (member "JetBrainsMono Nerd Font Propo" (font-family-list))
+    (set-frame-font "JetBrainsMono Nerd Font Propo 14" t t)
     (set-face-attribute 'fixed-pitch nil :family "Ubuntu Mono")
     (set-face-attribute 'variable-pitch nil :family "Arial")))
  ((eq system-type 'gnu/linux)

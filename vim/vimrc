@@ -59,10 +59,10 @@ colorscheme habamax
 set showmatch  " highlight matching brace
 
 if has("gui_running")
-  set guifont=Input\ Mono:h13
-  set go-=r
-  set go-=l
-  set go-=L
+    set guifont=Input\ Mono:h13
+    set go-=r
+    set go-=l
+    set go-=L
 endif
 
 set cursorline " Highlight cursor line

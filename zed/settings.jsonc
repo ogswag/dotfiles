@@ -1,0 +1,43 @@
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "base_keymap": "Emacs",
+  "telemetry": {
+    "metrics": false,
+    "diagnostics": true
+  },
+  "buffer_font_size": 14,
+  "buffer_font_family": "PragmataBrains Semi-Extended",
+  "buffer_font_weight": 400,
+  "buffer_line_height": "standard",
+  "cursor_shape": "hollow",
+  "theme": {
+    "mode": "system",
+    "light": "Fleet Light",
+    "dark": "Catppuccin Mocha - No Italics"
+  },
+  "indent_guides": {
+    "enabled": true,
+    "coloring": "indent_aware"
+  },
+  "use_auto_surround": true,
+  "languages": {
+    "Python": {
+      "language_servers": ["pylsp"],
+      "formatter": {
+        "external": {
+          "command": "yapf",
+          "arguments": [
+            "--style={based_on_style: google, column_limit: 240, indent_width: 4}"
+          ]
+        }
+      },
+      "format_on_save": "on"
+    }
+  }
+}

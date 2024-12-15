@@ -5,13 +5,13 @@
             '(
               (tool-bar-lines . 0)
               (width . 100) ; chars
-              (height . 30) ; lines
+              (height . 45) ; lines
               ))
       (setq default-frame-alist
             '(
               (tool-bar-lines . 0)
               (width . 100)
-              (height . 30))))
+              (height . 45))))
   (progn
     (setq initial-frame-alist '((tool-bar-lines . 0)))
     (setq default-frame-alist '((tool-bar-lines . 0)))))
