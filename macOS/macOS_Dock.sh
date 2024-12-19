@@ -7,7 +7,7 @@ echo 'Deleting all pinned icons from Dock'; sleep 0.025;
 defaults write com.apple.dock persistent-apps -array;
 
 # Change minimize/maximize window effect
-defaults write com.apple.dock mineffect -string "scale"
+defaults write com.apple.dock mineffect -string "scale";
 
 # Move Dock to the left
 echo 'Moving Dock to the left'; sleep 0.025;

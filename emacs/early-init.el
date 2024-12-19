@@ -3,5 +3,3 @@
 
 ;; Disable splash screen
 (setq inhibit-startup-screen t)
-
-(setq native-comp-async-report-warnings-errors 'silent)

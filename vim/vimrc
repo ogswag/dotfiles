@@ -53,9 +53,11 @@ augroup colorscheme_change | au!
     au ColorScheme habamax hi Normal ctermbg=NONE guibg=NONE
     au ColorScheme habamax hi Comment ctermfg=95 guifg=NONE
     au ColorScheme habamax hi SpellBad cterm=underline ctermfg=124 ctermbg=NONE guifg=#af0000 gui=underline guibg=NONE
+    au ColorScheme lunaperche hi Normal ctermbg=NONE guibg=NONE
+    au ColorScheme sorbet hi Normal ctermbg=NONE guibg=NONE
 augroup END
 
-colorscheme habamax
+colorscheme sorbet
 set showmatch  " highlight matching brace
 
 if has("gui_running")
