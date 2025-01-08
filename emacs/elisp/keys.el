@@ -17,8 +17,20 @@
 
 
 ;; Keybindings for toggling frame maximized and fullscreen
-(keymap-global-set "C-M-f" #'toggle-frame-maximized)
-(keymap-global-set "C-M-S-f" #'toggle-frame-fullscreen)
+(keymap-global-set "H-F" #'toggle-frame-maximized)
+(keymap-global-set "H-f" #'toggle-frame-fullscreen)
+
+
+(keymap-global-set "H-0" #'delete-window)
+(keymap-global-set "H-9" #'kill-current-buffer)
+(keymap-global-set "H-1" #'delete-other-windows)
+(keymap-global-set "H-2" #'ace-window)
+(keymap-global-set "H-3" #'split-window-horizontally)
+(keymap-global-set "H-4" #'split-window-vertically)
+(keymap-global-set "H-5" #'switch-to-prev-buffer)
+(keymap-global-set "H-6" #'switch-to-next-buffer)
+(keymap-global-set "H-=" #'balance-windows)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CHANGE MACOS-SPECIFIC KEYS ;;

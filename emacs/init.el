@@ -70,8 +70,8 @@
 
 (add-hook 'prog-mode-hook #'column-number-mode)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
-(setq-default display-line-numbers 'relative)
-(setq-default display-line-numbers-type 'relative)
+;; (setq-default display-line-numbers 'relative)
+;; (setq-default display-line-numbers-type 'relative)
 (setq-default display-line-numbers-grow-only t)
 (setq-default display-line-numbers-width-start t)
 
@@ -134,12 +134,14 @@
 
 (load "~/.emacs.d/elisp/colors.el")
 (load "~/.emacs.d/elisp/font.el")
-
+(load "~/.emacs.d/elisp/treesitter.el")
+(load "~/.emacs.d/elisp/keys.el")
 
 (add-to-list 'load-path "~/.emacs.d/package-local/")
 
 (use-package vimrc-mode
   :defer t
+  :mode ("\\.vim\\'" "vimrc")
   :commands (vimrc-mode))
 
 (use-package rainbow-mode
@@ -188,15 +190,14 @@
 
 (use-package ace-window
   :ensure t
-  :demand t
-  :bind ("C-c j" . ace-window))
+  :demand t)
 
 (use-package undo-fu
   :ensure t
   :demand t
   :bind
-  (("C-z" . undo-fu-only-undo)
-   ("C-S-z" . undo-fu-only-redo)))
+  (("C-{" . undo-fu-only-undo)
+   ("C-}" . undo-fu-only-redo)))
 
 (use-package undo-fu-session
   :ensure t
