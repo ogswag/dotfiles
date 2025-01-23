@@ -1,110 +1,179 @@
-local global = vim.g
-local o = vim.opt
-local map = vim.api.nvim_set_keymap
+--  ██▒   █▓ ██▓ ███▄ ▄███▓ ██▀███   ▄████▄
+-- ▓██░   █▒▓██▒▓██▒▀█▀ ██▒▓██ ▒ ██▒▒██▀ ▀█
+--  ▓██  █▒░▒██▒▓██    ▓██░▓██ ░▄█ ▒▒▓█    ▄
+--   ▒██ █░░░██░▒██    ▒██ ▒██▀▀█▄  ▒▓▓▄ ▄██▒
+--    ▒▀█░  ░██░▒██▒   ░██▒░██▓ ▒██▒▒ ▓███▀ ░
+--    ░ ▐░  ░▓  ░ ▒░   ░  ░░ ▒▓ ░▒▓░░ ░▒ ▒  ░
+--    ░ ░░   ▒ ░░  ░   ░  ░  ░▒ ░ ▒░  ░  ▒
+--      ░░   ▒ ░░      ░     ░░   ░ ░
+--       ░   ░         ░      ░     ░ ░
+--      ░                           ░
 
-o.belloff = 'all'
-o.shortmess = 'Ic'
+-- ---
+-- Bootstrap packer.nvim if not installed
+local fn = vim.fn
+local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 
-vim.g.mapleader = ","
+if fn.empty(fn.glob(install_path)) > 0 then
+    -- Clone packer.nvim if it doesn't exist
+    fn.system({ 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path })
+    -- Add packer.nvim to Neovim's runtime path
+    vim.cmd('packadd packer.nvim')
+end
 
-map("n", "N", "Nzz", {})
-map("n", "n", "nzz", {})
+-- Initialize packer
+require('packer').startup(function(use)
+    -- Packer can manage itself
+    use 'wbthomason/packer.nvim'
 
-map("i", "<C-h>", "<Left>", {})
-map("i", "<C-j>", "<Down>", {})
-map("i", "<C-k>", "<Up>", {})
-map("i", "<C-l>", "<Right>", {})
+    -- Add your plugins here
+    use 'christoomey/vim-titlecase'  -- Example plugin
+end)
 
-map("i", "<C-a>", "<C-o>I", {})
-map("i", "<C-e>", "<C-o>A", {})
+-- Automatically install plugins on first run
+-- if not vim.g.packer_plugins then
+--     vim.cmd('PackerSync')
+-- end
+-- ---------- GENERAL SETTINGS  ----------
+vim.cmd('filetype plugin indent on')
 
-map("i", "<C-v>", "<C-o>v", {})
-map("i", "<C-S-v>", "<C-o>V", {})
+vim.opt.ttimeout = true
+vim.opt.ttimeoutlen = 25
 
-map("n", ">>", ">>4l", {})
-map("n", "<<", "<<4h", {})
-map("i", "<C-,>", "<C-c>l<<i", {})
-map("i", "<C-.>", "<C-c>l>>i", {})
+vim.opt.hidden = true
+vim.opt.confirm = true
 
-map("i", "<C-s>", "<C-o>:w<CR>", {})
+vim.opt.scrolloff = 0
 
-o.compatible = false
-o.fileformats = "unix,mac"
-o.encoding = "UTF-8"
-o.fileencoding = "UTF-8"
-o.fileencodings = "UTF-8"
+vim.opt.langmenu = 'en_US.UTF-8'
+vim.cmd('language messages en_US.UTF-8')
 
-o.backspace = "indent,eol,start"
+vim.opt.compatible = false
+vim.opt.fileformats = 'unix,mac'
+vim.opt.encoding = 'utf-8'
+vim.opt.fileencoding = 'utf-8'
+vim.opt.fileencodings = 'utf-8'
+vim.opt.splitbelow = true
+vim.opt.splitright = true
+vim.opt.title = true
+vim.opt.swapfile = false
+vim.opt.spell = false
+vim.opt.spelllang = 'en_gb,ru_yo'
 
-o.autoread = true
-o.autochdir = true
+vim.opt.wrap = false
+vim.opt.breakindent = true
+vim.opt.breakindentopt = 'sbr,list:-1'
+vim.opt.linebreak = true
+vim.opt.joinspaces = false
+vim.opt.list = true
+vim.opt.listchars = {tab = '› ', nbsp = '␣', trail = '·', extends = '…', precedes = '…'}
+vim.opt.showbreak = '↪'
+vim.opt.fillchars = {fold = ' ', vert = '│'}
+vim.opt.sidescroll = 1
+vim.opt.sidescrolloff = 3
+vim.opt.startofline = false
+vim.opt.virtualedit = 'block'
+vim.opt.display = 'lastline'
+vim.opt.laststatus = 2
+vim.opt.ruler = true
+vim.opt.belloff = 'all'
+vim.opt.shortmess:append('Ic')
 
-o.confirm = true
+vim.opt.colorcolumn = '110'
+vim.opt.textwidth = 110
 
-o.swapfile = false
+vim.cmd('syntax on')
+vim.opt.background = 'dark'
+vim.cmd([[
+augroup colorscheme_change
+    au!
+    au ColorScheme habamax hi Normal ctermbg=NONE guibg=NONE
+    au ColorScheme habamax hi Comment ctermfg=95 guifg=NONE
+    au ColorScheme habamax hi SpellBad cterm=underline ctermfg=124 ctermbg=NONE guifg=#af0000 gui=underline guibg=NONE
+    au ColorScheme lunaperche hi Normal ctermbg=NONE guibg=NONE
+    au ColorScheme sorbet hi Normal ctermbg=NONE guibg=NONE
+    au ColorScheme wildcharm hi Normal ctermbg=NONE guibg=NONE
+    au ColorScheme zellner hi Normal ctermbg=NONE guibg=NONE
+augroup END
+]])
 
-o.wrap = false
-o.linebreak = true
+vim.cmd('colorscheme habamax')
+vim.opt.showmatch = true
 
-o.laststatus = 2
-o.ruler = true
-o.display = "lastline"
+if vim.fn.has('gui_running') == 1 then
+    vim.opt.guifont = 'Input Mono:h13'
+    vim.opt.guioptions:remove('r')
+    vim.opt.guioptions:remove('l')
+    vim.opt.guioptions:remove('L')
+end
 
-o.clipboard = "unnamedplus,unnamed"
+vim.opt.cursorline = true
+vim.opt.cursorlineopt = 'number'
+vim.opt.number = true
+vim.opt.relativenumber = true
 
-o.relativenumber = true
-o.number = true
+vim.opt.hlsearch = true
+vim.opt.incsearch = true
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
 
-o.termguicolors = true
-o.syntax = "on"
+-- Centre search results on screen
+vim.keymap.set('n', 'n', 'nzz', {noremap = true})
+vim.keymap.set('n', 'N', 'Nzz', {noremap = true})
 
-o.hlsearch = true
-o.smartcase = true
-o.ignorecase = true
-o.incsearch = true
+vim.keymap.set('n', 'j', 'gj', {noremap = true})
+vim.keymap.set('n', 'k', 'gk', {noremap = true})
 
-o.wildmenu = true
-o.wildoptions = "pum,fuzzy"
-o.pumheight = 20
-o.wildignore = "*.o,*.obj,*.bak,*.exe,*.swp,tags"
+vim.keymap.set('n', '<C-q>', '<End>a;<C-c>j', {noremap = true, silent = true})
+vim.keymap.set('i', '<C-q>', '<End>;<Down>', {noremap = true, silent = true})
 
-o.autoindent = true
+vim.keymap.set('i', '<C-a>', '<C-o>I', {noremap = true, silent = true})
+vim.keymap.set('i', '<C-e>', '<C-o>A', {noremap = true, silent = true})
 
-o.cursorline = true
-o.cursorlineopt = "number"
-o.guicursor =
-"n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
+vim.keymap.set('i', '<C-k>', '<up>', {noremap = true, silent = true})
+vim.keymap.set('i', '<C-j>', '<down>', {noremap = true, silent = true})
+vim.keymap.set('i', '<C-h>', '<left>', {noremap = true, silent = true})
+vim.keymap.set('i', '<C-l>', '<right>', {noremap = true, silent = true})
 
+vim.opt.autoindent = true
+vim.opt.shiftwidth = 4
+vim.opt.softtabstop = -1
+vim.opt.expandtab = true
 
-o.colorcolumn = "110"
-o.textwidth = 110
+vim.cmd([[
+autocmd BufNewFile,BufRead,BufWinEnter,FileType,OptionSet * set formatoptions-=t formatoptions-=l formatoptions-=c formatoptions-=r formatoptions-=o formatoptions-=q
+autocmd BufNewFile,BufRead,BufWinEnter,FileType,OptionSet * setlocal formatoptions-=t formatoptions-=l formatoptions-=c formatoptions-=r formatoptions-=o formatoptions-=q
+]])
 
-o.expandtab = true
-o.shiftwidth = 4
-o.tabstop = 4
+vim.opt.smartindent = true
+vim.opt.autoindent = true
+vim.opt.smarttab = true
 
-o.list = true
-o.listchars = "tab:› ,nbsp:␣,trail:·,extends:…,precedes:…"
-o.showbreak = "↪"
+vim.opt.autochdir = true
+vim.opt.autoread = true
 
-o.mouse = "a"
-o.title = true
-o.hidden = true
-o.ttimeoutlen = 0
+vim.opt.backspace = 'indent,eol,start'
 
-o.showcmd = true
-o.showmatch = true
+vim.opt.mouse = 'a'
 
-o.inccommand = "split"
-o.splitright = true
-o.splitbelow = true
+vim.opt.wildmenu = true
+vim.opt.wildoptions = 'pum,fuzzy'
+vim.opt.pumheight = 20
+vim.opt.wildignore = '*.o,*.obj,*.bak,*.exe,*.swp,tags,*.out'
 
-o.virtualedit = "block"
+local function check_undo_dir()
+    local home = vim.fn.expand('$HOME')
+    local undo_dir = home .. '/.vimUndoDir'
 
-o.errorbells = false
-o.visualbell = false
+    if vim.fn.isdirectory(undo_dir) == 0 then
+        vim.fn.system('mkdir -p ' .. undo_dir)
+    end
+end
 
-o.undolevels = 1000
-o.undofile = true
+-- Call the function to check and create undo directory if necessary
+check_undo_dir()
+vim.opt.undodir = '~/.vimUndoDir'
 
-require("config.lazy")
+vim.opt.undolevels = 1000
+vim.opt.undofile = true
+vim.opt.viminfo = "'200,<500,s32"

@@ -13,16 +13,16 @@ decorations = "Buttonless"
   lines = 38
 
 [font]
-size = 15
+size = 13
 
   [font.normal]
-  family = "IosevkaCustomTerminal Nerd Font Mono"
+  family = "SF Mono"
 
 [colors]
 cursor = { text = "CellBackground", cursor = "#f5a97f" }
 
 [cursor]
-thickness = 0.25
+thickness = 0.275
 
   [cursor.style]
   shape = "Beam"
