@@ -1,4 +1,4 @@
-font-family = "Input"
+font-family = "IBM Plex Mono"
 window-inherit-font-size = false
 font-size = 14
-theme = "Jellybeans"
+theme = "LiquidCarbonTransparent"

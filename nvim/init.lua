@@ -9,31 +9,6 @@
 --       ░   ░         ░      ░     ░ ░
 --      ░                           ░
 
--- ---
--- Bootstrap packer.nvim if not installed
-local fn = vim.fn
-local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
-
-if fn.empty(fn.glob(install_path)) > 0 then
-    -- Clone packer.nvim if it doesn't exist
-    fn.system({ 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path })
-    -- Add packer.nvim to Neovim's runtime path
-    vim.cmd('packadd packer.nvim')
-end
-
--- Initialize packer
-require('packer').startup(function(use)
-    -- Packer can manage itself
-    use 'wbthomason/packer.nvim'
-
-    -- Add your plugins here
-    use 'christoomey/vim-titlecase'  -- Example plugin
-end)
-
--- Automatically install plugins on first run
--- if not vim.g.packer_plugins then
---     vim.cmd('PackerSync')
--- end
 -- ---------- GENERAL SETTINGS  ----------
 vim.cmd('filetype plugin indent on')
 
@@ -97,7 +72,7 @@ augroup colorscheme_change
 augroup END
 ]])
 
-vim.cmd('colorscheme habamax')
+vim.cmd('colorscheme lunaperche')
 vim.opt.showmatch = true
 
 if vim.fn.has('gui_running') == 1 then
@@ -161,19 +136,6 @@ vim.opt.wildoptions = 'pum,fuzzy'
 vim.opt.pumheight = 20
 vim.opt.wildignore = '*.o,*.obj,*.bak,*.exe,*.swp,tags,*.out'
 
-local function check_undo_dir()
-    local home = vim.fn.expand('$HOME')
-    local undo_dir = home .. '/.vimUndoDir'
-
-    if vim.fn.isdirectory(undo_dir) == 0 then
-        vim.fn.system('mkdir -p ' .. undo_dir)
-    end
-end
-
--- Call the function to check and create undo directory if necessary
-check_undo_dir()
-vim.opt.undodir = '~/.vimUndoDir'
-
 vim.opt.undolevels = 1000
-vim.opt.undofile = true
+-- vim.opt.undofile = true
 vim.opt.viminfo = "'200,<500,s32"

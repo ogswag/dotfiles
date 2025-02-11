@@ -5,8 +5,8 @@
  ((eq system-type 'darwin) ; macOS
   (when (member "Menlo" (font-family-list))
     (set-frame-font "Menlo 12" t t)
-    (set-face-attribute 'fixed-pitch nil :family "Ubuntu Mono")
-    (set-face-attribute 'variable-pitch nil :family "Arial")))
+    (set-face-attribute 'fixed-pitch nil :family "Menlo")
+    (set-face-attribute 'variable-pitch nil :family "Helvetica Neue")))
  ((eq system-type 'gnu/linux)
   (when (member "Ubuntu Mono" (font-family-list))
     (set-frame-font "Ubuntu Mono 14" t t))))
