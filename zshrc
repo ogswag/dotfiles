@@ -66,7 +66,7 @@ function generate_top_border() {
 
 # Set the prompt
 PROMPT='$(generate_top_border)
-%F{blue}│ %F{white}%n@%m%f %# '
+%F{blue}│%f %n@%m %# '
 
 
 # Enable completion

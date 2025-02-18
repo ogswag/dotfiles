@@ -235,3 +235,6 @@
 
 (use-package auto-dark
   :ensure t)
+
+(use-package devdocs
+  :ensure t)

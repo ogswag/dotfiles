@@ -72,7 +72,7 @@ augroup colorscheme_change
 augroup END
 ]])
 
-vim.cmd('colorscheme lunaperche')
+vim.cmd('colorscheme shine')
 vim.opt.showmatch = true
 
 if vim.fn.has('gui_running') == 1 then
