@@ -14,6 +14,7 @@
 
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
+(pixel-scroll-precision-mode 1)
 (context-menu-mode 1)
 
 

@@ -69,7 +69,7 @@ augroup colorscheme_change | au!
     au ColorScheme zellner hi Normal ctermbg=NONE guibg=NONE
 augroup END
 
-colorscheme lunaperche
+colorscheme shine
 set showmatch  " highlight matching brace
 
 if has("gui_running")
