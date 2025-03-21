@@ -1,6 +1,9 @@
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (add-to-list 'load-path "~/.emacs.d/themes/")
 
+(use-package monokai-theme
+  :ensure t)
+
 ;; (load-theme 'nimbus t)
 
 (custom-set-faces
@@ -9,7 +12,7 @@
 
 (use-package auto-dark
   :custom
-  (auto-dark-themes '((nimbus) (standard-light)))
+  (auto-dark-themes '((monokai) (standard-light)))
   (auto-dark-polling-interval-seconds 5)
   (auto-dark-allow-osascript t)
   ;; (auto-dark-detection-method nil) ;; dangerous to be set manually

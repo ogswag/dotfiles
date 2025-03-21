@@ -124,6 +124,7 @@
 
 (setq custom-safe-themes t)
 
+
 (require 'project)
 
 ;; Define your projects
@@ -154,7 +155,6 @@
   :hook ((prog-mode text-mode) . rainbow-delimiters-mode))
 
 (use-package which-key
-  :demand t
   :config (which-key-mode 1))
 
 (use-package avy
