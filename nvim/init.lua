@@ -58,21 +58,24 @@ vim.opt.colorcolumn = '110'
 vim.opt.textwidth = 110
 
 vim.cmd('syntax on')
-vim.opt.background = 'dark'
 vim.cmd([[
 augroup colorscheme_change
     au!
-    au ColorScheme habamax hi Normal ctermbg=NONE guibg=NONE
-    au ColorScheme habamax hi Comment ctermfg=95 guifg=NONE
-    au ColorScheme habamax hi SpellBad cterm=underline ctermfg=124 ctermbg=NONE guifg=#af0000 gui=underline guibg=NONE
-    au ColorScheme lunaperche hi Normal ctermbg=NONE guibg=NONE
-    au ColorScheme sorbet hi Normal ctermbg=NONE guibg=NONE
-    au ColorScheme wildcharm hi Normal ctermbg=NONE guibg=NONE
-    au ColorScheme zellner hi Normal ctermbg=NONE guibg=NONE
+    au ColorScheme default hi Normal ctermbg=NONE guibg=NONE
+    au ColorScheme habamax.nvim hi Normal ctermbg=NONE guibg=NONE
 augroup END
 ]])
+-- Enable transparent background if supported by colorscheme
+-- vim.api.nvim_create_autocmd("ColorScheme", {
+--   pattern = "*",
+--   callback = function()
+--     pcall(vim.cmd, "highlight Normal guibg=none ctermbg=none")
+--     pcall(vim.cmd, "highlight NonText guibg=none ctermbg=none")
+--     pcall(vim.cmd, "highlight LineNr guibg=none ctermbg=none")
+--     pcall(vim.cmd, "highlight SignColumn guibg=none ctermbg=none")
+--   end,
+-- })
 
-vim.cmd('colorscheme shine')
 vim.opt.showmatch = true
 
 if vim.fn.has('gui_running') == 1 then
@@ -139,3 +142,107 @@ vim.opt.wildignore = '*.o,*.obj,*.bak,*.exe,*.swp,tags,*.out'
 vim.opt.undolevels = 1000
 -- vim.opt.undofile = true
 vim.opt.viminfo = "'200,<500,s32"
+
+-- Set up lazy.nvim plugin manager
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable",
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+
+-- Set up plugins
+require("lazy").setup({
+  -- Colorschemes with both light and dark variants
+  { "rebelot/kanagawa.nvim" },
+  { "sainnhe/gruvbox-material" },
+  { "navarasu/onedark.nvim" },
+  { "folke/tokyonight.nvim" },
+  { "ntk148v/habamax.nvim", dependencies={ "rktjmp/lush.nvim" } },
+  { "EdenEast/nightfox.nvim" },
+
+  -- Tree-sitter
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    config = function()
+      require("nvim-treesitter.configs").setup({
+        ensure_installed = {
+          "bash", "c", "cpp", "css", "dockerfile", "go", "html", "java",
+          "javascript", "json", "lua", "markdown", "python", "rust", "sql",
+          "tsx", "typescript", "vim", "yaml", "toml", "regex", "vimdoc"
+        },
+        highlight = { enable = true },
+        indent = { enable = true },
+        incremental_selection = {
+          enable = true,
+          keymaps = {
+            init_selection = "<c-space>",
+            node_incremental = "<c-space>",
+            scope_incremental = "<c-s>",
+            node_decremental = "<M-space>",
+          },
+        },
+      })
+    end
+  },
+
+  -- Auto dark/light mode detection
+  {
+    "f-person/auto-dark-mode.nvim",
+    config = function()
+      local auto_dark_mode = require("auto-dark-mode")
+
+      auto_dark_mode.setup({
+        update_interval = 1000, -- ms
+        set_dark_mode = function()
+          vim.api.nvim_set_option("background", "dark")
+          -- Choose your preferred dark colorscheme here
+          vim.cmd.colorscheme("habamax.nvim") -- alternatives: tokyonight, onedark, gruvbox-material
+        end,
+        set_light_mode = function()
+          vim.api.nvim_set_option("background", "light")
+          -- Choose your preferred light colorscheme here
+          vim.cmd.colorscheme("dayfox") -- alternatives: tokyonight-day, gruvbox-material-light
+        end,
+      })
+
+      auto_dark_mode.init()
+    end
+  },
+
+  -- Quality of life plugins
+  { "tpope/vim-sleuth" }, -- Detect tabstop and shiftwidth automatically
+  { "tpope/vim-commentary" }, -- Easy commenting
+  { "tpope/vim-surround" }, -- Surround text objects
+  { "windwp/nvim-autopairs", config = true }, -- Auto pair brackets, quotes, etc.
+
+  -- File navigation
+  {
+    "nvim-telescope/telescope.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" }
+  },
+
+})
+
+-- Key mappings
+vim.g.mapleader = ","
+vim.g.maplocalleader = ","
+
+vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { desc = "Find files" })
+vim.keymap.set("n", "<leader>fg", "<cmd>Telescope live_grep<cr>", { desc = "Live grep" })
+vim.keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<cr>", { desc = "Find buffers" })
+vim.keymap.set("n", "<leader>fh", "<cmd>Telescope help_tags<cr>", { desc = "Help tags" })
+
+-- Auto commands
+vim.api.nvim_create_autocmd("TextYankPost", {
+  callback = function()
+    vim.highlight.on_yank({ timeout = 200 })
+  end,
+})

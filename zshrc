@@ -49,10 +49,13 @@ setopt NO_FLOW_CONTROL
 
 # alias l="eza --group-directories-first -lhU --time-style='long-iso'"
 alias l="ls -FAG"
-alias e="emacs -nw"
+alias n="nvim"
+alias nv="nvim"
+alias v="vim"
 
 export VISUAL=e
 
 export PATH="/usr/local/opt/jpeg/bin:$PATH"
 
 export PATH="/usr/local/sbin:$PATH"
+export PATH="/usr/local/opt/llvm/bin:$PATH"
