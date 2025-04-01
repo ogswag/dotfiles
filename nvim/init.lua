@@ -33,7 +33,7 @@ vim.opt.splitright = true
 vim.opt.title = true
 vim.opt.swapfile = false
 vim.opt.spell = false
-vim.opt.spelllang = 'en_gb,ru_yo'
+vim.opt.spelllang = 'en_us,ru_yo'
 
 vim.opt.wrap = false
 vim.opt.breakindent = true
@@ -62,7 +62,7 @@ vim.cmd([[
 augroup colorscheme_change
     au!
     au ColorScheme default hi Normal ctermbg=NONE guibg=NONE
-    au ColorScheme habamax.nvim hi Normal ctermbg=NONE guibg=NONE
+    au ColorScheme habamax.nvim hi Normal ctermbg=NONE guibg=NONE ctermfg=0 guifg=#FEFFFF
 augroup END
 ]])
 -- Enable transparent background if supported by colorscheme
@@ -140,7 +140,7 @@ vim.opt.pumheight = 20
 vim.opt.wildignore = '*.o,*.obj,*.bak,*.exe,*.swp,tags,*.out'
 
 vim.opt.undolevels = 1000
--- vim.opt.undofile = true
+vim.opt.undofile = true
 vim.opt.viminfo = "'200,<500,s32"
 
 -- Set up lazy.nvim plugin manager
@@ -160,10 +160,9 @@ vim.opt.rtp:prepend(lazypath)
 -- Set up plugins
 require("lazy").setup({
   -- Colorschemes with both light and dark variants
-  { "rebelot/kanagawa.nvim" },
-  { "sainnhe/gruvbox-material" },
-  { "navarasu/onedark.nvim" },
-  { "folke/tokyonight.nvim" },
+  { "kkga/vim-envy" },
+  { "foxoman/vim-helix" },
+  { "boriselec/intellij.vim" },
   { "ntk148v/habamax.nvim", dependencies={ "rktjmp/lush.nvim" } },
   { "EdenEast/nightfox.nvim" },
 
@@ -209,7 +208,7 @@ require("lazy").setup({
         set_light_mode = function()
           vim.api.nvim_set_option("background", "light")
           -- Choose your preferred light colorscheme here
-          vim.cmd.colorscheme("dayfox") -- alternatives: tokyonight-day, gruvbox-material-light
+          vim.cmd.colorscheme("helix-light") -- alternatives: tokyonight-day, gruvbox-material-light
         end,
       })
 
