@@ -1,18 +1,23 @@
+;;; -*- lexical-binding: t; -*-
+
+(setq warning-suppress-types '((files)))
 (setq custom-file (locate-user-emacs-file "custom.el"))
 (when (file-exists-p custom-file)
   (load custom-file))
 
 (setq native-comp-async-report-warnings-errors 'silent)
 
-(setq mac-command-modifier 'hyper) ; make cmd key do Meta
-(setq mac-option-modifier 'meta) ; make opt key do Super
-(setq mac-control-modifier 'control) ; make Control key do Control
+(setq mac-command-modifier 'hyper)   ;; make cmd key do Meta
+(setq mac-option-modifier 'meta)     ;; make opt key do Super
+(setq mac-control-modifier 'control) ;; make Control key do Control
+(load "~/.emacs.d/elisp/keys.el")
 
 
 (fringe-mode '(8 . 0))
 (setq-default indicate-empty-lines t)
 
 (tool-bar-mode 0)
+(setq use-dialog-box nil)
 (scroll-bar-mode 0)
 (pixel-scroll-precision-mode 1)
 (context-menu-mode 1)
@@ -30,9 +35,9 @@
 
 (setq-default ring-bell-function 'ignore)
 
-(setq vc-follow-symlinks t) ;; auto follow symlinkgs without asking
+(setq vc-follow-symlinks t)  ;; auto follow symlinkgs without asking
 
-(setq use-short-answers t) ;; Use y-n instead of yes-no
+(setq use-short-answers t)   ;; Use y-n instead of yes-no
 
 (global-goto-address-mode t) ;; Make links clickable
 
@@ -41,21 +46,20 @@
 (setq-default fill-column 240)
 ;; Fill column ruler
 (use-package display-fill-column-indicator-mode
-    :hook (prog-mode LaTeX-mode))
+  :hook (prog-mode LaTeX-mode))
 
 
-(setq-default indent-tabs-mode nil) ;; Indent by spaces
-(setq-default tab-width 4)          ;; Set tab length = N
-(setq-default c-basic-offset 4)     ;; Set default offset for C-like modes
-(setq-default python-indent-guess-indent-offset nil)
-
+(setq-default indent-tabs-mode nil) ;; Use spaces instead of tabs
+(setq-default tab-width 4)          ;; Set tab width to 4 spaces
+(setq-default c-ts-mode-indent-style 'bsd)
+(setq-default c-ts-mode-indent-offset 4)
 
 (electric-indent-mode 1)
 (electric-pair-mode 1)
 
 
 (blink-cursor-mode 1) ;; Stop (or don't) cursor blinking
-(setq-default cursor-type 'box) ;; Set cursor shape
+(setq-default cursor-type 'bar) ;; Set cursor shape
 
 
 (delete-selection-mode 1) ;; Paste over selected region
@@ -127,62 +131,114 @@
 
 (require 'project)
 
-;; Define your projects
-;; (setq project--list
-;;       '(("~/Workspace/dotfiles/" . "Dotfiles")))
-
 
 (setq-default default-input-method 'russian-computer)
 
-(load "~/.emacs.d/elisp/colors.el")
-(load "~/.emacs.d/elisp/font.el")
+
+(defun compile-yandex-g++14.1 ()
+  "Compile current .cpp file with optimizations and run the executable."
+  (interactive)
+  (let* ((cpp-file (buffer-file-name))
+         (build-file (replace-regexp-in-string "\\.cpp$" ".cpp.build" cpp-file))
+         (compile-command (format "g++ -O2 -lm -std=c++20 -x c++ %s -o %s"
+                                  (shell-quote-argument cpp-file)
+                                  (shell-quote-argument build-file))))
+
+    (unless cpp-file
+      (error "Buffer is not visiting a file"))
+
+    (unless (string-match "\\.cpp$" cpp-file)
+      (error "Not a C++ file"))
+
+    ;; Compile the program
+    (if (zerop (shell-command compile-command))
+        ;; If compilation succeeds, run the executable
+        (progn
+          (message "Compilation successful. Running...")
+          (async-shell-command build-file))
+      ;; Show error message if compilation fails
+      (error "Compilation failed"))))
+
+
+(cond
+ ((eq system-type 'windows-nt)
+  (when (member "Cascadia Code 12" (font-family-list))
+    (set-frame-font "Cascadia Code" t t)
+    (set-face-attribute 'fixed-pitch nil :family "Cascadia Code")
+    (set-face-attribute 'variable-pitch nil :family "Calibri")))
+ ((eq system-type 'darwin)
+  (when (member "Cascadia Code" (font-family-list))
+    (set-frame-font "Cascadia Code 14" t t)
+    (set-face-attribute 'fixed-pitch nil :family "Monaco")
+    (set-face-attribute 'variable-pitch nil :family "Arial")))
+ ((eq system-type 'gnu/linux)
+  (when (member "DejaVu Sans Mono" (font-family-list))
+    (set-frame-font "DejaVu Sans Mono 12" t t)
+    (set-face-attribute 'fixed-pitch nil :family "DejaVu Sans Mono")
+    (set-face-attribute 'variable-pitch nil :family "DejaVu Sans"))))
+
+
+;; (load "~/.emacs.d/elisp/colors.el")
+;; (load "~/.emacs.d/elisp/font.el")
 (load "~/.emacs.d/elisp/treesitter.el")
-(load "~/.emacs.d/elisp/keys.el")
 
-(add-to-list 'load-path "~/.emacs.d/package-local/")
+;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+;; (add-to-list 'load-path "~/.emacs.d/themes/")
 
-(use-package vimrc-mode
-  :defer t
-  :mode ("\\.vim\\'" "vimrc")
-  :commands (vimrc-mode))
-
-(use-package rainbow-mode
-  :defer t
-  :commands (rainbow-mode))
-
-(use-package rainbow-delimiters
-  :demand t
-  :hook ((prog-mode text-mode) . rainbow-delimiters-mode))
-
-(use-package which-key
-  :config (which-key-mode 1))
-
-(use-package avy
-  :demand t
-  :bind ("C-c c" . 'avy-goto-char))
-
-(use-package exec-path-from-shell
-  :if (memq window-system '(mac ns))
-  :defer t
-  :commands (exec-path-from-shell-initialize)
-  :config
-  (exec-path-from-shell-initialize))
-
-(use-package highlight-doxygen
-  :defer t
-  :commands (highlight-doxygen-global-mode)
-  :hook (c++-mode c++-ts-mode))
-
-(use-package markdown-mode
-  :defer t
-  :mode "\\.md\\'"
-  :commands (markdown-mode))
+;; (add-to-list 'load-path "~/.emacs.d/package-local/")
 
 (require 'package)
 (add-to-list 'package-archives '("gnu"   . "https://elpa.gnu.org/packages/"))
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
+
+(use-package vimrc-mode
+  :ensure t
+  :defer t
+  :mode ("\\.vim\\'" "vimrc")
+  :commands (vimrc-mode))
+
+(use-package rainbow-mode
+  :ensure t
+  :defer t
+  :commands (rainbow-mode))
+
+(use-package rainbow-delimiters
+  :ensure t
+  :demand t
+  :hook ((prog-mode text-mode) . rainbow-delimiters-mode))
+
+(use-package which-key
+  :ensure t
+  :config (which-key-mode 1))
+
+(use-package avy
+  :ensure t
+  :demand t
+  :bind ("H-j" . 'avy-goto-char))
+
+(use-package exec-path-from-shell
+  :ensure t
+  :if (memq window-system '(mac ns))
+  :defer t
+  :commands (exec-path-from-shell-initialize)
+  :config
+  (exec-path-from-shell-initialize))
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
+
+(use-package highlight-doxygen
+  :ensure t
+  :defer t
+  :commands (highlight-doxygen-global-mode)
+  :hook (c++-mode c++-ts-mode))
+
+(use-package markdown-mode
+  :ensure t
+  :defer t
+  :mode "\\.md\\'"
+  :commands (markdown-mode))
 
 (use-package rmsbolt
   :ensure t
@@ -192,6 +248,7 @@
 (use-package ace-window
   :ensure t
   :demand t)
+(ace-window-display-mode 1)
 
 (use-package undo-fu
   :ensure t
@@ -234,8 +291,72 @@
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion)))))
 
-(use-package auto-dark
+(use-package monokai-theme
   :ensure t)
+
+(use-package standard-themes
+  :ensure t)
+
+(use-package ef-themes
+  :ensure t)
+
+(custom-set-faces
+ ;; make fringe transparent for any theme
+ '(fringe ((t (:background nil))))
+ '(line-number ((t (:background nil)))))
+
+(setq modus-vivendi-palette-overrides
+      '((comment cyan-faint)
+        (string green-intense)))
+
+(defvar after-enable-theme-hook nil
+   "Normal hook run after enabling a theme.")
+
+(defun run-after-enable-theme-hook (&rest _args)
+   "Run `after-enable-theme-hook'."
+   (run-hooks 'after-enable-theme-hook))
+
+(defun my-ef-themes-custom-faces ()
+  "My customizations on top of the Ef themes.
+This function is added to the `ef-themes-post-load-hook'."
+  (ef-themes-with-colors
+    (custom-set-faces
+     ;; These are the default specifications
+     `(font-lock-comment-face ((,c :inherit default :foreground ,comment))))))
+     ;; `(font-lock-variable-name-face ((,c :foreground ,variable))))))
+
+;; Using the hook lets our changes persist when we use the commands
+;; `ef-themes-toggle', `ef-themes-select', and `ef-themes-load-random'.
+(add-hook 'ef-themes-post-load-hook #'my-ef-themes-custom-faces)
+
+(advice-add 'enable-theme :after #'run-after-enable-theme-hook)
+
+(use-package auto-dark
+  :ensure t
+  :custom
+  (auto-dark-themes '((modus-vivendi) (ef-light)))
+  (auto-dark-polling-interval-seconds 5)
+  (auto-dark-allow-osascript t)
+  ;; (auto-dark-detection-method nil) ;; dangerous to be set manually
+  :hook
+  (auto-dark-dark-mode
+   . (lambda ()
+       ;; something to execute when dark mode is detected
+       ))
+  (auto-dark-light-mode
+   . (lambda ()
+       ;; something to execute when light mode is detected
+       ))
+  :init (auto-dark-mode))
+
+(use-package format-all
+  :ensure t
+  :commands format-all-mode
+  :hook (prog-mode . format-all-mode)
+  :config
+  (setq-default format-all-formatters
+                '(("C++"   (clang-format "--style=file" "--fallback-style=webkit"))
+                  ("Shell" (shfmt "-i" "4" "-ci")))))
 
 (use-package devdocs
   :ensure t)

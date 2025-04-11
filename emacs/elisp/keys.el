@@ -1,11 +1,13 @@
+;;; -*- lexical-binding: t; -*-
+
 ;; Unset default undo keys
 (keymap-global-unset "C-_")
 (keymap-global-unset "C-z")
 
 ;; Set better `set-mark-command' keybinding
-(global-unset-key (kbd "C-SPC"))
-(global-unset-key (kbd "C-@"))
-(global-unset-key (kbd "C-s"))
+(keymap-global-unset "C-SPC")
+(keymap-global-unset "C-@")
+(keymap-global-unset "C-s")
 (keymap-global-set "C-s" #'set-mark-command)
 
 ;; Stop Emacs from zooming when holding CTRL + Mouse Wheel
@@ -30,6 +32,9 @@
 (keymap-global-set "H-5" #'switch-to-prev-buffer)
 (keymap-global-set "H-6" #'switch-to-next-buffer)
 (keymap-global-set "H-=" #'balance-windows)
+
+(keymap-global-set "H-c c" #'compile)
+(keymap-global-set "H-c y" #'compile-yandex-g++14.1)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
