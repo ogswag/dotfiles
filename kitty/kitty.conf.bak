@@ -23,7 +23,7 @@ enable_audio_bell no
 visual_bell_duration 0.0
 
 
-shell_integration no-cursor
+shell_integration enabled
 
 notify_on_cmd_finish unfocused
 
@@ -60,10 +60,7 @@ map kitty_mod+delete clear_terminal reset active
 map cmd+m minimize_macos_window
 map cmd+q quit
 
-cursor_chape block
-cursor_blink_interval 1
-
 # BEGIN_KITTY_THEME
-# zenwritten_dark
-include zenwritten_dark.conf
+# Afterglow
+include current-theme.conf
 # END_KITTY_THEME

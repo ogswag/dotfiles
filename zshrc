@@ -93,12 +93,11 @@ setopt NO_MULTIOS
 setopt NO_FLOW_CONTROL
 
 # alias l="eza --group-directories-first -lhU --time-style='long-iso'"
-alias l="ls -FAG"
+alias l="eza --sort=type -l --hyperlink"
 alias n="nvim"
 alias nv="nvim"
 alias v="vim"
-
-export VISUAL=e
+alias cd-focus-config="cd ~/Library/Application\ Support/dev.focus-editor"
 
 export PATH="/usr/local/opt/jpeg/bin:$PATH"
 
@@ -106,20 +105,7 @@ export PATH="/usr/local/sbin:$PATH"
 export PATH="/usr/local/opt/llvm/bin:$PATH"
 export PATH="/usr/local/bin:$PATH"
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/usr/local/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/usr/local/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
-        . "/usr/local/Caskroom/miniconda/base/etc/profile.d/conda.sh"
-    else
-        export PATH="/usr/local/Caskroom/miniconda/base/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
-
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
+mdcd () {
+    mkdir -p "$1";
+    cd "$1"
+}
