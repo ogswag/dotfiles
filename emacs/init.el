@@ -309,32 +309,10 @@
       '((comment cyan-faint)
         (string green-intense)))
 
-(defvar after-enable-theme-hook nil
-   "Normal hook run after enabling a theme.")
-
-(defun run-after-enable-theme-hook (&rest _args)
-   "Run `after-enable-theme-hook'."
-   (run-hooks 'after-enable-theme-hook))
-
-(defun my-ef-themes-custom-faces ()
-  "My customizations on top of the Ef themes.
-This function is added to the `ef-themes-post-load-hook'."
-  (ef-themes-with-colors
-    (custom-set-faces
-     ;; These are the default specifications
-     `(font-lock-comment-face ((,c :inherit default :foreground ,comment))))))
-     ;; `(font-lock-variable-name-face ((,c :foreground ,variable))))))
-
-;; Using the hook lets our changes persist when we use the commands
-;; `ef-themes-toggle', `ef-themes-select', and `ef-themes-load-random'.
-(add-hook 'ef-themes-post-load-hook #'my-ef-themes-custom-faces)
-
-(advice-add 'enable-theme :after #'run-after-enable-theme-hook)
-
 (use-package auto-dark
   :ensure t
   :custom
-  (auto-dark-themes '((modus-vivendi) (ef-light)))
+  (auto-dark-themes '((ef-owl) (ef-duo-light)))
   (auto-dark-polling-interval-seconds 5)
   (auto-dark-allow-osascript t)
   ;; (auto-dark-detection-method nil) ;; dangerous to be set manually

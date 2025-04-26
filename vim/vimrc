@@ -69,7 +69,6 @@ augroup colorscheme_change | au!
     au ColorScheme zellner hi Normal ctermbg=NONE guibg=NONE
 augroup END
 
-set bg=light
 colorscheme wildcharm
 set showmatch  " highlight matching brace
 
