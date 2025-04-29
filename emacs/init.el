@@ -16,11 +16,23 @@
 (fringe-mode '(8 . 0))
 (setq-default indicate-empty-lines t)
 
+
 (tool-bar-mode 0)
 (setq use-dialog-box nil)
 (scroll-bar-mode 0)
-(pixel-scroll-precision-mode 1)
 (context-menu-mode 1)
+
+
+(unless (and (eq window-system 'mac)
+             (bound-and-true-p mac-carbon-version-string))
+  ;; Enables `pixel-scroll-precision-mode' on all operating systems and Emacs
+  ;; versions, except for emacs-mac.
+  ;;
+  ;; Enabling `pixel-scroll-precision-mode' is unnecessary with emacs-mac, as
+  ;; this version of Emacs natively supports smooth scrolling.
+  ;; https://bitbucket.org/mituharu/emacs-mac/commits/65c6c96f27afa446df6f9d8eff63f9cc012cc738
+  (setq pixel-scroll-precision-use-momentum nil) ; Precise/smoother scrolling
+  (pixel-scroll-precision-mode 1))
 
 
 (setq
@@ -53,7 +65,6 @@
 (setq-default tab-width 4)          ;; Set tab width to 4 spaces
 (setq-default c-ts-mode-indent-style 'bsd)
 (setq-default c-ts-mode-indent-offset 4)
-
 (electric-indent-mode 1)
 (electric-pair-mode 1)
 
@@ -167,8 +178,8 @@
     (set-face-attribute 'fixed-pitch nil :family "Cascadia Code")
     (set-face-attribute 'variable-pitch nil :family "Calibri")))
  ((eq system-type 'darwin)
-  (when (member "Cascadia Code" (font-family-list))
-    (set-frame-font "Cascadia Code 14" t t)
+  (when (member "SF Mono" (font-family-list))
+    (set-frame-font "SF Mono 13" t t)
     (set-face-attribute 'fixed-pitch nil :family "Monaco")
     (set-face-attribute 'variable-pitch nil :family "Arial")))
  ((eq system-type 'gnu/linux)
@@ -182,8 +193,8 @@
 ;; (load "~/.emacs.d/elisp/font.el")
 (load "~/.emacs.d/elisp/treesitter.el")
 
-;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-;; (add-to-list 'load-path "~/.emacs.d/themes/")
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+(add-to-list 'load-path "~/.emacs.d/themes/")
 
 ;; (add-to-list 'load-path "~/.emacs.d/package-local/")
 
@@ -210,8 +221,15 @@
   :hook ((prog-mode text-mode) . rainbow-delimiters-mode))
 
 (use-package which-key
-  :ensure t
-  :config (which-key-mode 1))
+  :ensure nil ; builtin
+  :defer t
+  :commands which-key-mode
+  :hook (after-init . which-key-mode)
+  :custom
+  (which-key-idle-delay 1.5)
+  (which-key-idle-secondary-delay 0.25)
+  (which-key-add-column-padding 1)
+  (which-key-max-description-length 40))
 
 (use-package avy
   :ensure t
@@ -274,6 +292,47 @@
               ("M-DEL" . vertico-directory-delete-word))
   :init (vertico-mode))
 
+(use-package marginalia
+  ;; Marginalia allows Embark to offer you preconfigured actions in more contexts.
+  ;; In addition to that, Marginalia also enhances Vertico by adding rich
+  ;; annotations to the completion candidates displayed in Vertico's interface.
+  :ensure t
+  :defer t
+  :commands (marginalia-mode marginalia-cycle)
+  :hook (after-init . marginalia-mode))
+
+(use-package embark
+  ;; Embark is an Emacs package that acts like a context menu, allowing
+  ;; users to perform context-sensitive actions on selected items
+  ;; directly from the completion interface.
+  :ensure t
+  :defer t
+  :commands (embark-act
+             embark-dwim
+             embark-export
+             embark-collect
+             embark-bindings
+             embark-prefix-help-command)
+  :bind
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+  :config
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+(use-package embark-consult
+  :ensure t
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
+
 (use-package consult
   :ensure t
   :bind (("C-c i"   . #'consult-imenu)
@@ -297,35 +356,30 @@
 (use-package standard-themes
   :ensure t)
 
-(use-package ef-themes
-  :ensure t)
-
-(custom-set-faces
- ;; make fringe transparent for any theme
- '(fringe ((t (:background nil))))
- '(line-number ((t (:background nil)))))
-
-(setq modus-vivendi-palette-overrides
-      '((comment cyan-faint)
-        (string green-intense)))
-
-(use-package auto-dark
+(use-package atom-one-dark-theme
   :ensure t
-  :custom
-  (auto-dark-themes '((ef-owl) (ef-duo-light)))
-  (auto-dark-polling-interval-seconds 5)
-  (auto-dark-allow-osascript t)
-  ;; (auto-dark-detection-method nil) ;; dangerous to be set manually
-  :hook
-  (auto-dark-dark-mode
-   . (lambda ()
-       ;; something to execute when dark mode is detected
-       ))
-  (auto-dark-light-mode
-   . (lambda ()
-       ;; something to execute when light mode is detected
-       ))
-  :init (auto-dark-mode))
+  :demand t)
+
+(mapc #'disable-theme custom-enabled-themes)  ; Disable all active themes
+(load-theme 'polar-bear-colored t)  ; Load the built-in theme
+
+;; (use-package auto-dark
+;;   :ensure t
+;;   :custom
+;;   (auto-dark-themes '((ef-owl) (ef-duo-light)))
+;;   (auto-dark-polling-interval-seconds 5)
+;;   (auto-dark-allow-osascript t)
+;;   ;; (auto-dark-detection-method nil) ;; dangerous to be set manually
+;;   :hook
+;;   (auto-dark-dark-mode
+;;    . (lambda ()
+;;        ;; something to execute when dark mode is detected
+;;        ))
+;;   (auto-dark-light-mode
+;;    . (lambda ()
+;;        ;; something to execute when light mode is detected
+;;        ))
+;;   :init (auto-dark-mode))
 
 (use-package format-all
   :ensure t
@@ -338,3 +392,70 @@
 
 (use-package devdocs
   :ensure t)
+
+(use-package eglot
+  :ensure nil
+  :defer t
+  :hook
+  ((c++-ts-mode . eglot-ensure)  ; For Tree-sitter C++ mode
+   (c-ts-mode . eglot-ensure)
+   (python-ts-mode . eglot-ensure))   ; For Tree-sitter C mode
+  :config
+  (add-to-list 'eglot-server-programs '(c++-mode . ("clangd")))
+  ;; (add-hook 'c++-mode-hook #'eglot-ensure)
+  ;; (add-hook 'c-mode-hook #'eglot-ensure)
+
+  :commands (eglot
+             eglot-ensure
+             eglot-rename
+             eglot-format-buffer))
+
+(setq-default eglot-workspace-configuration
+              `(:pylsp (:plugins
+                        (;; Fix imports and syntax using `eglot-format-buffer`
+                         :isort (:enabled t)
+                         :autopep8 (:enabled t)
+
+                         ;; Syntax checkers (works with Flymake)
+                         :pylint (:enabled t)
+                         :pycodestyle (:enabled t)
+                         :flake8 (:enabled t)
+                         :pyflakes (:enabled t)
+                         :pydocstyle (:enabled t)
+                         :mccabe (:enabled t)
+
+                         :yapf (:enabled :json-false)
+                         :rope_autoimport (:enabled :json-false)))))
+
+(use-package corfu
+  :ensure t
+  :defer t
+  :commands (corfu-mode global-corfu-mode)
+
+  :hook ((prog-mode . corfu-mode)
+         (shell-mode . corfu-mode)
+         (eshell-mode . corfu-mode))
+
+  :custom
+  ;; Hide commands in M-x which do not apply to the current mode.
+  (read-extended-command-predicate #'command-completion-default-include-p)
+  ;; Disable Ispell completion function. As an alternative try `cape-dict'.
+  (text-mode-ispell-word-completion nil)
+  (tab-always-indent 'complete)
+
+  ;; Enable Corfu
+  :config
+  (global-corfu-mode))
+
+(corfu-popupinfo-mode t)
+
+(use-package cape
+  :ensure t
+  :defer t
+  :commands (cape-dabbrev cape-file cape-elisp-block)
+  :bind ("C-c p" . cape-prefix-map)
+  :init
+  ;; Add to the global default value of `completion-at-point-functions' which is
+  ;; used by `completion-at-point'.
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file))

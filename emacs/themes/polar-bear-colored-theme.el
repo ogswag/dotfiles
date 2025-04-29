@@ -1,9 +1,9 @@
-;;; polar-bear-theme.el --- ʕ•ᴥ•ʔ Dark theme loosely based on nord-like palette. -*- lexical-binding: t -*-
+;;; polar-bear-colored-theme.el --- ʕ•ᴥ•ʔ Dark theme with arctic colors. -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2024 Alexander Zakharov (GNU/GPL Licence)
 
-;; Authors: Alexander Zakharov <apz_works@icloud.com>
-;; URL: http://github.com/alee3x/polar-bear
+;; Authors: Alexander Zakharov <alexz1243421@gmail.com>
+;; URL: http://github.com/alexsacharow/polar-bear
 ;; Version: 1.0.0
 ;; Package-Requires: ((emacs "27.1"))
 
@@ -30,35 +30,62 @@
 
 ;;; Code:
 
-(deftheme polar-bear
-  "ʕ•ᴥ•ʔ Dark theme loosely based on nord-like palette.")
+(deftheme polar-bear-colored
+  "ʕ•ᴥ•ʔ Dark theme with arctic colors.")
 
 (let ((class '((class color) (min-colors 89)))
-      (polar-bg          "#2E3440")
-      (polar-bg-darker   "#252A33")
-      (polar-bg-dim      "#3B4352")
-      (polar-bg-active   "#4C566A")
-      (polar-bg-inactive "#66738D")
+      (polar-bg          "#262626")
+      (polar-bg-darker   "#171717")
+      (polar-bg-dim      "#303235")
+      (polar-bg-active   "#5C6575")
+      (polar-bg-inactive "#757F93")
       ;; fg
-      (polar-fg          "#D8DEE9")
-      (polar-fg-dim      "#8B95AB")
-      (polar-fg-dimmer   "#5D6880")
-      (polar-fg-alt      "#A1C0E6")
+      (polar-fg            "#C7CCD6")
+      (polar-fg-dim        "#989EAE")
+      (polar-fg-dimmer     "#454545")
+      (polar-fg-alt        "#9DBFE0")
+      (polar-fg-alt-green  "#A3D1B0")
+      (polar-fg-alt-yellow "#E0E0B8")
       ;; other colors
-      (polar-white   "#fff")
-      (polar-black   "#000")
-      (polar-red         "#D5616D")
-      ;; (polar-rust        "#D6926B")
-      (polar-yellow      "#EBCB8B")
-      ;; (polar-olive       "#93B371")
-      (polar-green       "#7EB891")
-      ;; (polar-sea-green   "#8FC7BA")
-      (polar-blue        "#72A0CE")
-      (polar-cyan        "#7BC6D1")
-      (polar-magenta     "#B77CCB")
-      (polar-pink        "#D0B3CF"))
+      (polar-white        "#FFF")
+      (polar-black        "#000")
+      (polar-red          "#EB7575")
+      (polar-rust         "#FFB380")
+      (polar-yellow       "#EBD17F")
+      ;; (polar-olive     "#93B371")
+      ;; (polar-green     "#7EB891")
+      ;; (polar-green     "#81C274")
+      (polar-green        "#9CD689")
+      ;; (polar-sea-green "#8FC7BA"
+      ;; (polar-blue         "#6A96D4")#669cd1
+      (polar-blue         "#73A8E6")
+      (polar-cyan         "#81BEC7")
+      (polar-magenta      "#D29EF0")
+      (polar-pink         "#FAA0D4")
+
+      (polar-rainbow-fg       "#ABB2BF")
+      (polar-rainbow-bg       "#282C34")
+      (polar-rainbow-bg-1     "#121417")
+      (polar-rainbow-bg-hl    "#2C323C")
+      (polar-rainbow-gutter   "#4B5363")
+      (polar-rainbow-mono-1   "#ABB2BF")
+      (polar-rainbow-mono-2   "#828997")
+      (polar-rainbow-mono-3   "#5C6370")
+      (polar-rainbow-cyan     "#56B6C2")
+      (polar-rainbow-blue     "#61AFEF")
+      (polar-rainbow-purple   "#C678DD")
+      (polar-rainbow-green    "#98C379")
+      (polar-rainbow-red-1    "#E06C75")
+      (polar-rainbow-red-2    "#BE5046")
+      (polar-rainbow-orange-1 "#D19A66")
+      (polar-rainbow-orange-2 "#E5C07B")
+      (polar-rainbow-gray     "#3E4451")
+      (polar-rainbow-silver   "#9DA5B4")
+      (polar-rainbow-black    "#21252B")
+      (polar-rainbow-border   "#181A1F")
+      )
   (custom-theme-set-faces
-   'polar-bear
+   'polar-bear-colored
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; BUILTIN FUNCTIONS AND PACKAGES ;;
@@ -69,7 +96,7 @@
    `(tooltip ((,class :foreground ,polar-fg :background ,polar-bg-active)))
    `(cursor  ((,class :foreground ,polar-bg :background ,polar-white)))
    `(fringe  ((,class :inherit default)))
-   `(highlight   ((,class :foreground ,polar-fg :background ,polar-bg-active)))
+   `(highlight   ((,class :foreground nil :background ,polar-bg-dim)))
    `(header-line ((,class :background ,polar-bg-dim :foreground ,polar-fg-dim)))
    `(help-key-binding    ((,class :inherit font-lock-comment-face)))
    `(trailing-whitespace ((,class :foreground ,polar-bg :background ,polar-red)))
@@ -166,11 +193,11 @@
    `(fill-column-indicator ((,class :inherit nil :foreground ,polar-bg-active :background ,polar-bg-active)))
 
    ;; modeline
-   `(mode-line           ((,class :box (:line-width -1 :style flat-button) :foreground ,polar-fg :background ,polar-bg-active)))
+   `(mode-line           ((,class :box (:line-width -1 :style flat-button) :foreground ,polar-fg :background ,polar-bg-dim)))
    `(mode-line-buffer-id ((,class :inherit bold)))
    `(mode-line-emphasis  ((,class :foreground ,polar-cyan :inherit bold)))
    `(mode-line-highlight ((,class :box (:line-width 1 :color ,polar-white :style flat-button) :foreground ,polar-white :background ,polar-bg-active)))
-   `(mode-line-inactive  ((,class :box (:line-width -1 :style flat-button) :foreground ,polar-fg-dim :background ,polar-bg)))
+   `(mode-line-inactive  ((,class :box (:line-width -1 :style flat-button) :foreground ,polar-fg-dim :background ,polar-bg-darker)))
 
    ;; widgets
    `(widget-field             ((,class :box (:line-width 1 :style flat-button :color ,polar-bg-inactive) :foreground ,polar-fg :background ,polar-bg-darker)))
@@ -249,51 +276,49 @@
 
    ;; CODE PARTS
 
-   ;; colored
-   `(font-lock-comment-delimiter-face ((,class :inherit font-lock-comment-face)))
-   `(font-lock-comment-face           ((,class :foreground ,polar-cyan)))
-   `(font-lock-string-face            ((,class :foreground ,polar-fg-alt)))
-   `(font-lock-constant-face          ((,class :foreground ,polar-fg-alt)))
-   ;; `(font-lock-doc-face              ((,class :background nil :foreground ,polar-fg)))
-   ;; `(font-lock-doc-markup-face       ((,class :background nil :foreground ,polar-fg)))
-   `(font-lock-warning-face           ((,class :foreground ,polar-yellow)))
-   `(font-lock-negation-char-face     ((,class :inherit error)))
-   `(trailing-whitespace              ((,class :background ,polar-red)))
-   `(escape-glyph                     ((,class :foreground ,polar-magenta)))
-   `(font-lock-escape-face            ((,class :foreground ,polar-magenta)))
-   `(font-lock-keyword-face           ((,class :foreground ,polar-fg)))
-   `(homoglyph                        ((,class :foreground ,polar-yellow)))
+   `(font-lock-comment-delimiter-face    ((,class :inherit font-lock-comment-face)))
+   `(font-lock-comment-face              ((,class :foreground ,polar-cyan)))
+   `(font-lock-string-face               ((,class :foreground ,polar-green)))
+   `(font-lock-constant-face             ((,class :foreground ,polar-yellow)))
+   ;; `(font-lock-doc-face               ((,class :background nil :foreground ,polar-blue)))
+   ;; `(font-lock-doc-markup-face        ((,class :background nil :foreground ,polar-blue)))
+   `(font-lock-warning-face              ((,class :foreground ,polar-rust)))
+   `(font-lock-negation-char-face        ((,class :inherit error)))
+   `(trailing-whitespace                 ((,class :background ,polar-red)))
+   `(escape-glyph                        ((,class :foreground ,polar-magenta)))
+   `(font-lock-escape-face               ((,class :foreground ,polar-magenta)))
+   `(font-lock-keyword-face              ((,class :foreground ,polar-blue)))
+   `(homoglyph                           ((,class :foreground ,polar-yellow)))
    `(font-lock-regexp-grouping-backslash ((,class :foreground ,polar-magenta)))
    `(font-lock-regexp-grouping-construct ((,class :foreground ,polar-magenta)))
    `(font-lock-regexp-face               ((,class :foreground ,polar-magenta)))
    `(markdown-highlight-face             ((,class :background ,polar-yellow :foreground ,polar-black)))
 
-   ;; not colored
    `(font-lock-bracket-face          ((,class :background nil :foreground ,polar-fg)))
    `(font-lock-builtin-face          ((,class :background nil :foreground ,polar-fg)))
    `(font-lock-delimiter-face        ((,class :background nil :foreground ,polar-fg)))
-   `(font-lock-function-call-face    ((,class :background nil :foreground ,polar-fg)))
-   `(font-lock-function-name-face    ((,class :background nil :foreground ,polar-fg)))
+   `(font-lock-function-call-face    ((,class :background nil :foreground ,polar-magenta)))
+   `(font-lock-function-name-face    ((,class :background nil :foreground ,polar-magenta)))
    `(font-lock-misc-punctuation-face ((,class :background nil :foreground ,polar-fg)))
-   `(font-lock-number-face           ((,class :background nil :foreground ,polar-fg)))
+   `(font-lock-number-face           ((,class :background nil :foreground ,polar-fg-alt-yellow)))
    `(font-lock-operator-face         ((,class :background nil :foreground ,polar-fg)))
-   `(font-lock-preprocessor-face     ((,class :background nil :foreground ,polar-fg)))
-   `(font-lock-property-name-face    ((,class :background nil :foreground ,polar-fg)))
-   `(font-lock-property-use-face     ((,class :background nil :foreground ,polar-fg)))
+   `(font-lock-preprocessor-face     ((,class :background nil :foreground ,polar-fg-alt)))
+   `(font-lock-property-name-face    ((,class :background nil :foreground ,polar-yellow)))
+   `(font-lock-property-use-face     ((,class :background nil :foreground ,polar-yellow)))
    `(font-lock-punctuation-face      ((,class :background nil :foreground ,polar-fg)))
-   `(font-lock-variable-name-face    ((,class :background nil :foreground ,polar-fg)))
-   `(font-lock-variable-use-face     ((,class :background nil :foreground ,polar-fg)))
-   `(font-lock-type-face             ((,class :background nil :foreground ,polar-fg)))
+   `(font-lock-type-face             ((,class :background nil :foreground ,polar-fg-alt)))
+   `(font-lock-variable-name-face    ((,class :background nil :foreground ,polar-fg-alt-green)))
+   `(font-lock-variable-use-face     ((,class :background nil :foreground ,polar-fg-alt-green)))
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; OTHER PACKAGES (not builtin) ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ;; orderless
-   `(orderless-match-face-0 ((,class :foreground ,polar-cyan)))
-   `(orderless-match-face-1 ((,class :foreground ,polar-blue)))
-   `(orderless-match-face-2 ((,class :foreground ,polar-magenta)))
-   `(orderless-match-face-3 ((,class :foreground ,polar-pink)))
+   `(orderless-match-face-0 ((,class :foreground ,polar-blue)))
+   `(orderless-match-face-1 ((,class :foreground ,polar-rust)))
+   `(orderless-match-face-2 ((,class :foreground ,polar-green)))
+   `(orderless-match-face-3 ((,class :foreground ,polar-magenta)))
 
    ;; corfu
    `(corfu-default ((,class :foreground ,polar-fg :background ,polar-bg)))
@@ -339,9 +364,23 @@
    `(undo-tree-visualizer-default-face      ((,class :foreground ,polar-fg)))
    `(undo-tree-visualizer-register-face     ((,class :foreground ,polar-yellow)))
    `(undo-tree-visualizer-unmodified-face   ((,class :foreground ,polar-cyan)))
-   ))
 
-(provide-theme 'polar-bear)
+
+   ;; rainbow-delimiters
+   `(rainbow-delimiters-depth-1-face   ((,class :foreground ,polar-blue)))
+   `(rainbow-delimiters-depth-2-face   ((,class :foreground ,polar-rainbow-orange-1)))
+   `(rainbow-delimiters-depth-3-face   ((,class :foreground ,polar-yellow)))
+   `(rainbow-delimiters-depth-4-face   ((,class :foreground ,polar-rainbow-green)))
+   `(rainbow-delimiters-depth-5-face   ((,class :foreground ,polar-blue)))
+   `(rainbow-delimiters-depth-6-face   ((,class :foreground ,polar-magenta)))
+   `(rainbow-delimiters-depth-7-face   ((,class :foreground ,polar-rainbow-orange-1)))
+   `(rainbow-delimiters-depth-8-face   ((,class :foreground ,polar-blue)))
+   `(rainbow-delimiters-depth-9-face   ((,class :foreground ,polar-green)))
+   `(rainbow-delimiters-depth-10-face  ((,class :foreground ,polar-rainbow-cyan)))
+   `(rainbow-delimiters-depth-11-face  ((,class :foreground ,polar-rainbow-purple)))
+   `(rainbow-delimiters-depth-12-face  ((,class :foreground ,polar-rainbow-orange-2)))
+   `(rainbow-delimiters-unmatched-face ((,class :underline (:style wave :colors ,polar-rainbow-red-1) :foreground ,polar-rainbow-red-1 :weight bold)))))
+
 
 ;;;###autoload
 (and load-file-name
@@ -350,6 +389,6 @@
                   (file-name-as-directory
                    (file-name-directory load-file-name))))
 
-(provide 'polar-bear-theme)
+(provide 'polar-bear-colored-theme)
 
-;;; polar-bear-theme.el ends here
+;;; polar-bear-colored-theme.el ends here
