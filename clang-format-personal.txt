@@ -1,0 +1,14 @@
+---
+BasedOnStyle: LLVM
+AccessModifierOffset: -2
+AlignArrayOfStructures: Right
+AlignTrailingComments:
+  OverEmptyLines: 1
+AllowShortBlocksOnASingleLine: Always
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLoopsOnASingleLine: true
+IndentCaseLabels: true
+NamespaceIndentation: Inner
+TabWidth: 2
+Language: Cpp
