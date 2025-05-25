@@ -7,11 +7,36 @@
 
 (setq native-comp-async-report-warnings-errors 'silent)
 
-(setq mac-command-modifier 'hyper)   ;; make cmd key do Meta
-(setq mac-option-modifier 'meta)     ;; make opt key do Super
-(setq mac-control-modifier 'control) ;; make Control key do Control
+(setq mac-command-modifier 'hyper)   ;; make command key do Hyper
+(setq mac-option-modifier 'meta)     ;; make option/alt  key do Meta
+(setq mac-control-modifier 'control) ;; make control key do Control
+
+;; Control emacs frame
+(use-package moom
+  :ensure t
+  :custom
+  (moom-use-font-module nil)
+  :config (moom-mode 1))
+
+(use-package exec-path-from-shell
+  :ensure t
+  :if (memq window-system '(mac ns))
+  :commands (exec-path-from-shell-initialize)
+  :config
+  (exec-path-from-shell-initialize))
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
+
+(load "~/.emacs.d/elisp/xah-functions.el")
+(load "~/.emacs.d/elisp/yandex-compile-commands.el")
 (load "~/.emacs.d/elisp/keys.el")
 
+(setq-default frame-resize-pixelwise 1)
+
+(setq org-log-done nil
+      org-agenda-files   (list "~/org/")
+      org-refile-targets '((org-agenda-files :maxlevel . 5))
+      org-refile-use-outline-path 'file)
 
 (fringe-mode '(8 . 0))
 (setq-default indicate-empty-lines t)
@@ -55,7 +80,7 @@
 
 
 ;; Fill column
-(setq-default fill-column 240)
+(setq-default fill-column 120)
 ;; Fill column ruler
 (use-package display-fill-column-indicator-mode
   :hook (prog-mode LaTeX-mode))
@@ -63,9 +88,13 @@
 
 (setq-default indent-tabs-mode nil) ;; Use spaces instead of tabs
 (setq-default tab-width 4)          ;; Set tab width to 4 spaces
-(setq-default c-ts-mode-indent-style 'bsd)
-(setq-default c-ts-mode-indent-offset 4)
+(setq-default c-ts-mode-indent-offset 2)
+(setq-default c-ts-mode-indent-style 'gnu)
+(setq-default c-indentation-style 'gnu)
+
+
 (electric-indent-mode 1)
+(setq-default electric-indent-inhibit t)
 (electric-pair-mode 1)
 
 
@@ -146,51 +175,50 @@
 (setq-default default-input-method 'russian-computer)
 
 
-(defun compile-yandex-g++14.1 ()
-  "Compile current .cpp file with optimizations and run the executable."
-  (interactive)
-  (let* ((cpp-file (buffer-file-name))
-         (build-file (replace-regexp-in-string "\\.cpp$" ".cpp.build" cpp-file))
-         (compile-command (format "g++ -O2 -lm -std=c++20 -x c++ %s -o %s"
-                                  (shell-quote-argument cpp-file)
-                                  (shell-quote-argument build-file))))
-
-    (unless cpp-file
-      (error "Buffer is not visiting a file"))
-
-    (unless (string-match "\\.cpp$" cpp-file)
-      (error "Not a C++ file"))
-
-    ;; Compile the program
-    (if (zerop (shell-command compile-command))
-        ;; If compilation succeeds, run the executable
-        (progn
-          (message "Compilation successful. Running...")
-          (async-shell-command build-file))
-      ;; Show error message if compilation fails
-      (error "Compilation failed"))))
-
-
 (cond
  ((eq system-type 'windows-nt)
-  (when (member "Cascadia Code 12" (font-family-list))
-    (set-frame-font "Cascadia Code" t t)
+  (when (member "Cascadia Code" (font-family-list))
+    (set-frame-font "Cascadia Code 12" t t)
     (set-face-attribute 'fixed-pitch nil :family "Cascadia Code")
     (set-face-attribute 'variable-pitch nil :family "Calibri")))
  ((eq system-type 'darwin)
-  (when (member "SF Mono" (font-family-list))
-    (set-frame-font "SF Mono 13" t t)
-    (set-face-attribute 'fixed-pitch nil :family "Monaco")
-    (set-face-attribute 'variable-pitch nil :family "Arial")))
+  (cond ((member "Lilex" (font-family-list))
+         (set-frame-font "Lilex 15" t t)
+         (set-face-attribute 'fixed-pitch nil :family "Lilex")
+         (set-face-attribute 'variable-pitch nil :family "Helvetica Neue"))
+        ((member "Monaco" (font-family-list))
+         (set-frame-font "Monaco 14" t t)
+         (set-face-attribute 'fixed-pitch nil :family "Monaco")
+         (set-face-attribute 'variable-pitch nil :family "Helvetica Neue"))))
  ((eq system-type 'gnu/linux)
   (when (member "DejaVu Sans Mono" (font-family-list))
     (set-frame-font "DejaVu Sans Mono 12" t t)
     (set-face-attribute 'fixed-pitch nil :family "DejaVu Sans Mono")
     (set-face-attribute 'variable-pitch nil :family "DejaVu Sans"))))
 
+(use-package ligature
+  :ensure t
+  :config
+  ;; Enable traditional ligature support in eww-mode, if the
+  ;; `variable-pitch' face supports it
+  (ligature-set-ligatures 't '("--" "---" "==" "===" "!=" "!==" "=!="
+                               "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
+                               "??" "???" "?:" "?." "?=" "<:" ":<" ":>" ">:" "<:<" "<>" "<<<" ">>>"
+                               "<<" ">>" "||" "-|" "_|_" "|-" "||-" "|=" "||=" "##" "###" "####"
+                               "#{" "#[" "]#" "#(" "#?" "#_" "#_(" "#:" "#!" "#=" "^=" "<$>" "<$"
+                               "$>" "<+>" "<+" "+>" "<*>" "<*" "*>" "</" "</>" "/>" "<!--" "<#--"
+                               "-->" "->" "->>" "<<-" "<-" "<=<" "=<<" "<<=" "<==" "<=>" "<==>"
+                               "==>" "=>" "=>>" ">=>" ">>=" ">>-" ">-" "-<" "-<<" ">->" "<-<" "<-|"
+                               "<=|" "|=>" "|->" "<->" "<~~" "<~" "<~>" "~~" "~~>" "~>" "~-" "-~"
+                               "~@" "[||]" "|]" "[|" "|}" "{|" "[<" ">]" "|>" "<|" "||>" "<||"
+                               "|||>" "<|||" "<|>" "..." ".." ".=" "..<" ".?" "::" ":::" ":=" "::="
+                               ":?" ":?>" "//" "///" "/*" "*/" "/=" "//=" "/==" "@_" "__" "???"
+                               "<:<" ";;;"))
+  ;; Enables ligature checks globally in all buffers. You can also do it
+  ;; per mode with `ligature-mode'.
+  (global-ligature-mode t))
 
-;; (load "~/.emacs.d/elisp/colors.el")
-;; (load "~/.emacs.d/elisp/font.el")
+
 (load "~/.emacs.d/elisp/treesitter.el")
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
@@ -217,8 +245,12 @@
 
 (use-package rainbow-delimiters
   :ensure t
+  :defer t)
+
+(use-package highlight-parentheses
+  :ensure t
   :demand t
-  :hook ((prog-mode text-mode) . rainbow-delimiters-mode))
+  :hook (after-init . global-highlight-parentheses-mode))
 
 (use-package which-key
   :ensure nil ; builtin
@@ -234,17 +266,8 @@
 (use-package avy
   :ensure t
   :demand t
-  :bind ("H-j" . 'avy-goto-char))
-
-(use-package exec-path-from-shell
-  :ensure t
-  :if (memq window-system '(mac ns))
-  :defer t
-  :commands (exec-path-from-shell-initialize)
-  :config
-  (exec-path-from-shell-initialize))
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
+  :bind
+  ("H-'" . 'avy-goto-char))
 
 (use-package highlight-doxygen
   :ensure t
@@ -270,10 +293,7 @@
 
 (use-package undo-fu
   :ensure t
-  :demand t
-  :bind
-  (("C-{" . undo-fu-only-undo)
-   ("C-}" . undo-fu-only-redo)))
+  :demand t)
 
 (use-package undo-fu-session
   :ensure t
@@ -344,51 +364,72 @@
          ("C-c `"   . #'consult-flymake)
          ("C-c h"   . #'consult-ripgrep)))
 
+(use-package affe
+  :ensure
+  :config
+  ;; Manual preview key for `affe-grep'
+  (consult-customize affe-grep :preview-key "M-."))
+
 (use-package orderless
   :ensure t
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion)))))
 
+;; The default regular expression transformation of Consult is limited.  It is
+;; recommended to configure Orderless as affe-regexp-compiler in Consult.
+
+(defun affe-orderless-regexp-compiler (input _type _ignorecase)
+  (setq input (cdr (orderless-compile input)))
+  (cons input (apply-partially #'orderless--highlight input t)))
+(setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
+
+
 (use-package monokai-theme
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package standard-themes
-  :ensure t)
-
-(use-package atom-one-dark-theme
   :ensure t
-  :demand t)
+  :defer t)
 
 (mapc #'disable-theme custom-enabled-themes)  ; Disable all active themes
-(load-theme 'polar-bear-colored t)  ; Load the built-in theme
+;; (load-theme 'polar-bear t)
 
-;; (use-package auto-dark
-;;   :ensure t
-;;   :custom
-;;   (auto-dark-themes '((ef-owl) (ef-duo-light)))
-;;   (auto-dark-polling-interval-seconds 5)
-;;   (auto-dark-allow-osascript t)
-;;   ;; (auto-dark-detection-method nil) ;; dangerous to be set manually
-;;   :hook
-;;   (auto-dark-dark-mode
-;;    . (lambda ()
-;;        ;; something to execute when dark mode is detected
-;;        ))
-;;   (auto-dark-light-mode
-;;    . (lambda ()
-;;        ;; something to execute when light mode is detected
-;;        ))
-;;   :init (auto-dark-mode))
+;; (setq-default polar-bear-operator-color "#B14747"
+;;               polar-bear-delimiter-color "#B14747"
+;;               polar-bear-rainbow-delimiters-style 'strong)
+
+(use-package auto-dark
+  :ensure t
+  :demand t
+  :custom
+  (auto-dark-themes '((polar-bear) (twilight-bright)))
+  (auto-dark-polling-interval-seconds 5)
+  (auto-dark-allow-osascript t)
+  ;; (auto-dark-detection-method nil) ;; dangerous to be set manually
+  :hook
+  (auto-dark-dark-mode
+   . (lambda ()
+       ;; something to execute when dark mode is detected
+       ))
+  (auto-dark-light-mode
+   . (lambda ()
+       ;; something to execute when light mode is detected
+       ))
+  :init (auto-dark-mode))
 
 (use-package format-all
   :ensure t
   :commands format-all-mode
-  :hook (prog-mode . format-all-mode)
+  ;; :hook (prog-mode . format-all-mode)
   :config
   (setq-default format-all-formatters
-                '(("C++"   (clang-format "--style=file" "--fallback-style=webkit"))
-                  ("Shell" (shfmt "-i" "4" "-ci")))))
+                '(("C++"    (clang-format "--style=file" "--fallback-style=llvm"))
+                  ("Shell"  (shfmt "-i" "4" "-ci"))
+                  ("Python" (ruff))
+                  ("JSON"   (prettier)
+                   ))))
 
 (use-package devdocs
   :ensure t)
@@ -396,15 +437,12 @@
 (use-package eglot
   :ensure nil
   :defer t
-  :hook
-  ((c++-ts-mode . eglot-ensure)  ; For Tree-sitter C++ mode
-   (c-ts-mode . eglot-ensure)
-   (python-ts-mode . eglot-ensure))   ; For Tree-sitter C mode
-  :config
-  (add-to-list 'eglot-server-programs '(c++-mode . ("clangd")))
-  ;; (add-hook 'c++-mode-hook #'eglot-ensure)
-  ;; (add-hook 'c-mode-hook #'eglot-ensure)
-
+  ;; :hook
+  ;; ((c++-ts-mode . eglot-ensure)  ; For Tree-sitter C++ mode
+  ;;  (c-ts-mode . eglot-ensure)
+  ;;  (python-ts-mode . eglot-ensure))   ; For Tree-sitter C mode
+  :custom
+  (eglot-ignored-server-capabilities '(:documentOnTypeFormattingProvider))
   :commands (eglot
              eglot-ensure
              eglot-rename

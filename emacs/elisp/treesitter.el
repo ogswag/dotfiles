@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;; treesitter.el --- tree-sitter setup
 ;;; Commentary:
 
@@ -24,6 +25,8 @@
     (elisp "https://github.com/Wilfred/tree-sitter-elisp" "master" "src")))
 
 ;; (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
+
+(setq-default treesit-font-lock-level 4)
 
 (setq major-mode-remap-alist
  '((yaml-mode . yaml-ts-mode)

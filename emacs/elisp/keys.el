@@ -1,14 +1,57 @@
 ;;; -*- lexical-binding: t; -*-
 
-;; Unset default undo keys
-(keymap-global-unset "C-_")
-(keymap-global-unset "C-z")
+(use-package xah-fly-keys
+  :ensure t
+  :defer t)
 
-;; Set better `set-mark-command' keybinding
-(keymap-global-unset "C-SPC")
-(keymap-global-unset "C-@")
-(keymap-global-unset "C-s")
-(keymap-global-set "C-s" #'set-mark-command)
+(use-package surround
+  :ensure t
+  :defer t)
+
+(use-package expand-region
+  :ensure t
+  :defer t)
+
+(use-package change-inner
+  :after expand-region
+  :ensure t
+  :defer t)
+
+
+(require 'xah-fly-keys)
+
+
+;; Motion keys
+(keymap-global-unset "M-f") ;; forward-word
+(keymap-global-unset "M-b") ;; backward-word
+(keymap-global-unset "M-d") ;; kill-word
+(keymap-global-unset "M-k") ;; kill-sentence
+(keymap-global-unset "M-e") ;; forward-sentence
+(keymap-global-unset "M-a") ;; backward-sentence
+
+(keymap-global-unset "M-c") ;; capitalize-word
+(keymap-global-unset "M-l") ;; downcase-word
+(keymap-global-unset "M-q") ;; prog-fill-reindent-defun
+(keymap-global-unset "M-s") ;; isearch commands
+(keymap-global-unset "M-v") ;; scroll-down-command
+(keymap-global-unset "M-z") ;; zap-to-char
+(keymap-global-unset "M-j") ;; default-indent-new-line
+(keymap-global-unset "M-u") ;; upcase-word
+(keymap-global-unset "M-t") ;; transpose-words
+
+(keymap-global-set "H-[" #'undo-fu-only-undo)
+(keymap-global-set "H-]" #'undo-fu-only-redo)
+(keymap-global-set "H-y" #'backward-word)
+(keymap-global-set "H-u" #'backward-to-word)
+(keymap-global-set "H-o" #'forward-to-word)
+(keymap-global-set "H-p" #'forward-word)
+
+(keymap-global-set "H-h" #'xah-beginning-of-line-or-block)
+(keymap-global-set "H-i" #'previous-line)
+(keymap-global-set "H-j" #'backward-char)
+(keymap-global-set "H-k" #'next-line)
+(keymap-global-set "H-l" #'forward-char)
+(keymap-global-set "H-;" #'xah-end-of-line-or-block)
 
 ;; Stop Emacs from zooming when holding CTRL + Mouse Wheel
 (keymap-global-set "<pinch>" 'ignore)
@@ -17,25 +60,36 @@
 (keymap-global-set "C-M-<wheel-up>" 'ignore)
 (keymap-global-set "C-M-<wheel-down>" 'ignore)
 
+;; Frame Shortcuts
+(when (and (display-graphic-p) (eq system-type 'darwin))
+  (keymap-global-set "H-\\ m" #'iconify-frame)
+  (keymap-global-set "H-\\ h" #'ns-do-hide-emacs))
+(keymap-global-set "H-\\ n" #'make-frame)
+(keymap-global-set "H-\\ k" #'delete-frame)
 
 ;; Keybindings for toggling frame maximized and fullscreen
 (keymap-global-set "H-F" #'toggle-frame-maximized)
-(keymap-global-set "H-f" #'toggle-frame-fullscreen)
+(keymap-global-set "C-H-f" #'toggle-frame-fullscreen)
 
 
-(keymap-global-set "H-0" #'delete-window)
-(keymap-global-set "H-9" #'kill-current-buffer)
 (keymap-global-set "H-1" #'delete-other-windows)
-(keymap-global-set "H-2" #'ace-window)
+(keymap-global-set "H-0" #'delete-window)
+(keymap-global-set "H-8" #'kill-current-buffer)
+(keymap-global-set "H-9" #'kill-buffer-and-window)
+
+(keymap-global-set "H-2" #'xah-next-window-or-frame)
 (keymap-global-set "H-3" #'split-window-horizontally)
 (keymap-global-set "H-4" #'split-window-vertically)
-(keymap-global-set "H-5" #'switch-to-prev-buffer)
-(keymap-global-set "H-6" #'switch-to-next-buffer)
+(keymap-global-set "H-5" #'xah-previous-user-buffer)
+(keymap-global-set "H-6" #'xah-next-user-buffer)
 (keymap-global-set "H-=" #'balance-windows)
 
-(keymap-global-set "H-c c" #'compile)
-(keymap-global-set "H-c y" #'compile-yandex-g++14.1)
-
+;; moom frame control
+(keymap-global-set "H-<right>" #'moom-fill-right)
+(keymap-global-set "H-<left>" #'moom-fill-left)
+(keymap-global-set "H-<up>" #'moom-fill-top)
+(keymap-global-set "H-<down>" #'moom-fill-bottom)
+(keymap-global-set "H-<backspace>" #'moom-reset)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CHANGE MACOS-SPECIFIC KEYS ;;
@@ -106,6 +160,28 @@
 (keymap-global-unset "s-z") ;; disable undo
 (keymap-global-unset "s-|") ;; shell-command-on-region
 (keymap-global-unset "s-~") ;; ns-prev-frame
-;; (keymap-global-unset "s-h") ;; ns-do-hide-emacs
-;; (keymap-global-unset "s-m") ;; iconify-frame
-(keymap-global-set "s-q" 'ns-do-hide-emacs) ;; save-buffers-kill-emacs
+(keymap-global-unset "s-h") ;; ns-do-hide-emacs
+(keymap-global-unset "s-m") ;; iconify-frame
+
+
+
+;; affe -- fuzzy file search and rg
+;; requires ripgrep to be installed on the system
+(defun ensure-ripgrep-installed ()
+  "Check if running on macOS, and if ripgrep is installed. If not, install it via Homebrew."
+  (interactive)
+  (when (eq system-type 'darwin)
+    (unless (executable-find "rg")
+      (message "ripgrep not found. Attempting to install via Homebrew...")
+      (unless (executable-find "brew")
+        (error "Homebrew not found. Please install Homebrew first (https://brew.sh)"))
+      (let ((exit-status (call-process "brew" nil nil nil "install" "ripgrep")))
+        (if (zerop exit-status)
+            (message "Successfully installed ripgrep via Homebrew")
+          (error "Failed to install ripgrep via Homebrew (exit status: %d)" exit-status))))))
+
+;; Run the check
+(ensure-ripgrep-installed)
+
+(keymap-global-set "H-f" #'affe-find)
+(keymap-global-set "H-g" #'affe-grep)
