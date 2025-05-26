@@ -8,16 +8,6 @@
   :ensure t
   :defer t)
 
-(use-package expand-region
-  :ensure t
-  :defer t)
-
-(use-package change-inner
-  :after expand-region
-  :ensure t
-  :defer t)
-
-
 (require 'xah-fly-keys)
 
 
