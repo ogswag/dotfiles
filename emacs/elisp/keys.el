@@ -53,6 +53,27 @@
 (keymap-global-set "H-l" #'forward-char)
 (keymap-global-set "H-;" #'xah-end-of-line-or-block)
 
+(keymap-global-set "H-z" #'xah-comment-dwim)
+(keymap-global-set "H-x" #'xah-cut-line-or-region)
+(keymap-global-set "H-c" #'xah-copy-line-or-region)
+(keymap-global-set "H-v" #'yank)
+(keymap-global-set "H-V" #'xah-paste-or-paste-previous)
+(keymap-global-set "H-b c" #'compile)
+(keymap-global-set "H-b y g" #'compile-yandex-g++14.1)
+(keymap-global-set "H-b y c" #'compile-yandex-clang++17.0.1)
+;; (keymap-global-set "H-n" #'xah-backward-left-bracket)
+(keymap-global-set "H-m" #'xah-backward-left-bracket)
+(keymap-global-set "H-," #'repeat)
+(keymap-global-set "H-." #'xah-forward-right-bracket)
+(keymap-global-set "H-/" #'xah-goto-matching-bracket)
+
+
+;; Set better `set-mark-command' keybinding
+(keymap-global-unset "C-SPC")
+(keymap-global-unset "C-@")
+(keymap-global-unset "C-s")
+(keymap-global-set "C-s" #'set-mark-command)
+
 ;; Stop Emacs from zooming when holding CTRL + Mouse Wheel
 (keymap-global-set "<pinch>" 'ignore)
 (keymap-global-set "C-<wheel-up>" 'ignore)
