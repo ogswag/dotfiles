@@ -1,22 +1,39 @@
 ;;; -*- lexical-binding: t; -*-
 
-(use-package xah-fly-keys
-  :ensure t
-  :defer t)
-
 (use-package surround
   :ensure t
   :defer t)
 
-(require 'xah-fly-keys)
+(defun az-move-bol-or-prev-eol ()
+  "Move to beginning of line, or to end of previous line if already at bol."
+  (interactive)
+  (if (bolp)
+      (progn
+        (forward-line -1)
+        (end-of-line))
+    (beginning-of-line)))
 
+(defun az-move-eol-or-next-bol ()
+  "Move to beginning of line, or to end of previous line if already at bol."
+  (interactive)
+  (if (eolp)
+      (progn
+        (forward-line 1)
+        (beginning-of-line))
+    (end-of-line)))
+
+
+(require 'viper-cmd)
 
 ;; Motion keys
 (keymap-global-unset "M-f") ;; forward-word
+(keymap-global-set "M-f" #'viper-forward-word) ;; forward-word
 (keymap-global-unset "M-b") ;; backward-word
-(keymap-global-unset "M-d") ;; kill-word
+(keymap-global-set "M-b" #'viper-backward-word) ;; backward-word
+;; (keymap-global-unset "M-d") ;; kill-word
 (keymap-global-unset "M-k") ;; kill-sentence
 (keymap-global-unset "M-e") ;; forward-sentence
+(keymap-global-set "M-e" #'forward-word) ;; forward-sentence
 (keymap-global-unset "M-a") ;; backward-sentence
 
 (keymap-global-unset "M-c") ;; capitalize-word
@@ -31,32 +48,18 @@
 
 (keymap-global-set "H-[" #'undo-fu-only-undo)
 (keymap-global-set "H-]" #'undo-fu-only-redo)
-(keymap-global-set "H-y" #'backward-word)
-(keymap-global-set "H-u" #'backward-to-word)
-(keymap-global-set "H-o" #'forward-to-word)
-(keymap-global-set "H-p" #'forward-word)
 
-(keymap-global-set "H-h" #'xah-beginning-of-line-or-block)
-(keymap-global-set "H-i" #'previous-line)
-(keymap-global-set "H-j" #'backward-char)
-(keymap-global-set "H-k" #'next-line)
-(keymap-global-set "H-l" #'forward-char)
-(keymap-global-set "H-;" #'xah-end-of-line-or-block)
+(keymap-global-set "H-s" #'set-mark-command)
 
-(keymap-global-set "H-z" #'xah-comment-dwim)
-(keymap-global-set "H-x" #'xah-cut-line-or-region)
-(keymap-global-set "H-c" #'xah-copy-line-or-region)
-(keymap-global-set "H-v" #'yank)
-(keymap-global-set "H-V" #'xah-paste-or-paste-previous)
+(keymap-global-set "H-k" #'az-move-bol-or-prev-eol)
+(keymap-global-set "H-l" #'az-move-eol-or-next-bol)
+
 (keymap-global-set "H-b c" #'compile)
 (keymap-global-set "H-b y g" #'compile-yandex-g++14.1)
 (keymap-global-set "H-b y c" #'compile-yandex-clang++17.0.1)
 ;; (keymap-global-set "H-n" #'xah-backward-left-bracket)
-(keymap-global-set "H-m" #'xah-backward-left-bracket)
-(keymap-global-set "H-," #'repeat)
-(keymap-global-set "H-." #'xah-forward-right-bracket)
-(keymap-global-set "H-/" #'xah-goto-matching-bracket)
 
+(keymap-global-set "H-," #'repeat)
 
 ;; Set better `set-mark-command' keybinding
 (keymap-global-unset "C-SPC")
@@ -82,13 +85,12 @@
 (keymap-global-set "H-F" #'toggle-frame-maximized)
 (keymap-global-set "C-H-f" #'toggle-frame-fullscreen)
 
-
 (keymap-global-set "H-1" #'delete-other-windows)
 (keymap-global-set "H-0" #'delete-window)
 (keymap-global-set "H-8" #'kill-current-buffer)
 (keymap-global-set "H-9" #'kill-buffer-and-window)
 
-(keymap-global-set "H-2" #'xah-next-window-or-frame)
+(keymap-global-set "H-2" #'ace-window)
 (keymap-global-set "H-3" #'split-window-horizontally)
 (keymap-global-set "H-4" #'split-window-vertically)
 (keymap-global-set "H-5" #'xah-previous-user-buffer)

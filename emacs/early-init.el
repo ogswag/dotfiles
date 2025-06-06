@@ -4,4 +4,6 @@
 (setq gc-cons-threshold 100000000)
 
 ;; Disable splash screen
-(setq inhibit-startup-screen t)
+(setq-default inhibit-startup-screen t)
+(setq-default inhibit-startup-message t)
+(setq-default inhibit-startup-echo-area-message t)

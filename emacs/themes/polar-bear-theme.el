@@ -50,7 +50,7 @@
 
 (let (
       ;; bg
-      (pb-bg          "#141417")
+      (pb-bg          "#141415")
       (pb-bg-darker   "#040407")
       (pb-bg-dim      "#2E2E2f")
       (pb-bg-active   "#5B5B5d")
@@ -73,6 +73,7 @@
       (pb-mint   "#008a5e")
       (pb-cyan   "#8BB3B3")
       (pb-violet "#8788AC"))
+
   (when (eq polar-bear-rainbow-delimiters-style 'subtle)
     (setq pb-rainbow-1 pb-cyan)
     (setq pb-rainbow-2 pb-violet)

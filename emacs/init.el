@@ -3,7 +3,7 @@
 (setq warning-suppress-types '((files)))
 (setq custom-file (locate-user-emacs-file "custom.el"))
 (when (file-exists-p custom-file)
-  (load custom-file))
+  (load custom-file nil t t))
 
 (setq native-comp-async-report-warnings-errors 'silent)
 
@@ -27,9 +27,9 @@
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 
-(load "~/.emacs.d/elisp/xah-functions.el")
-(load "~/.emacs.d/elisp/yandex-compile-commands.el")
-(load "~/.emacs.d/elisp/keys.el")
+(load "~/.emacs.d/elisp/xah-functions.el" nil t t)
+(load "~/.emacs.d/elisp/yandex-compile-commands.el" nil t t)
+(load "~/.emacs.d/elisp/keys.el" nil t t)
 
 (setq-default frame-resize-pixelwise 1)
 
@@ -182,9 +182,9 @@
     (set-face-attribute 'fixed-pitch nil :family "Cascadia Code")
     (set-face-attribute 'variable-pitch nil :family "Calibri")))
  ((eq system-type 'darwin)
-  (cond ((member "Lilex" (font-family-list))
-         (set-frame-font "Lilex 15" t t)
-         (set-face-attribute 'fixed-pitch nil :family "Lilex")
+  (cond ((member "Iosevka Berkley" (font-family-list))
+         (set-frame-font "Iosevka Berkley 15" t t)
+         (set-face-attribute 'fixed-pitch nil :family "Iosevka Berkley")
          (set-face-attribute 'variable-pitch nil :family "Helvetica Neue"))
         ((member "Monaco" (font-family-list))
          (set-frame-font "Monaco 14" t t)
@@ -219,10 +219,10 @@
   (global-ligature-mode t))
 
 
-(load "~/.emacs.d/elisp/treesitter.el")
+(load "~/.emacs.d/elisp/treesitter.el" nil t t)
 
-(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-(add-to-list 'load-path "~/.emacs.d/themes/")
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/" 'nomessage)
+(add-to-list 'load-path "~/.emacs.d/themes/" 'nomessage)
 
 ;; (add-to-list 'load-path "~/.emacs.d/package-local/")
 
@@ -498,3 +498,13 @@
   ;; used by `completion-at-point'.
   (add-hook 'completion-at-point-functions #'cape-dabbrev)
   (add-hook 'completion-at-point-functions #'cape-file))
+
+
+(defun my-move-bol-or-prev-eol ()
+  "Move to beginning of line, or to end of previous line if already at bol."
+  (interactive)
+  (if (bolp)
+      (progn
+        (forward-line -1)
+        (end-of-line))
+    (beginning-of-line)))
