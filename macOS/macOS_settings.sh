@@ -10,3 +10,6 @@ launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/nul
 
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
+
+# ctrl+cmd+click for moving windows
+defaults write -g NSWindowShouldDragOnGesture -bool true
