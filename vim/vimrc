@@ -58,7 +58,6 @@ set colorcolumn=110
 set textwidth=110
 
 syntax on
-set bg=dark
 augroup colorscheme_change | au!
     au ColorScheme habamax hi Normal ctermbg=NONE guibg=NONE
     au ColorScheme habamax hi Comment ctermfg=95 guifg=NONE
@@ -66,10 +65,14 @@ augroup colorscheme_change | au!
     au ColorScheme lunaperche hi Normal ctermbg=NONE guibg=NONE
     au ColorScheme sorbet hi Normal ctermbg=NONE guibg=NONE
     au ColorScheme wildcharm hi Normal ctermbg=NONE guibg=NONE
-    au ColorScheme zellner hi Normal ctermbg=NONE guibg=NONE
+    au ColorScheme default hi Normal ctermbg=NONE guibg=NONE
+    au ColorScheme default hi LineNr ctermfg=8 guifg=gray
+    au ColorScheme default hi CursorLineNr cterm=NONE ctermfg=12
+    au ColorScheme default hi Special ctermfg=5
 augroup END
 
-colorscheme habamax
+colorscheme default
+set bg=dark
 set showmatch  " highlight matching brace
 
 if has("gui_running")

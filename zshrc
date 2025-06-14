@@ -109,3 +109,6 @@ mdcd () {
     mkdir -p "$1";
     cd "$1"
 }
+export PATH="$(brew --prefix)/bin:$PATH"
+
+eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib=$HOME/perl5)"

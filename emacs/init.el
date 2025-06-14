@@ -182,13 +182,13 @@
     (set-face-attribute 'fixed-pitch nil :family "Cascadia Code")
     (set-face-attribute 'variable-pitch nil :family "Calibri")))
  ((eq system-type 'darwin)
-  (cond ((member "Iosevka Berkley" (font-family-list))
-         (set-frame-font "Iosevka Berkley 15" t t)
-         (set-face-attribute 'fixed-pitch nil :family "Iosevka Berkley")
+  (cond ((member "Meslo LG S" (font-family-list))
+         (set-frame-font "Meslo LG S 14" t t)
+         (set-face-attribute 'fixed-pitch nil :family "Meslo LG S")
          (set-face-attribute 'variable-pitch nil :family "Helvetica Neue"))
-        ((member "Monaco" (font-family-list))
-         (set-frame-font "Monaco 14" t t)
-         (set-face-attribute 'fixed-pitch nil :family "Monaco")
+        ((member "Menlo" (font-family-list))
+         (set-frame-font "Menlo 14" t t)
+         (set-face-attribute 'fixed-pitch nil :family "Menlo")
          (set-face-attribute 'variable-pitch nil :family "Helvetica Neue"))))
  ((eq system-type 'gnu/linux)
   (when (member "DejaVu Sans Mono" (font-family-list))
@@ -230,7 +230,6 @@
 (require 'package)
 (add-to-list 'package-archives '("gnu"   . "https://elpa.gnu.org/packages/"))
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(package-initialize)
 
 
 (use-package vimrc-mode
@@ -426,11 +425,15 @@
   ;; :hook (prog-mode . format-all-mode)
   :config
   (setq-default format-all-formatters
-                '(("C++"    (clang-format "--style=file" "--fallback-style=llvm"))
+                '(
+                  ("C++"    (clang-format "--style=file" "--fallback-style=llvm"))
                   ("Shell"  (shfmt "-i" "4" "-ci"))
                   ("Python" (ruff))
-                  ("JSON"   (prettier)
-                   ))))
+                  ("JSON"   (prettier))
+                  ("LaTeX"  (latexindent ))
+                  )
+                )
+  )
 
 (use-package devdocs
   :ensure t)

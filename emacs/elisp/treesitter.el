@@ -3,6 +3,14 @@
 ;;; Commentary:
 
 ;; Code:
+
+(use-package treesit-auto
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
+
 (setq treesit-language-source-alist
   '((bash "https://github.com/tree-sitter/tree-sitter-bash")
     (c "https://github.com/tree-sitter/tree-sitter-c")
@@ -24,8 +32,6 @@
     (yaml "https://github.com/ikatyang/tree-sitter-yaml")
     (elisp "https://github.com/Wilfred/tree-sitter-elisp" "master" "src")))
 
-;; (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
-
 (setq-default treesit-font-lock-level 4)
 
 (setq major-mode-remap-alist
@@ -39,14 +45,8 @@
    (c++-mode . c++-ts-mode)
    (c-mode . c-ts-mode)))
 
-;; (defun mp-remove-treesit-sexp-changes ()
-;;   (when (eq forward-sexp-function #'treesit-forward-sexp)
-;;     (setq forward-sexp-function nil))
-;;   (when (eq transpose-sexps-function #'treesit-transpose-sexps)
-;;     (setq transpose-sexps-function #'transpose-sexps-default-function))
-;;   (when (eq forward-sentence-function #'treesit-forward-sentence)
-;;     (setq forward-sentence-function #'forward-sentence-default-function)))
-
-;; (add-hook 'prog-mode-hook #'mp-remove-treesit-sexp-changes)
-
+(use-package yaml-ts-mode
+  :ensure nil  ; Built-in in Emacs 29+
+  :mode (("\\.ya?ml\\'" . yaml-ts-mode)
+         ("\\.eyaml\\'" . yaml-ts-mode)))
 ;;; treesitter.el ends here
