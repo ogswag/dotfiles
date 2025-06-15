@@ -5,22 +5,22 @@ alias l="eza --sort=type -al --hyperlink"
 alias n="nvim"
 alias nv="nvim"
 alias v="vim"
-alias cd-focus-config="cd ~/Library/Application\ Support/dev.focus-editor"
-
-export PATH="/usr/local/opt/jpeg/bin:$PATH"
-
-export PATH="/usr/local/sbin:$PATH"
-export PATH="/usr/local/opt/llvm/bin:$PATH"
-export PATH="/usr/local/bin:$PATH"
 
 mdcd () {
     mkdir -p "$1";
     cd "$1"
 }
 
-export PATH="$(brew --prefix)/bin:$PATH"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    alias cd-focus-config="cd ~/Library/Application\ Support/dev.focus-editor"
 
-eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib=$HOME/perl5)"
+    export PATH="/usr/local/opt/jpeg/bin:$PATH"
+    export PATH="/usr/local/sbin:$PATH"
+    export PATH="/usr/local/opt/llvm/bin:$PATH"
+    export PATH="/usr/local/bin:$PATH"
+    export PATH="$(brew --prefix)/bin:$PATH"
+    eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib=$HOME/perl5)"
+fi
 
 ##? Clone a plugin, identify its init file, source it, and add it to your fpath.
 function plugin-load {
