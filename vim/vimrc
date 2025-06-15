@@ -69,9 +69,10 @@ augroup colorscheme_change | au!
     au ColorScheme default hi LineNr ctermfg=8 guifg=gray
     au ColorScheme default hi CursorLineNr cterm=NONE ctermfg=12
     au ColorScheme default hi Special ctermfg=5
+    au ColorScheme default hi PreProc ctermfg=5
 augroup END
 
-colorscheme default
+colorscheme retrobox
 set bg=dark
 set showmatch  " highlight matching brace
 

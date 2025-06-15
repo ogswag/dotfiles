@@ -1,5 +1,27 @@
 export PS1="%n@%m %F{red}%1~%f %% "
 
+# alias l="eza --group-directories-first -lhU --time-style='long-iso'"
+alias l="eza --sort=type -al --hyperlink"
+alias n="nvim"
+alias nv="nvim"
+alias v="vim"
+alias cd-focus-config="cd ~/Library/Application\ Support/dev.focus-editor"
+
+export PATH="/usr/local/opt/jpeg/bin:$PATH"
+
+export PATH="/usr/local/sbin:$PATH"
+export PATH="/usr/local/opt/llvm/bin:$PATH"
+export PATH="/usr/local/bin:$PATH"
+
+mdcd () {
+    mkdir -p "$1";
+    cd "$1"
+}
+
+export PATH="$(brew --prefix)/bin:$PATH"
+
+eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib=$HOME/perl5)"
+
 ##? Clone a plugin, identify its init file, source it, and add it to your fpath.
 function plugin-load {
   local repo plugdir initfile initfiles=()
@@ -45,70 +67,135 @@ bindkey '^[[A' history-substring-search-up # or '\eOA'
 bindkey '^[[B' history-substring-search-down # or '\eOB'
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 
-# Enable completion
-autoload -Uz compinit && compinit
+# ===== Completion System =====
+autoload -Uz compinit
+if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
+  compinit -i  # only load completions if dump file is older than 24 hours
+else
+  compinit -C -i  # skip security check for faster load
+fi
+unsetopt menu_complete  # do not autoselect the first completion entry
+setopt auto_menu        # show completion menu on successive tab press
+setopt complete_in_word # allow completion from within a word
+setopt always_to_end    # move cursor to end if word had one match
+setopt completealiases
 
-# Emacs keybindings
-bindkey -e
+# Case-insensitive, partial-word, and then substring completion
+zstyle ':completion:*' matcher-list \
+  'm:{a-zA-Z-_}={A-Za-z_-}' \
+  'r:|[._-]=* r:|=*' \
+  'l:|=* r:|=*'
+# Show descriptions when completion options exist
+zstyle ':completion:*' verbose yes
 
-# Color file completions
-zstyle ':completion:*' list-colors ''
+# Use caching so that commands like apt and dpkg complete are useable
+zstyle ':completion:*' use-cache yes
+zstyle ':completion:*' cache-path ~/.zsh/cache
 
-# Group completions by type
-# zstyle ':completion:*' group-name ''
-# zstyle ':completion:*' format '%B%d%b'
+# Group matches and describe what type they are
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' format '%F{yellow}-- %d --%f'
+zstyle ':completion:*' menu select=2
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
-# History file for zsh
+# Better completion for kill, ps, and other system commands
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm -w -w"
+
+# Complete . and .. special directories
+zstyle ':completion:*' special-dirs true
+
+# Allow approximate completions (after pressing Ctrl+X a)
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
+
+# SSH/SCP/RSYNC host completion from known_hosts
+zstyle ':completion:*:(ssh|scp|rsync):*' tag-order 'hosts:-host:host hosts:-domain:domain hosts:-ipaddr:ip\ address *'
+zstyle ':completion:*:(scp|rsync):*' group-order users files all-files hosts-domain hosts-host hosts-ipaddr
+zstyle ':completion:*:ssh:*' group-order users hosts-domain hosts-host users hosts-ipaddr
+zstyle ':completion:*:(ssh|scp|rsync):*:hosts-host' ignored-patterns '*(.|:)*' loopback ip6-loopback localhost ip6-localhost broadcasthost
+zstyle ':completion:*:(ssh|scp|rsync):*:hosts-domain' ignored-patterns '<->.<->.<->.<->' '^[-[:alnum:]]##(.[-[:alnum:]]##)##' '*@*'
+zstyle ':completion:*:(ssh|scp|rsync):*:hosts-ipaddr' ignored-patterns '^(<->.<->.<->.<->|(|::)([[:xdigit:].]##:(#c,2))##(|%*))' '127.0.0.<->' '255.255.255.255' '::1' 'fe80::*'
+
+# ===== History Configuration =====
 HISTFILE=~/.zsh_history
+HISTSIZE=5000
+SAVEHIST=5000
 
-# How many commands to store in history
-HISTSIZE=1000
-SAVEHIST=$HISTSIZE
+setopt extended_history       # record timestamp of command in HISTFILE
+setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
+setopt hist_ignore_dups       # ignore duplicated commands history list
+setopt hist_ignore_space      # ignore commands that start with space
+setopt hist_verify            # show command with history expansion to user before running it
+setopt share_history          # share command history data
+setopt inc_append_history     # immediately append to history file, not just when a term is killed
+setopt hist_find_no_dups      # don't show duplicates when searching history
 
-# Ignore a duplicate of the previous command
-setopt HIST_IGNORE_DUPS
+# ===== Keybindings =====
+bindkey -e  # emacs keybindings
+bindkey '^U' backward-kill-line  # Ctrl+U - kill to beginning of line (like bash)
+bindkey '^[[3;5~' kill-word      # Ctrl+Del - kill word forward
+bindkey '^H' backward-kill-word  # Ctrl+Backspace - kill word backward
 
-# Append to history file
-setopt APPEND_HISTORY
+# ===== Enhanced Emacs Keybindings =====
+bindkey -e  # Ensure emacs keybindings are enabled
 
-# Save history immediately after each command
-setopt INC_APPEND_HISTORY
-
-# Share history between active zsh sessions
-setopt share_history
-
-# Disable beeping
-setopt NO_BEEP
-
-# Recognize comments on the command line
-setopt INTERACTIVE_COMMENTS
-
-# Error on a redirections which would overwrite an existing file
-setopt NO_CLOBBER
-
-# Disable multios
-setopt NO_MULTIOS
-
-# Disable flow control
-setopt NO_FLOW_CONTROL
-
-# alias l="eza --group-directories-first -lhU --time-style='long-iso'"
-alias l="eza --sort=type -l --hyperlink"
-alias n="nvim"
-alias nv="nvim"
-alias v="vim"
-alias cd-focus-config="cd ~/Library/Application\ Support/dev.focus-editor"
-
-export PATH="/usr/local/opt/jpeg/bin:$PATH"
-
-export PATH="/usr/local/sbin:$PATH"
-export PATH="/usr/local/opt/llvm/bin:$PATH"
-export PATH="/usr/local/bin:$PATH"
-
-mdcd () {
-    mkdir -p "$1";
-    cd "$1"
+# Define a function to paste clipboard content
+function paste-from-clipboard {
+  # macOS
+  if command -v pbpaste &>/dev/null; then
+    LBUFFER+=$(pbpaste 2>/dev/null)
+  # Linux (X11/Wayland)
+  elif command -v wl-paste &>/dev/null; then
+    LBUFFER+=$(wl-paste 2>/dev/null)
+  elif command -v xsel &>/dev/null; then
+    LBUFFER+=$(xsel -b 2>/dev/null)
+  elif command -v xclip &>/dev/null; then
+    LBUFFER+=$(xclip -selection clipboard -o 2>/dev/null)
+  else
+    echo "Error: No clipboard tool found!" >&2
+  fi
 }
-export PATH="$(brew --prefix)/bin:$PATH"
 
-eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib=$HOME/perl5)"
+# Register the function as a Zsh widget
+zle -N paste-from-clipboard
+
+# Bind Ctrl+Y to the widget
+bindkey '^Y' paste-from-clipboard
+
+# Ctrl+S - Enter selection mode (emacs style)
+bindkey '^s' set-mark-command  # Set mark at current position
+
+# Ctrl+W - Copy selected text to clipboard without killing (for emacs style copy)
+bindkey '^w' copy-region-as-kill-to-clipboard
+function copy-region-as-kill-to-clipboard() {
+  zle copy-region-as-kill
+  if [[ "$OSTYPE" = darwin* ]]; then
+    echo -n "$CUTBUFFER" | pbcopy
+  else
+    echo -n "$CUTBUFFER" | xclip -i -selection clipboard 2>/dev/null || xsel --clipboard --input 2>/dev/null
+  fi
+}
+zle -N copy-region-as-kill-to-clipboard
+
+bindkey '^\' redo
+
+# ===== Other Options =====
+setopt no_beep                  # disable beeping
+setopt interactive_comments     # allow comments in interactive shells
+setopt no_clobber               # prevent overwriting files with >
+setopt no_flow_control          # disable start/stop output control
+setopt auto_cd                  # cd by typing directory name without cd
+setopt multios                  # enable multiple redirections
+setopt prompt_subst             # enable parameter expansion in prompt
+
+# ===== Directory Navigation =====
+setopt auto_pushd               # make cd push old dir to dir stack
+setopt pushd_ignore_dups        # don't push duplicates to dir stack
+setopt pushdminus               # invert + and - meanings
+
+# ===== Globbing and Expansion =====
+setopt extended_glob            # enable extended globbing
+setopt numeric_glob_sort        # sort numbered files numerically
+unsetopt case_glob              # make globbing case-sensitive
