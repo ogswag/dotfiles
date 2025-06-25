@@ -7,9 +7,11 @@
 
 (setq native-comp-async-report-warnings-errors 'silent)
 
-(setq mac-command-modifier 'hyper)   ;; make command key do Hyper
-(setq mac-option-modifier 'meta)     ;; make option/alt  key do Meta
-(setq mac-control-modifier 'control) ;; make control key do Control
+(cond ((eq system-type 'darwin)
+       ;; (setq mac-command-modifier 'hyper)   ;; make command key do Hyper
+       (setq mac-option-modifier 'meta)     ;; make option/alt  key do Meta
+       (setq mac-control-modifier 'control) ;; make control key do Control
+       ))
 
 ;; Control emacs frame
 (use-package moom
@@ -124,7 +126,8 @@
 ;; Do not wrap line by default, unless in specific modes
 (setq-default truncate-lines t)
 (use-package visual-line
-  :hook (LaTeX-mode toml-ts-mode))
+  :hook (LaTeX-mode toml-ts-mode makefile-mode makefile-gmake-mode makefile-bsdmake-mode))
+(global-visual-wrap-prefix-mode t)
 
 
 (global-hl-line-mode t)
@@ -183,7 +186,7 @@
     (set-face-attribute 'variable-pitch nil :family "Calibri")))
  ((eq system-type 'darwin)
   (cond ((member "Adwaita Mono" (font-family-list))
-         (set-frame-font "Adwaita Mono 12" t t)
+         (set-frame-font "Adwaita Mono 14" t t)
          (set-face-attribute 'fixed-pitch nil :family "Adwaita Mono")
          (set-face-attribute 'variable-pitch nil :family "Adwaita Sans"))
         ((member "Meslo LG S" (font-family-list))
@@ -278,7 +281,7 @@
   :ensure t
   :demand t
   :bind
-  ("H-'" . 'avy-goto-char))
+  ("s-'" . 'avy-goto-char))
 
 (use-package highlight-doxygen
   :ensure t
@@ -411,6 +414,9 @@
 ;;               polar-bear-delimiter-color "#B14747"
 ;;               polar-bear-rainbow-delimiters-style 'strong)
 
+(use-package ansi-color
+    :hook (compilation-filter . ansi-color-compilation-filter))
+
 (use-package auto-dark
   :ensure t
   :demand t
@@ -441,7 +447,7 @@
                   ("Shell"  (shfmt "-i" "4" "-ci"))
                   ("Python" (ruff))
                   ("JSON"   (prettier))
-                  ("LaTeX"  (latexindent ))
+                  ("LaTeX"  (latexindent))
                   )
                 )
   )

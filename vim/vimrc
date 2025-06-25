@@ -70,10 +70,11 @@ augroup colorscheme_change | au!
     au ColorScheme default hi CursorLineNr cterm=NONE ctermfg=12
     au ColorScheme default hi Special ctermfg=5
     au ColorScheme default hi PreProc ctermfg=5
+    au ColorScheme retrobox hi Normal ctermbg=NONE guibg=NONE
 augroup END
 
 colorscheme retrobox
-set bg=dark
+set bg=light
 set showmatch  " highlight matching brace
 
 if has("gui_running")
