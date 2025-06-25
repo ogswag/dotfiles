@@ -19,6 +19,7 @@ endif
 call plug#begin()
 Plug 'https://github.com/tpope/vim-commentary'
 Plug 'https://github.com/christoomey/vim-titlecase'
+Plug 'https://github.com/sainnhe/everforest'
 call plug#end()
 
 " ---------- GENERAL SETTINGS  ----------
@@ -73,7 +74,15 @@ augroup colorscheme_change | au!
     au ColorScheme retrobox hi Normal ctermbg=NONE guibg=NONE
 augroup END
 
-colorscheme retrobox
+if has('termguicolors')
+    set termguicolors
+    let g:everforest_background = 'hard'
+    let g:everforest_better_performance = 1
+    colorscheme everforest
+else
+    colorscheme retrobox
+endif
+
 set bg=light
 set showmatch  " highlight matching brace
 
