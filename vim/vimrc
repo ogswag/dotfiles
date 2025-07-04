@@ -74,16 +74,54 @@ augroup colorscheme_change | au!
     au ColorScheme retrobox hi Normal ctermbg=NONE guibg=NONE
 augroup END
 
-if has('termguicolors')
-    set termguicolors
-    let g:everforest_background = 'hard'
-    let g:everforest_better_performance = 1
-    colorscheme everforest
-else
-    colorscheme retrobox
-endif
+let g:everforest_better_performance = 1
+let g:everforest_background = 'hard'
 
-set bg=light
+function! EnableTermGuicolorsIfSupported()
+    " Only proceed if Vim supports termguicolors
+    if !has('termguicolors')
+        return
+    endif
+
+    " Check for truecolor support indicators
+    if ($COLORTERM ==# 'truecolor' || $COLORTERM ==# '24bit') ||
+        \ ($TERM ==# 'xterm-kitty') ||
+        \ ($TERM_PROGRAM ==# 'WezTerm') ||
+        \ ($TERM_PROGRAM ==# 'vscode') ||
+        \ (exists('$VTE_VERSION') && $VTE_VERSION >= 3600)
+
+        " Handle tmux/screen compatibility
+        if &term =~# '^screen' || &term =~# '^tmux'
+            let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+            let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+        endif
+
+        set termguicolors
+        colorscheme everforest
+
+        return 1
+    endif
+
+    colorscheme retrobox
+    return 0
+endfunction
+
+call EnableTermGuicolorsIfSupported()
+
+function! ChangeBackground()
+    if system("defaults read -g AppleInterfaceStyle") =~ '^Dark'
+        set background=dark   " for the dark version of the theme
+    else
+        set background=light  " for the light version of the theme
+    endif
+endfunction
+
+" initialize the colorscheme for the first run
+call ChangeBackground()
+
+" change the color scheme if we receive a SigUSR1
+autocmd SigUSR1 * call ChangeBackground()
+
 set showmatch  " highlight matching brace
 
 if has("gui_running")

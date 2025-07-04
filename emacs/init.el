@@ -185,7 +185,11 @@
     (set-face-attribute 'fixed-pitch nil :family "Cascadia Code")
     (set-face-attribute 'variable-pitch nil :family "Calibri")))
  ((eq system-type 'darwin)
-  (cond ((member "Adwaita Mono" (font-family-list))
+  (cond ((member "Cascadia Code" (font-family-list))
+         (set-frame-font "Cascadia Code 14" t t)
+         (set-face-attribute 'fixed-pitch nil :family "Cascadia Code")
+         (set-face-attribute 'variable-pitch nil :family "Arial"))
+        ((member "Adwaita Mono" (font-family-list))
          (set-frame-font "Adwaita Mono 14" t t)
          (set-face-attribute 'fixed-pitch nil :family "Adwaita Mono")
          (set-face-attribute 'variable-pitch nil :family "Adwaita Sans"))
@@ -264,6 +268,8 @@
 (use-package highlight-parentheses
   :ensure t
   :demand t
+  :custom
+  (highlight-parentheses-colors '("RoyalBlue" "firebrick2" "DarkOrange" "MediumSeaGreen"))
   :hook (after-init . global-highlight-parentheses-mode))
 
 (use-package which-key
@@ -407,34 +413,21 @@
   :ensure t
   :defer t)
 
-(mapc #'disable-theme custom-enabled-themes)  ; Disable all active themes
-;; (load-theme 'polar-bear t)
-
 ;; (setq-default polar-bear-operator-color "#B14747"
 ;;               polar-bear-delimiter-color "#B14747"
 ;;               polar-bear-rainbow-delimiters-style 'strong)
 
 (use-package ansi-color
-    :hook (compilation-filter . ansi-color-compilation-filter))
+  :hook (compilation-filter . ansi-color-compilation-filter))
 
 (use-package auto-dark
   :ensure t
   :demand t
   :custom
-  (auto-dark-themes '((polar-bear) (twilight-bright)))
+  (auto-dark-themes '((polar-bear) (tsdh-light)))
   (auto-dark-polling-interval-seconds 5)
-  (auto-dark-allow-osascript t)
-  ;; (auto-dark-detection-method nil) ;; dangerous to be set manually
-  :hook
-  (auto-dark-dark-mode
-   . (lambda ()
-       ;; something to execute when dark mode is detected
-       ))
-  (auto-dark-light-mode
-   . (lambda ()
-       ;; something to execute when light mode is detected
-       ))
-  :init (auto-dark-mode))
+  (auto-dark-allow-osascript t))
+(auto-dark-mode t)
 
 (use-package format-all
   :ensure t
