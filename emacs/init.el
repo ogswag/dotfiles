@@ -35,6 +35,7 @@
 
 (setq-default frame-resize-pixelwise 1)
 
+(require 'org)
 (setq org-log-done nil
       org-agenda-files   (list "~/org/")
       org-refile-targets '((org-agenda-files :maxlevel . 5))
@@ -180,17 +181,22 @@
 
 (cond
  ((eq system-type 'windows-nt)
-  (when (member "Cascadia Code" (font-family-list))
-    (set-frame-font "Cascadia Code 12" t t)
-    (set-face-attribute 'fixed-pitch nil :family "Cascadia Code")
-    (set-face-attribute 'variable-pitch nil :family "Calibri")))
+  (cond ((member "Cascadia Code" (font-family-list))
+         (set-frame-font "Cascadia Code 12" t t)
+         (set-face-attribute 'fixed-pitch nil :family "Cascadia Code")
+         (set-face-attribute 'variable-pitch nil :family "Calibri"))
+        ((member "Consolas" (font-family-list))
+         (set-frame-font "Consolas 12" t t)
+         (set-face-attribute 'fixed-pitch nil :family "Consolas")
+         (set-face-attribute 'variable-pitch nil :family "Calibri"))
+        ))
  ((eq system-type 'darwin)
   (cond ((member "Cascadia Code" (font-family-list))
-         (set-frame-font "Cascadia Code 14" t t)
+         (set-frame-font "Cascadia Code 12" t t)
          (set-face-attribute 'fixed-pitch nil :family "Cascadia Code")
          (set-face-attribute 'variable-pitch nil :family "Arial"))
         ((member "Adwaita Mono" (font-family-list))
-         (set-frame-font "Adwaita Mono 14" t t)
+         (set-frame-font "Adwaita Mono 12" t t)
          (set-face-attribute 'fixed-pitch nil :family "Adwaita Mono")
          (set-face-attribute 'variable-pitch nil :family "Adwaita Sans"))
         ((member "Meslo LG S" (font-family-list))
