@@ -20,6 +20,7 @@ call plug#begin()
 Plug 'https://github.com/tpope/vim-commentary'
 Plug 'https://github.com/christoomey/vim-titlecase'
 Plug 'https://github.com/sainnhe/everforest'
+Plug 'https://github.com/sheerun/vim-polyglot'
 call plug#end()
 
 " ---------- GENERAL SETTINGS  ----------
@@ -63,19 +64,31 @@ augroup colorscheme_change | au!
     au ColorScheme habamax hi Normal ctermbg=NONE guibg=NONE
     au ColorScheme habamax hi Comment ctermfg=95 guifg=NONE
     au ColorScheme habamax hi SpellBad cterm=underline ctermfg=124 ctermbg=NONE guifg=#af0000 gui=underline guibg=NONE
-    au ColorScheme lunaperche hi Normal ctermbg=NONE guibg=NONE
     au ColorScheme sorbet hi Normal ctermbg=NONE guibg=NONE
-    au ColorScheme wildcharm hi Normal ctermbg=NONE guibg=NONE
     au ColorScheme default hi Normal ctermbg=NONE guibg=NONE
     au ColorScheme default hi LineNr ctermfg=8 guifg=gray
     au ColorScheme default hi CursorLineNr cterm=NONE ctermfg=12
     au ColorScheme default hi Special ctermfg=5
     au ColorScheme default hi PreProc ctermfg=5
-    au ColorScheme retrobox hi Normal ctermbg=NONE guibg=NONE
 augroup END
 
 let g:everforest_better_performance = 1
-let g:everforest_background = 'hard'
+let g:everforest_background = 'medium'
+
+function! ChangeBackground()
+    if system("defaults read -g AppleInterfaceStyle") =~ '^Dark'
+        set background=dark   " for the dark version of the theme
+    else
+        set background=light  " for the light version of the theme
+    endif
+endfunction
+
+" initialize the colorscheme for the first run
+call ChangeBackground()
+
+" change the color scheme if we receive a SigUSR1
+autocmd SigUSR1 * call ChangeBackground()
+
 
 function! EnableTermGuicolorsIfSupported()
     " Only proceed if Vim supports termguicolors
@@ -103,24 +116,11 @@ function! EnableTermGuicolorsIfSupported()
     endif
 
     colorscheme retrobox
+
     return 0
 endfunction
 
 call EnableTermGuicolorsIfSupported()
-
-function! ChangeBackground()
-    if system("defaults read -g AppleInterfaceStyle") =~ '^Dark'
-        set background=dark   " for the dark version of the theme
-    else
-        set background=light  " for the light version of the theme
-    endif
-endfunction
-
-" initialize the colorscheme for the first run
-call ChangeBackground()
-
-" change the color scheme if we receive a SigUSR1
-autocmd SigUSR1 * call ChangeBackground()
 
 set showmatch  " highlight matching brace
 
