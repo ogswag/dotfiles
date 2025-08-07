@@ -17,10 +17,11 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
 endif
 " ---
 call plug#begin()
+
 Plug 'https://github.com/tpope/vim-commentary'
 Plug 'https://github.com/christoomey/vim-titlecase'
-Plug 'https://github.com/sainnhe/everforest'
 Plug 'https://github.com/sheerun/vim-polyglot'
+
 call plug#end()
 
 " ---------- GENERAL SETTINGS  ----------
@@ -110,12 +111,12 @@ function! EnableTermGuicolorsIfSupported()
         endif
 
         set termguicolors
-        colorscheme everforest
+        colorscheme unokai
 
         return 1
     endif
 
-    colorscheme retrobox
+    colorscheme unokai
 
     return 0
 endfunction

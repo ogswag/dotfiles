@@ -1,5 +1,9 @@
+[general]
+import = ["./Monokai.toml"]
+
+
 [window]
-decorations = "Buttonless"
+decorations = "Full"
   [window.padding]
   x = 2
   y = 1
@@ -12,13 +16,13 @@ decorations = "Buttonless"
 size = 13
 
   [font.normal]
-  family = "SF Mono"
+  family = "JetBrains Mono"
 
 [colors]
 cursor = { text = "CellBackground", cursor = "#f5a97f" }
 
 [cursor]
-thickness = 0.275
+thickness = 0.33
 
   [cursor.style]
   shape = "Beam"
