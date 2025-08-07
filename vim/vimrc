@@ -21,6 +21,7 @@ call plug#begin()
 Plug 'https://github.com/tpope/vim-commentary'
 Plug 'https://github.com/christoomey/vim-titlecase'
 Plug 'https://github.com/sheerun/vim-polyglot'
+Plug 'https://github.com/chasinglogic/modus-themes-vim'
 
 call plug#end()
 
@@ -73,12 +74,10 @@ augroup colorscheme_change | au!
     au ColorScheme default hi PreProc ctermfg=5
 augroup END
 
-let g:everforest_better_performance = 1
-let g:everforest_background = 'medium'
-
 function! ChangeBackground()
     if system("defaults read -g AppleInterfaceStyle") =~ '^Dark'
         set background=dark   " for the dark version of the theme
+        colors unokai
     else
         set background=light  " for the light version of the theme
     endif

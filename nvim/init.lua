@@ -159,100 +159,22 @@ vim.opt.rtp:prepend(lazypath)
 -- Set up plugins
 require("lazy").setup({
     -- Colorschemes with both light and dark variants
-    { "kkga/vim-envy" },
-    { "foxoman/vim-helix" },
     {
-        "ellisonleao/gruvbox.nvim",
+        "khoido2003/classic_monokai.nvim",
+        lazy = false,
         priority = 1000,
         config = function()
-            require("gruvbox").setup({
-                terminal_colors = true, -- add neovim terminal colors
-                undercurl = true,
-                underline = true,
-                bold = true,
-                italic = {
-                    strings = false,
-                    emphasis = true,
-                    comments = false,
-                    operators = false,
-                    folds = true,
-                },
-                strikethrough = true,
-                invert_selection = true,
-                invert_signs = false,
-                invert_tabline = true,
-                invert_intend_guides = false,
-                inverse = true, -- invert background for search, diffs, statuslines and errors
-                contrast = "", -- can be "hard", "soft" or empty string
-                palette_overrides = {},
-                overrides = {},
-                dim_inactive = false,
-                transparent_mode = false,
-            })
+            -- Default configuration
+            require("classic_monokai").setup()
         end,
     },
-    { "navarasu/onedark.nvim" },
-    { "pappasam/papercolor-theme-slim" },
-    { "ntk148v/habamax.nvim", dependencies = { "rktjmp/lush.nvim" } },
+
     {
-        "folke/which-key.nvim",
-        event = "VeryLazy",
-        opts = {
-            -- your configuration comes here
-            -- or leave it empty to use the default settings
-            -- refer to the configuration section below
-        },
-        keys = {
-            {
-                "<leader>?",
-                function()
-                    require("which-key").show({ global = true })
-                end,
-                desc = "Buffer Local Keymaps (which-key)",
-            },
-        },
-    },
-    -- Tree-sitter
-    {
-        "nvim-treesitter/nvim-treesitter",
-        build = ":TSUpdate",
+        "miikanissi/modus-themes.nvim",
+        priority = 1000,
         config = function()
-            require("nvim-treesitter.configs").setup({
-                ensure_installed = {
-                    "bash",
-                    "c",
-                    "cpp",
-                    "css",
-                    "dockerfile",
-                    "go",
-                    "html",
-                    "java",
-                    "javascript",
-                    "json",
-                    "lua",
-                    "markdown",
-                    "python",
-                    "rust",
-                    "sql",
-                    "tsx",
-                    "typescript",
-                    "vim",
-                    "yaml",
-                    "toml",
-                    "regex",
-                    "vimdoc",
-                },
-                highlight = { enable = true },
-                indent = { enable = true },
-                incremental_selection = {
-                    enable = true,
-                    keymaps = {
-                        init_selection = "<c-space>",
-                        node_incremental = "<c-space>",
-                        scope_incremental = "<c-s>",
-                        node_decremental = "<M-space>",
-                    },
-                },
+            require("modus-themes").setup({
+                variant = "tinted"
             })
         end,
     },
@@ -268,12 +190,12 @@ require("lazy").setup({
                 set_dark_mode = function()
                     vim.api.nvim_set_option("background", "dark")
                     -- Choose your preferred dark colorscheme here
-                    vim.cmd.colorscheme("gruvbox") -- alternatives: tokyonight, onedark, gruvbox-material
+                    vim.cmd.colorscheme("classic-monokai") -- alternatives: tokyonight, onedark, gruvbox-material
                 end,
                 set_light_mode = function()
                     vim.api.nvim_set_option("background", "light")
                     -- Choose your preferred light colorscheme here
-                    vim.cmd.colorscheme("helix-light") -- alternatives: tokyonight-day, gruvbox-material-light
+                    vim.cmd.colorscheme("modus_operandi") -- alternatives: tokyonight-day, gruvbox-material-light
                 end,
             })
 
@@ -286,8 +208,7 @@ require("lazy").setup({
     { "tpope/vim-commentary" }, -- Easy commenting
     { "tpope/vim-surround" }, -- Surround text objects
     { "windwp/nvim-autopairs", config = true }, -- Auto pair brackets, quotes, etc.
-    { -- A better user experience for viewing and interacting with Vim marks.
-        "chentoast/marks.nvim",
+    { "chentoast/marks.nvim", -- A better user experience for viewing and interacting with Vim marks.,
         event = "VeryLazy",
         config = function()
             require("marks").setup({
