@@ -174,7 +174,7 @@ require("lazy").setup({
         priority = 1000,
         config = function()
             require("modus-themes").setup({
-                variant = "tinted"
+                variant = "tinted",
             })
         end,
     },
@@ -208,7 +208,8 @@ require("lazy").setup({
     { "tpope/vim-commentary" }, -- Easy commenting
     { "tpope/vim-surround" }, -- Surround text objects
     { "windwp/nvim-autopairs", config = true }, -- Auto pair brackets, quotes, etc.
-    { "chentoast/marks.nvim", -- A better user experience for viewing and interacting with Vim marks.,
+    {
+        "chentoast/marks.nvim", -- A better user experience for viewing and interacting with Vim marks.,
         event = "VeryLazy",
         config = function()
             require("marks").setup({
@@ -266,6 +267,8 @@ require("lazy").setup({
                 lua = { "stylua" },
                 python = { "ruff_format" },
                 javascript = { "prettier" },
+                shell = { "shfmt" },
+                bash = { "shfmt" },
             },
             formatters = {
                 clang_format = {

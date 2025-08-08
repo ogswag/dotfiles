@@ -5,6 +5,10 @@ alias l="eza --sort=type -al --hyperlink"
 alias n="nvim"
 alias nv="nvim"
 alias v="vim"
+alias vim="nvim"
+
+export EDITOR='nvim'
+export VISUAL='nvim'
 
 mkcd () {
     mkdir -p "$1";
@@ -199,4 +203,4 @@ setopt pushdminus               # invert + and - meanings
 setopt extended_glob            # enable extended globbing
 setopt numeric_glob_sort        # sort numbered files numerically
 unsetopt case_glob              # make globbing case-sensitive
-alias vim=nvim
+
