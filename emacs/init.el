@@ -1,577 +1,563 @@
-;;; -*- lexical-binding: t; -*-
+;;; init.el --- Init -*- lexical-binding: t; -*-
 
-(setq warning-suppress-types '((files)))
-(setq custom-file (locate-user-emacs-file "custom.el"))
-(when (file-exists-p custom-file)
-  (load custom-file nil t t))
+;; Author: James Cherti
+;; URL: https://github.com/jamescherti/minimal-emacs.d
+;; Package-Requires: ((emacs "29.1"))
+;; Keywords: maint
+;; Version: 1.3.0
+;; SPDX-License-Identifier: GPL-3.0-or-later
 
-(setq native-comp-async-report-warnings-errors 'silent)
+;;; Commentary:
+;; The minimal-emacs.d project is a lightweight and optimized Emacs base
+;; (init.el and early-init.el) that gives you full control over your
+;; configuration. It provides better defaults, an optimized startup, and a clean
+;; foundation for building your own vanilla Emacs setup.
+;;
+;; Building the minimal-emacs.d init.el and early-init.el was the result of
+;; extensive research and testing to fine-tune the best parameters and
+;; optimizations for an Emacs configuration.
+;;
+;; Do not modify this file; instead, modify pre-init.el or post-init.el.
 
-(cond ((eq system-type 'darwin)
-       ;; (setq mac-command-modifier 'hyper)   ;; make command key do Hyper
-       (setq mac-option-modifier 'meta)     ;; make option/alt  key do Meta
-       (setq mac-control-modifier 'control) ;; make control key do Control
-       ))
+;;; Code:
 
-;; Control emacs frame
-(use-package moom
-  :ensure t
-  :custom
-  (moom-use-font-module nil)
-  :config (moom-mode 1))
+;;; Load pre-init.el
+(if (fboundp 'minimal-emacs-load-user-init)
+    (minimal-emacs-load-user-init "pre-init.el")
+  (error "The early-init.el file failed to loaded"))
 
-(use-package exec-path-from-shell
-  :ensure t
-  :if (memq window-system '(mac ns))
-  :commands (exec-path-from-shell-initialize)
-  :config
-  (exec-path-from-shell-initialize))
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
+;;; Before package
 
-(load "~/.emacs.d/elisp/xah-functions.el" nil t t)
-(load "~/.emacs.d/elisp/yandex-compile-commands.el" nil t t)
-(load "~/.emacs.d/elisp/keys.el" nil t t)
+;; Ask the user whether to terminate asynchronous compilations on exit.
+;; This prevents native compilation from leaving temporary files in /tmp.
+(setq native-comp-async-query-on-exit t)
 
-(setq-default frame-resize-pixelwise 1)
+;; Allow for shorter responses: "y" for yes and "n" for no.
+(setq read-answer-short t)
+(if (boundp 'use-short-answers)
+    (setq use-short-answers t)
+  (advice-add 'yes-or-no-p :override #'y-or-n-p))
 
-(require 'org)
-(setq org-log-done nil
-      org-agenda-files   (list "~/org/")
-      org-refile-targets '((org-agenda-files :maxlevel . 5))
-      org-refile-use-outline-path 'file)
+;;; Undo/redo
 
-(fringe-mode '(8 . 0))
-(setq-default indicate-empty-lines t)
+(setq undo-limit (* 13 160000)
+      undo-strong-limit (* 13 240000)
+      undo-outer-limit (* 13 24000000))
+
+;;; package.el
+
+(when (bound-and-true-p minimal-emacs-package-initialize-and-refresh)
+  ;; Initialize and refresh package contents again if needed
+  (package-initialize)
+  ;; Install use-package if necessary
+  (unless (package-installed-p 'use-package)
+    (unless (seq-empty-p package-archive-contents)
+      (package-refresh-contents))
+    (package-install 'use-package))
+
+  ;; Ensure use-package is available
+  (require 'use-package))
+
+;;; Minibuffer
+
+;; Allow nested minibuffers
+(setq enable-recursive-minibuffers t)
+
+;; Keep the cursor out of the read-only portions of the.minibuffer
+(setq minibuffer-prompt-properties
+      '(read-only t intangible t cursor-intangible t face minibuffer-prompt))
+(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+;;; User interface
+
+(defalias #'view-hello-file #'ignore)  ; Never show the hello file
+
+;; No beeping or blinking
+(setq visible-bell nil)
+(setq ring-bell-function #'ignore)
+
+;;; Show-paren
+(setq show-paren-delay 0.1
+      show-paren-highlight-openparen t
+      show-paren-when-point-inside-paren t
+      show-paren-when-point-in-periphery t)
+
+;;; Misc
+
+(setq custom-buffer-done-kill t)
+
+(setq whitespace-line-column nil)  ; Use the value of `fill-column'.
+
+;; Can be activated with `display-line-numbers-mode'
+(setq-default display-line-numbers-width 3)
+(setq-default display-line-numbers-widen t)
+
+(setq truncate-string-ellipsis "…")
+
+;; Disable truncation of printed s-expressions in the message buffer
+(setq eval-expression-print-length nil
+      eval-expression-print-level nil)
+
+;; Position underlines at the descent line instead of the baseline.
+(setq x-underline-at-descent-line t)
+
+(setq tramp-verbose 1)
+(setq tramp-completion-reread-directory-timeout 50)
+(setq remote-file-name-inhibit-cache 50)
+
+;; Automatically rescan the buffer for Imenu entries when `imenu' is invoked
+;; This ensures the index reflects recent edits.
+(setq imenu-auto-rescan t)
+
+;; Prevent truncation of long function names in `imenu' listings
+(setq imenu-max-item-length 160)
+
+;; Disable auto-adding a new line at the bottom when scrolling.
+(setq next-line-add-newlines nil)
+
+;;; Files
+
+;; Delete by moving to trash in interactive mode
+(setq delete-by-moving-to-trash (not noninteractive))
+(setq remote-file-name-inhibit-delete-by-moving-to-trash t)
+
+;; Ignoring this is acceptable since it will redirect to the buffer regardless.
+(setq find-file-suppress-same-file-warnings t)
+
+;; Resolve symlinks so that operations are conducted from the file's directory
+(setq find-file-visit-truename t
+      vc-follow-symlinks t)
+
+;; Prefer vertical splits over horizontal ones
+(setq split-width-threshold 170
+      split-height-threshold nil)
+
+;;; Buffers
+
+(setq uniquify-buffer-name-style 'forward)
+
+;;; comint (general command interpreter in a window)
+
+(setq ansi-color-for-comint-mode t
+      comint-prompt-read-only t
+      comint-buffer-maximum-size 4096)
+
+;;; Compilation
+
+(setq compilation-ask-about-save nil
+      compilation-always-kill t
+      compilation-scroll-output 'first-error)
+
+;; Skip confirmation prompts when creating a new file or buffer
+(setq confirm-nonexistent-file-or-buffer nil)
+
+;;; Backup files
+
+;; Avoid backups or lockfiles to prevent creating world-readable copies of files
+(setq create-lockfiles nil)
+(setq make-backup-files nil)
+
+(setq backup-directory-alist
+      `(("." . ,(expand-file-name "backup" user-emacs-directory))))
+(setq tramp-backup-directory-alist backup-directory-alist)
+(setq backup-by-copying-when-linked t)
+(setq backup-by-copying t)  ; Backup by copying rather renaming
+(setq delete-old-versions t)  ; Delete excess backup versions silently
+(setq version-control t)  ; Use version numbers for backup files
+(setq kept-new-versions 5)
+(setq kept-old-versions 5)
+
+;;; VC
+
+(setq vc-git-print-log-follow t)
+(setq vc-make-backup-files nil)  ; Do not backup version controlled files
+(setq vc-git-diff-switches '("--histogram"))  ; Faster algorithm for diffing.
+
+;;; Auto save
+
+;; Enable auto-save to safeguard against crashes or data loss. The
+;; `recover-file' or `recover-session' functions can be used to restore
+;; auto-saved data.
+(setq auto-save-default nil)
+(setq auto-save-no-message t)
+
+;; Do not auto-disable auto-save after deleting large chunks of
+;; text.
+(setq auto-save-include-big-deletions t)
+
+(setq auto-save-list-file-prefix
+      (expand-file-name "autosave/" user-emacs-directory))
+(setq tramp-auto-save-directory
+      (expand-file-name "tramp-autosave/" user-emacs-directory))
+
+;; Auto save options
+(setq kill-buffer-delete-auto-save-files t)
+
+;; Remove duplicates from the kill ring to reduce clutter
+(setq kill-do-not-save-duplicates t)
+
+;;; Auto revert
+;; Auto-revert in Emacs is a feature that automatically updates the contents of
+;; a buffer to reflect changes made to the underlying file.
+(setq revert-without-query (list ".")  ; Do not prompt
+      auto-revert-stop-on-user-input nil
+      auto-revert-verbose t)
+
+;; Revert other buffers (e.g, Dired)
+(setq global-auto-revert-non-file-buffers t)
+(setq global-auto-revert-ignore-modes '(Buffer-menu-mode))  ; Resolve issue #29
+
+;;; recentf
+
+;; `recentf' is an that maintains a list of recently accessed files.
+(setq recentf-max-saved-items 300) ; default is 20
+(setq recentf-max-menu-items 15)
+(setq recentf-auto-cleanup 'mode)
+
+;; Update recentf-exclude
+(setq recentf-exclude (list "^/\\(?:ssh\\|su\\|sudo\\)?:"))
+
+;;; saveplace
+
+;; Enables Emacs to remember the last location within a file upon reopening.
+(setq save-place-file (expand-file-name "saveplace" user-emacs-directory))
+(setq save-place-limit 600)
+
+;;; savehist
+
+;; `savehist-mode' is an Emacs feature that preserves the minibuffer history
+;; between sessions.
+(setq history-length 300)
+(setq savehist-save-minibuffer-history t)  ;; Default
+(setq savehist-additional-variables
+      '(kill-ring                        ; clipboard
+        register-alist                   ; macros
+        mark-ring global-mark-ring       ; marks
+        search-ring regexp-search-ring)) ; searches
+
+;;; Frames and windows
+
+;; However, do not resize windows pixelwise, as this can cause crashes in some
+;; cases when resizing too many windows at once or rapidly.
+(setq window-resize-pixelwise nil)
+
+(setq resize-mini-windows 'grow-only)
+
+;; The native border "uses" a pixel of the fringe on the rightmost
+;; splits, whereas `window-divider-mode' does not.
+(setq window-divider-default-bottom-width 1
+      window-divider-default-places t
+      window-divider-default-right-width 1)
+
+;;; Fontification
+
+;; Disable fontification during user input to reduce lag in large buffers.
+;; Also helps marginally with scrolling performance.
+(setq redisplay-skip-fontification-on-input t)
+
+;;; Scrolling
+
+;; Enables faster scrolling. This may result in brief periods of inaccurate
+;; syntax highlighting, which should quickly self-correct.
+(setq fast-but-imprecise-scrolling t)
+
+;; Move point to top/bottom of buffer before signaling a scrolling error.
+(setq scroll-error-top-bottom t)
+
+;; Keep screen position if scroll command moved it vertically out of the window.
+(setq scroll-preserve-screen-position t)
+
+;; If `scroll-conservatively' is set above 100, the window is never
+;; automatically recentered, which decreases the time spend recentering.
+(setq scroll-conservatively 101)
+
+;; 1. Preventing automatic adjustments to `window-vscroll' for long lines.
+;; 2. Resolving the issue of random half-screen jumps during scrolling.
+(setq auto-window-vscroll nil)
+
+;; Number of lines of margin at the top and bottom of a window.
+(setq scroll-margin 0)
+
+;; Number of lines of continuity when scrolling by screenfuls.
+(setq next-screen-context-lines 0)
+
+;; Horizontal scrolling
+(setq hscroll-margin 2
+      hscroll-step 1)
+
+;;; Mouse
+
+(setq mouse-yank-at-point nil)
+
+;; Emacs 29
+(when (memq 'context-menu minimal-emacs-ui-features)
+  (when (and (display-graphic-p) (fboundp 'context-menu-mode))
+    (add-hook 'after-init-hook #'context-menu-mode)))
+
+;;; Cursor
+
+;; The blinking cursor is distracting and interferes with cursor settings in
+;; some minor modes that try to change it buffer-locally (e.g., Treemacs).
+(when (bound-and-true-p blink-cursor-mode)
+  (blink-cursor-mode -1))
+
+;; Don't blink the paren matching the one at point, it's too distracting.
+(setq blink-matching-paren nil)
+
+;; Do not extend the cursor to fit wide characters
+(setq x-stretch-cursor nil)
+
+;; Reduce rendering/line scan work by not rendering cursors or regions in
+;; non-focused windows.
+(setq-default cursor-in-non-selected-windows nil)
+(setq highlight-nonselected-windows nil)
+
+;;; Text editing, indent, font, and formatting
+
+;; Avoid automatic frame resizing when adjusting settings.
+(setq global-text-scale-adjust-resizes-frames nil)
+
+;; A longer delay can be annoying as it causes a noticeable pause after each
+;; deletion, disrupting the flow of editing.
+(setq delete-pair-blink-delay 0.03)
+
+(setq-default left-fringe-width  8)
+(setq-default right-fringe-width 8)
+
+;; Disable visual indicators in the fringe for buffer boundaries and empty lines
+(setq-default indicate-buffer-boundaries nil)
+(setq-default indicate-empty-lines nil)
+
+;; Continue wrapped lines at whitespace rather than breaking in the
+;; middle of a word.
+(setq-default word-wrap t)
+
+;; Disable wrapping by default due to its performance cost.
+(setq-default truncate-lines t)
+
+;; If enabled and `truncate-lines' is disabled, soft wrapping will not occur
+;; when the window is narrower than `truncate-partial-width-windows' characters.
+(setq truncate-partial-width-windows nil)
+
+;; Configure automatic indentation to be triggered exclusively by newline and
+;; DEL (backspace) characters.
+(setq-default electric-indent-chars '(?\n ?\^?))
+
+;; Prefer spaces over tabs. Spaces offer a more consistent default compared to
+;; 8-space tabs. This setting can be adjusted on a per-mode basis as needed.
+(setq-default indent-tabs-mode nil
+              tab-width 4
+              c-ts-mode-indent-offset 4
+              c-ts-mode-indent-style 'bsd
+              c-indentation-style 'bsd)
 
 
-(tool-bar-mode 0)
-(setq use-dialog-box nil)
-(scroll-bar-mode 0)
-(context-menu-mode 1)
+;; Enable indentation and completion using the TAB key
+(setq tab-always-indent 'complete)
+(setq tab-first-completion 'word-or-paren-or-punct)
 
+;; Perf: Reduce command completion overhead.
+(setq read-extended-command-predicate #'command-completion-default-include-p)
 
-(unless (and (eq window-system 'mac)
-             (bound-and-true-p mac-carbon-version-string))
-  ;; Enables `pixel-scroll-precision-mode' on all operating systems and Emacs
-  ;; versions, except for emacs-mac.
-  ;;
-  ;; Enabling `pixel-scroll-precision-mode' is unnecessary with emacs-mac, as
-  ;; this version of Emacs natively supports smooth scrolling.
-  ;; https://bitbucket.org/mituharu/emacs-mac/commits/65c6c96f27afa446df6f9d8eff63f9cc012cc738
-  (setq pixel-scroll-precision-use-momentum nil) ; Precise/smoother scrolling
-  (pixel-scroll-precision-mode 1))
+;; Enable multi-line commenting which ensures that `comment-indent-new-line'
+;; properly continues comments onto new lines.
+(setq comment-multi-line t)
 
+;; Ensures that empty lines within the commented region are also commented out.
+;; This prevents unintended visual gaps and maintains a consistent appearance.
+(setq comment-empty-lines t)
 
-(setq
- make-backup-files nil  ;; disable automatic backup~ file
- auto-save-default nil
- create-lockfiles nil)  ;; stop creating #auto-save# files
+;; We often split terminals and editor windows or place them side-by-side,
+;; making use of the additional horizontal space.
+(setq-default fill-column 80)
 
-
-(set-language-environment "UTF-8")
-(set-default-coding-systems 'utf-8-unix)
-
-
-(setq-default ring-bell-function 'ignore)
-
-(setq vc-follow-symlinks t)  ;; auto follow symlinkgs without asking
-
-(setq use-short-answers t)   ;; Use y-n instead of yes-no
-
-(global-goto-address-mode t) ;; Make links clickable
-
-
-;; Fill column
-(setq-default fill-column 120)
 ;; Fill column ruler
 (use-package display-fill-column-indicator-mode
+  :ensure nil
   :hook (prog-mode LaTeX-mode))
 
+;; Disable the obsolete practice of end-of-line spacing from the typewriter era.
+(setq sentence-end-double-space nil)
 
-(setq-default indent-tabs-mode nil) ;; Use spaces instead of tabs
-(setq-default tab-width 4)          ;; Set tab width to 4 spaces
-(setq-default c-ts-mode-indent-offset 2)
-(setq-default c-ts-mode-indent-style 'gnu)
-(setq-default c-indentation-style 'gnu)
+;; According to the POSIX, a line is defined as "a sequence of zero or more
+;; non-newline characters followed by a terminating newline".
+(setq require-final-newline t)
 
+;; Eliminate delay before highlighting search matches
+(setq lazy-highlight-initial-delay 0)
 
-(electric-indent-mode 1)
-(setq-default electric-indent-inhibit t)
-(electric-pair-mode 1)
+;;; Modeline
 
+;; Makes Emacs omit the load average information from the mode line.
+(setq display-time-default-load-average nil)
 
-(blink-cursor-mode 1) ;; Stop (or don't) cursor blinking
-(setq-default cursor-type 'bar) ;; Set cursor shape
+;;; Filetype
 
+;; Do not notify the user each time Python tries to guess the indentation offset
+(setq python-indent-guess-indent-offset-verbose nil)
 
-(delete-selection-mode 1) ;; Paste over selected region
+(setq sh-indent-after-continuation 'always)
 
+;;; Dired and ls-lisp
 
-(subword-mode 1) ;; Navigate inside camelCaseWords
+(setq dired-free-space nil
+      dired-dwim-target t  ; Propose a target for intelligent moving/copying
+      dired-deletion-confirmer 'y-or-n-p
+      dired-filter-verbose nil
+      dired-recursive-deletes 'top
+      dired-recursive-copies 'always
+      dired-vc-rename-file t
+      dired-create-destination-dirs 'ask
+      dired-mouse-drag-files t
+      ;; Suppress Dired buffer kill prompt for deleted dirs
+      dired-clean-confirm-killing-deleted-buffers nil)
 
+;; This is a higher-level predicate that wraps `dired-directory-changed-p'
+;; with additional logic. This `dired-buffer-stale-p' predicate handles remote
+;; files, wdired, unreadable dirs, and delegates to dired-directory-changed-p
+;; for modification checks.
+(setq auto-revert-remote-files nil)
+(setq dired-auto-revert-buffer 'dired-buffer-stale-p)
 
-;; Enable mouse in terminal mode
-(unless (display-graphic-p)
-  (xterm-mouse-mode 1))
+;; dired-omit-mode
+(setq dired-omit-verbose nil
+      dired-omit-files (concat "\\`[.]\\'"))
 
+(setq ls-lisp-verbosity nil)
+(setq ls-lisp-dirs-first t)
 
-(add-hook 'prog-mode-hook #'column-number-mode)
-(add-hook 'prog-mode-hook #'display-line-numbers-mode)
-;; (setq-default display-line-numbers 'relative)
-;; (setq-default display-line-numbers-type 'relative)
-(setq-default display-line-numbers-grow-only t)
-(setq-default display-line-numbers-width-start t)
+;;; Ediff
 
+;; Configure Ediff to use a single frame and split windows horizontally
+(setq ediff-window-setup-function 'ediff-setup-windows-plain
+      ediff-split-window-function 'split-window-horizontally)
 
-;; Do not wrap line by default, unless in specific modes
-(setq-default truncate-lines t)
-(use-package visual-line
-  :hook (LaTeX-mode toml-ts-mode makefile-mode makefile-gmake-mode makefile-bsdmake-mode))
-(global-visual-wrap-prefix-mode t)
-
-
-(global-hl-line-mode t)
-
-
-;; Allow right-left scrolling with mouse
-(setq mouse-wheel-tilt-scroll t
-      mouse-wheel-flip-direction t)
-
-
-;; Delete trailing whitespace before saving
-(add-hook 'before-save-hook #'delete-trailing-whitespace)
-
-;; Simple and clean whitespace mode setup
-(progn
-  (setq whitespace-style (quote (face spaces tabs newline space-mark tab-mark newline-mark)))
-  (setq whitespace-display-mappings
-        ;; all numbers are unicode codepoint in decimal. e.g. (insert-char 182 1)
-        '(
-          (space-mark 32 [183] [46])
-          (newline-mark 10 [182 10])
-          (tab-mark 9 [9655 9] [92 9])
-          )))
-
-
-(savehist-mode t) ;; Persist history over Emacs restarts
-(save-place-mode t) ;; Save place in buffer
-(global-auto-revert-mode 1) ;; auto revert/refresh file when change detected
-(use-package recentf
-  :config
-  (add-to-list 'recentf-exclude "\\elpa")
-  (add-to-list 'recentf-exclude "private/tmp")
-  (recentf-mode 1))
-
-
-;; Ignore case in completion
-(setq read-buffer-completion-ignore-case t
-      read-file-name-completion-ignore-case t
-      completion-ignore-case t)
-
-
-(setq custom-safe-themes t)
-
-
-(require 'project)
-
-
-(setq-default default-input-method 'russian-computer)
-
-
-(cond
- ((eq system-type 'windows-nt)
-  (cond ((member "Cascadia Code" (font-family-list))
-         (set-frame-font "Cascadia Code 12" t t)
-         (set-face-attribute 'fixed-pitch nil :family "Cascadia Code")
-         (set-face-attribute 'variable-pitch nil :family "Calibri"))
-        ((member "Consolas" (font-family-list))
-         (set-frame-font "Consolas 12" t t)
-         (set-face-attribute 'fixed-pitch nil :family "Consolas")
-         (set-face-attribute 'variable-pitch nil :family "Calibri"))
-        ))
- ((eq system-type 'darwin)
-  (cond ((member "Cascadia Code" (font-family-list))
-         (set-frame-font "Cascadia Code 12" t t)
-         (set-face-attribute 'fixed-pitch nil :family "Cascadia Code")
-         (set-face-attribute 'variable-pitch nil :family "Arial"))
-        ((member "Adwaita Mono" (font-family-list))
-         (set-frame-font "Adwaita Mono 12" t t)
-         (set-face-attribute 'fixed-pitch nil :family "Adwaita Mono")
-         (set-face-attribute 'variable-pitch nil :family "Adwaita Sans"))
-        ((member "Meslo LG S" (font-family-list))
-         (set-frame-font "Meslo LG S 12" t t)
-         (set-face-attribute 'fixed-pitch nil :family "Meslo LG S")
-         (set-face-attribute 'variable-pitch nil :family "Helvetica Neue"))
-        ((member "Menlo" (font-family-list))
-         (set-frame-font "Menlo 12" t t)
-         (set-face-attribute 'fixed-pitch nil :family "Menlo")
-         (set-face-attribute 'variable-pitch nil :family "Helvetica Neue"))
-        ))
- ((eq system-type 'gnu/linux)
-  (cond ((member "Adwaita Mono" (font-family-list))
-         (set-frame-font "Adwaita Mono 10" t t)
-         (set-face-attribute 'fixed-pitch nil :family "Adwaita Mono")
-         (set-face-attribute 'variable-pitch nil :family "Adwaita Sans"))
-        ((member "DejaVu Sans Mono" (font-family-list))
-         (set-frame-font "DejaVu Sans Mono 10" t t)
-         (set-face-attribute 'fixed-pitch nil :family "DejaVu Sans Mono")
-         (set-face-attribute 'variable-pitch nil :family "DejaVu Sans"))
-        ))
- )
-
-(use-package ligature
-  :ensure
-  :config
-  ;; Enable the "www" ligature in every possible major mode
-  ;; (ligature-set-ligatures 't '("www"))
-  ;; Enable traditional ligature support in eww-mode, if the
-  ;; `variable-pitch' face supports it
-  ;; (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
-  ;; Enable all Cascadia and Fira Code ligatures in programming modes
-  (ligature-set-ligatures 'prog-mode
-                        '(;; == === ==== => =| =>>=>=|=>==>> ==< =/=//=// =~
-                          ;; =:= =!=
-                          ("=" (rx (+ (or ">" "<" "|" "/" "~" ":" "!" "="))))
-                          ;; ;; ;;;
-                          (";" (rx (+ ";")))
-                          ;; && &&&
-                          ("&" (rx (+ "&")))
-                          ;; !! !!! !. !: !!. != !== !~
-                          ("!" (rx (+ (or "=" "!" "\." ":" "~"))))
-                          ;; ?? ??? ?:  ?=  ?.
-                          ("?" (rx (or ":" "=" "\." (+ "?"))))
-                          ;; %% %%%
-                          ("%" (rx (+ "%")))
-                          ;; |> ||> |||> ||||> |] |} || ||| |-> ||-||
-                          ;; |->>-||-<<-| |- |== ||=||
-                          ;; |==>>==<<==<=>==//==/=!==:===>
-                          ("|" (rx (+ (or ">" "<" "|" "/" ":" "!" "}" "\]"
-                                          "-" "=" ))))
-                          ;; \\ \\\ \/
-                          ("\\" (rx (or "/" (+ "\\"))))
-                          ;; ++ +++ ++++ +>
-                          ("+" (rx (or ">" (+ "+"))))
-                          ;; :: ::: :::: :> :< := :// ::=
-                          (":" (rx (or ">" "<" "=" "//" ":=" (+ ":"))))
-                          ;; // /// //// /\ /* /> /===:===!=//===>>==>==/
-                          ("/" (rx (+ (or ">"  "<" "|" "/" "\\" "\*" ":" "!"
-                                          "="))))
-                          ;; .. ... .... .= .- .? ..= ..<
-                          ("\." (rx (or "=" "-" "\?" "\.=" "\.<" (+ "\."))))
-                          ;; -- --- ---- -~ -> ->> -| -|->-->>->--<<-|
-                          ("-" (rx (+ (or ">" "<" "|" "~" "-"))))
-                          ;; *> */ *)  ** *** ****
-                          ("*" (rx (or ">" "/" ")" (+ "*"))))
-                          ;; www wwww
-                          ("w" (rx (+ "w")))
-                          ;; <> <!-- <|> <: <~ <~> <~~ <+ <* <$ </  <+> <*>
-                          ;; <$> </> <|  <||  <||| <|||| <- <-| <-<<-|-> <->>
-                          ;; <<-> <= <=> <<==<<==>=|=>==/==//=!==:=>
-                          ;; << <<< <<<<
-                          ("<" (rx (+ (or "\+" "\*" "\$" "<" ">" ":" "~"  "!"
-                                          "-"  "/" "|" "="))))
-                          ;; >: >- >>- >--|-> >>-|-> >= >== >>== >=|=:=>>
-                          ;; >> >>> >>>>
-                          (">" (rx (+ (or ">" "<" "|" "/" ":" "=" "-"))))
-                          ;; #: #= #! #( #? #[ #{ #_ #_( ## ### #####
-                          ("#" (rx (or ":" "=" "!" "(" "\?" "\[" "{" "_(" "_"
-                                       (+ "#"))))
-                          ;; ~~ ~~~ ~=  ~-  ~@ ~> ~~>
-                          ("~" (rx (or ">" "=" "-" "@" "~>" (+ "~"))))
-                          ;; __ ___ ____ _|_ __|____|_
-                          ("_" (rx (+ (or "_" "|"))))
-                          ;; Fira code: 0xFF 0x12
-                          ("0" (rx (and "x" (+ (in "A-F" "a-f" "0-9")))))
-                          ;; Fira code:
-                          "Fl"  "Tl"  "fi"  "fj"  "fl"  "ft"
-                          ;; The few not covered by the regexps.
-                          "{|"  "[|"  "]#"  "(*"  "}#"  "$>"  "^="))
-  ;; Enables ligature checks globally in all buffers. You can also do it
-  ;; per mode with `ligature-mode'.
-  (global-ligature-mode t))
-
-(load "~/.emacs.d/elisp/treesitter.el" nil t t)
-
-(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/" 'nomessage)
-(add-to-list 'load-path "~/.emacs.d/themes/" 'nomessage)
-
-;; (add-to-list 'load-path "~/.emacs.d/package-local/")
-
-
-(require 'package)
-(add-to-list 'package-archives '("gnu"   . "https://elpa.gnu.org/packages/"))
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-
-
-(use-package vimrc-mode
-  :ensure t
-  :defer t
-  :mode ("\\.vim\\'" "vimrc")
-  :commands (vimrc-mode))
-
-(use-package rainbow-mode
-  :ensure t
-  :defer t
-  :commands (rainbow-mode))
-
-(use-package rainbow-delimiters
-  :ensure t
-  :defer t)
-
-(use-package highlight-parentheses
-  :ensure t
-  :demand t
-  :custom
-  (highlight-parentheses-colors '("RoyalBlue" "firebrick2" "DarkOrange" "MediumSeaGreen"))
-  :hook (after-init . global-highlight-parentheses-mode))
-
-(use-package which-key
-  :ensure nil ; builtin
-  :defer t
-  :commands which-key-mode
-  :hook (after-init . which-key-mode)
-  :custom
-  (which-key-idle-delay 1.5)
-  (which-key-idle-secondary-delay 0.25)
-  (which-key-add-column-padding 1)
-  (which-key-max-description-length 40))
-
-(use-package avy
-  :ensure t
-  :demand t
-  :bind
-  ("s-'" . 'avy-goto-char))
-
-(use-package highlight-doxygen
-  :ensure t
-  :defer t
-  :commands (highlight-doxygen-global-mode)
-  :hook (c++-mode c++-ts-mode))
-
-(use-package markdown-mode
-  :ensure t
-  :defer t
-  :mode "\\.md\\'"
-  :commands (markdown-mode))
-
-(use-package rmsbolt
-  :ensure t
-  :defer t
-  :commands (rmsbolt))
-
-(use-package ace-window
-  :ensure t
-  :demand t)
-(ace-window-display-mode 1)
-
-(use-package undo-fu
-  :ensure t
-  :demand t)
-
-(use-package undo-fu-session
-  :ensure t
-  :demand t
-  :config
-  (undo-fu-session-global-mode t))
-
-(use-package vertico
-  :ensure t
-  :custom
-  (vertico-count 20)
-  (vertico-cycle t)
-  :bind (:map vertico-map
-              ("RET" . vertico-directory-enter)
-              ("DEL" . vertico-directory-delete-char)
-              ("M-DEL" . vertico-directory-delete-word))
-  :init (vertico-mode))
-
-(use-package marginalia
-  ;; Marginalia allows Embark to offer you preconfigured actions in more contexts.
-  ;; In addition to that, Marginalia also enhances Vertico by adding rich
-  ;; annotations to the completion candidates displayed in Vertico's interface.
-  :ensure t
-  :defer t
-  :commands (marginalia-mode marginalia-cycle)
-  :hook (after-init . marginalia-mode))
-
-(use-package embark
-  ;; Embark is an Emacs package that acts like a context menu, allowing
-  ;; users to perform context-sensitive actions on selected items
-  ;; directly from the completion interface.
-  :ensure t
-  :defer t
-  :commands (embark-act
-             embark-dwim
-             embark-export
-             embark-collect
-             embark-bindings
-             embark-prefix-help-command)
-  :bind
-  (("C-." . embark-act)         ;; pick some comfortable binding
-   ("C-;" . embark-dwim)        ;; good alternative: M-.
-   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
-
-  :init
-  (setq prefix-help-command #'embark-prefix-help-command)
-
-  :config
-  ;; Hide the mode line of the Embark live/completions buffers
-  (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                 nil
-                 (window-parameters (mode-line-format . none)))))
-
-(use-package embark-consult
-  :ensure t
-  :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
-
-(use-package consult
-  :ensure t
-  :bind (("C-c i"   . #'consult-imenu)
-         ("C-c l"   . #'consult-line)
-         ("C-c b"   . #'consult-buffer)
-         ("C-x b"   . #'consult-buffer)
-         ("C-c r"   . #'consult-recent-file)
-         ("C-c R"   . #'consult-bookmark)
-         ("C-c `"   . #'consult-flymake)
-         ("C-c h"   . #'consult-ripgrep)))
-
-(use-package affe
-  :ensure
-  :config
-  ;; Manual preview key for `affe-grep'
-  (consult-customize affe-grep :preview-key "M-."))
-
-(use-package orderless
-  :ensure t
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles basic partial-completion)))))
-
-;; The default regular expression transformation of Consult is limited.  It is
-;; recommended to configure Orderless as affe-regexp-compiler in Consult.
-
-(defun affe-orderless-regexp-compiler (input _type _ignorecase)
-  (setq input (cdr (orderless-compile input)))
-  (cons input (apply-partially #'orderless--highlight input t)))
-(setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
-
-
-(use-package monokai-theme
-  :ensure t
-  :defer t)
-
-(use-package standard-themes
-  :ensure t
-  :defer t)
-
-;; (setq-default polar-bear-operator-color "#B14747"
-;;               polar-bear-delimiter-color "#B14747"
-;;               polar-bear-rainbow-delimiters-style 'strong)
-
-(use-package ansi-color
-  :hook (compilation-filter . ansi-color-compilation-filter))
-
-(use-package auto-dark
-  :ensure t
-  :demand t
-  :custom
-  (auto-dark-themes '((polar-bear) (tsdh-light)))
-  (auto-dark-polling-interval-seconds 5)
-  (auto-dark-allow-osascript t))
-(auto-dark-mode t)
-
-(use-package format-all
-  :ensure t
-  :commands format-all-mode
-  ;; :hook (prog-mode . format-all-mode)
-  :config
-  (setq-default format-all-formatters
-                '(
-                  ("C++"    (clang-format "--style=file" "--fallback-style=llvm"))
-                  ("Shell"  (shfmt "-i" "4" "-ci"))
-                  ("Python" (ruff))
-                  ("JSON"   (prettier))
-                  ("LaTeX"  (latexindent))
-                  )
-                )
-  )
-
-(use-package devdocs
-  :ensure t)
-
-(use-package eglot
-  :ensure nil
-  :defer t
-  ;; :hook
-  ;; ((c++-ts-mode . eglot-ensure)  ; For Tree-sitter C++ mode
-  ;;  (c-ts-mode . eglot-ensure)
-  ;;  (python-ts-mode . eglot-ensure))   ; For Tree-sitter C mode
-  :custom
-  (eglot-ignored-server-capabilities '(:documentOnTypeFormattingProvider))
-  :commands (eglot
-             eglot-ensure
-             eglot-rename
-             eglot-format-buffer))
-
-(setq-default eglot-workspace-configuration
-              `(:pylsp (:plugins
-                        (;; Fix imports and syntax using `eglot-format-buffer`
-                         :isort (:enabled t)
-                         :autopep8 (:enabled t)
-
-                         ;; Syntax checkers (works with Flymake)
-                         :pylint (:enabled t)
-                         :pycodestyle (:enabled t)
-                         :flake8 (:enabled t)
-                         :pyflakes (:enabled t)
-                         :pydocstyle (:enabled t)
-                         :mccabe (:enabled t)
-
-                         :yapf (:enabled :json-false)
-                         :rope_autoimport (:enabled :json-false)))))
-
-(use-package corfu
-  :ensure t
-  :defer t
-  :commands (corfu-mode global-corfu-mode)
-
-  :hook ((prog-mode . corfu-mode)
-         (shell-mode . corfu-mode)
-         (eshell-mode . corfu-mode))
-
-  :custom
-  ;; Hide commands in M-x which do not apply to the current mode.
-  (read-extended-command-predicate #'command-completion-default-include-p)
-  ;; Disable Ispell completion function. As an alternative try `cape-dict'.
-  (text-mode-ispell-word-completion nil)
-  (tab-always-indent 'complete)
-
-  ;; Enable Corfu
-  :config
-  (global-corfu-mode))
-
-(corfu-popupinfo-mode t)
-
-(use-package cape
-  :ensure t
-  :defer t
-  :commands (cape-dabbrev cape-file cape-elisp-block)
-  :bind ("C-c p" . cape-prefix-map)
-  :init
-  ;; Add to the global default value of `completion-at-point-functions' which is
-  ;; used by `completion-at-point'.
-  (add-hook 'completion-at-point-functions #'cape-dabbrev)
-  (add-hook 'completion-at-point-functions #'cape-file))
-
-
-(defun my-move-bol-or-prev-eol ()
-  "Move to beginning of line, or to end of previous line if already at bol."
-  (interactive)
-  (if (bolp)
-      (progn
-        (forward-line -1)
-        (end-of-line))
-    (beginning-of-line)))
+;;; Help
+
+;; Enhance `apropos' and related functions to perform more extensive searches
+(setq apropos-do-all t)
+
+;; Fixes #11: Prevents help command completion from triggering autoload.
+;; Loading additional files for completion can slow down help commands and may
+;; unintentionally execute initialization code from some libraries.
+(setq help-enable-completion-autoload nil)
+(setq help-enable-autoload nil)
+(setq help-enable-symbol-autoload nil)
+(setq help-window-select t)  ;; Focus new help windows when opened
+
+;;; Eglot
+
+;; A setting of nil or 0 means Eglot will not block the UI at all, allowing
+;; Emacs to remain fully responsive, although LSP features will only become
+;; available once the connection is established in the background.
+(setq eglot-sync-connect 0)
+
+(setq eglot-autoshutdown t)  ; Shut down server after killing last managed buffer
+
+;; Activate Eglot in cross-referenced non-project files
+(setq eglot-extend-to-xref t)
+
+;; Eglot optimization
+(if minimal-emacs-debug
+    (setq eglot-events-buffer-config '(:size 2000000 :format full))
+  ;; This reduces log clutter to improves performance.
+  (setq jsonrpc-event-hook nil)
+  ;; Reduce memory usage and avoid cluttering *EGLOT events* buffer
+  (setq eglot-events-buffer-size 0)  ; Deprecated
+  (setq eglot-events-buffer-config '(:size 0 :format short)))
+
+(setq eglot-report-progress minimal-emacs-debug)  ; Prevent minibuffer spam
+
+;;; Flymake
+
+(setq flymake-show-diagnostics-at-end-of-line nil)
+
+;; Disable wrapping around when navigating Flymake errors.
+(setq flymake-wrap-around nil)
+
+;;; hl-line-mode
+
+;; Restrict `hl-line-mode' highlighting to the current window, reducing visual
+;; clutter and slightly improving `hl-line-mode' performance.
+(setq hl-line-sticky-flag nil)
+(setq global-hl-line-sticky-flag nil)
+
+;;; icomplete
+
+;; Do not delay displaying completion candidates in `fido-mode' or
+;; `fido-vertical-mode'
+(setq icomplete-compute-delay 0.01)
+
+;;; flyspell
+
+(setq flyspell-issue-welcome-flag nil)
+
+;; Improves flyspell performance by preventing messages from being displayed for
+;; each word when checking the entire buffer.
+(setq flyspell-issue-message-flag nil)
+
+;;; ispell
+
+;; In Emacs 30 and newer, disable Ispell completion to avoid annotation errors
+;; when no `ispell' dictionary is set.
+(setq text-mode-ispell-word-completion nil)
+
+(setq ispell-silently-savep t)
+
+;;; ibuffer
+
+(setq ibuffer-formats
+      '((mark modified read-only locked
+              " " (name 55 55 :left :elide)
+              " " (size 8 -1 :right)
+              " " (mode 18 18 :left :elide) " " filename-and-process)
+        (mark " " (name 16 -1) " " filename)))
+
+;;; xref
+
+;; Enable completion in the minibuffer instead of the definitions buffer
+(setq xref-show-definitions-function 'xref-show-definitions-completing-read
+      xref-show-xrefs-function 'xref-show-definitions-completing-read)
+
+;;; abbrev
+
+;; Ensure `abbrev_defs` is stored in the correct location when
+;; `user-emacs-directory` is modified, as it defaults to ~/.emacs.d/abbrev_defs
+;; regardless of the change.
+(setq abbrev-file-name (expand-file-name "abbrev_defs" user-emacs-directory))
+
+(setq save-abbrevs 'silently)
+
+;;; dabbrev
+
+(setq dabbrev-upcase-means-case-search t)
+
+(setq dabbrev-ignored-buffer-modes
+      '(archive-mode image-mode docview-mode tags-table-mode pdf-view-mode))
+
+(setq dabbrev-ignored-buffer-regexps
+      '(;; - Buffers starting with a space (internal or temporary buffers)
+        "\\` "
+        ;; Tags files such as ETAGS, GTAGS, RTAGS, TAGS, e?tags, and GPATH,
+        ;; including versions with numeric extensions like <123>
+        "\\(?:\\(?:[EG]?\\|GR\\)TAGS\\|e?tags\\|GPATH\\)\\(<[0-9]+>\\)?"))
+
+;;; Remove warnings from narrow-to-region, upcase-region...
+
+(dolist (cmd '(list-timers narrow-to-region upcase-region downcase-region
+                           list-threads erase-buffer scroll-left
+                           dired-find-alternate-file set-goal-column))
+  (put cmd 'disabled nil))
+
+;;; Load post init
+(when (fboundp 'minimal-emacs-load-user-init)
+  (minimal-emacs-load-user-init "post-init.el"))
+(setq minimal-emacs--success t)
+
+(provide 'init)
+
+;; Local variables:
+;; byte-compile-warnings: (not obsolete free-vars)
+;; End:
+
+;;; init.el ends here
