@@ -299,13 +299,13 @@
 ;; The blinking cursor is distracting and interferes with cursor settings in
 ;; some minor modes that try to change it buffer-locally (e.g., Treemacs).
 (when (bound-and-true-p blink-cursor-mode)
-  (blink-cursor-mode -1))
+  (blink-cursor-mode 1))
 
 ;; Don't blink the paren matching the one at point, it's too distracting.
 (setq blink-matching-paren nil)
 
 ;; Do not extend the cursor to fit wide characters
-(setq x-stretch-cursor nil)
+(setq x-stretch-cursor 1)
 
 ;; Reduce rendering/line scan work by not rendering cursors or regions in
 ;; non-focused windows.

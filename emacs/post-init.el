@@ -1,6 +1,6 @@
 ;;; post-init.el --- post-init -*- no-byte-compile: t; lexical-binding: t; -*-
 
-(setq debug-on-error t)
+;; (setq debug-on-error t)
 
 
 (unless (and (eq window-system 'mac)
@@ -19,6 +19,7 @@
 
 (load (expand-file-name "keys.el" user-emacs-directory) nil t t)
 
+(context-menu-mode 1)
 
 (cond
  ((eq system-type 'windows-nt)
@@ -92,6 +93,9 @@
 
 
 (delete-selection-mode 1)
+
+
+(electric-pair-mode 1)
 
 
 (global-goto-address-mode 1)
@@ -466,22 +470,36 @@
   :hook (after-init . undo-fu-session-global-mode))
 
 
-(use-package format-all
+;; (use-package format-all
+;;   :ensure t
+;;   :commands format-all-mode
+;;   ;; :hook (prog-mode . format-all-mode)
+;;   :config
+;;   (setq-default format-all-formatters
+;;                 '(
+;;                   ("C++"    (clang-format "--style=file" "--fallback-style=Microsoft"))
+;;                   ("C"    (clang-format "--style=file" "--fallback-style=Microsoft"))
+;;                   ("Shell"  (shfmt "-i" "4" "-ci"))
+;;                   ("Python" (ruff))
+;;                   ("JSON"   (prettier))
+;;                   ("LaTeX"  (latexindent))
+;;                   )
+;;                 )
+;;   )
+
+;; Apheleia is an Emacs package designed to run code formatters (e.g., Shfmt,
+;; Black and Prettier) asynchronously without disrupting the cursor position.
+(use-package apheleia
   :ensure t
-  :commands format-all-mode
-  ;; :hook (prog-mode . format-all-mode)
   :config
-  (setq-default format-all-formatters
-                '(
-                  ("C++"    (clang-format "--style=file" "--fallback-style=Microsoft"))
-                  ("C"    (clang-format "--style=file" "--fallback-style=Microsoft"))
-                  ("Shell"  (shfmt "-i" "4" "-ci"))
-                  ("Python" (ruff))
-                  ("JSON"   (prettier))
-                  ("LaTeX"  (latexindent))
-                  )
-                )
-  )
+  (setf (alist-get 'clang-format apheleia-formatters)
+        '("clang-format"
+          "--style=file"
+          "--fallback-style=Google"
+          file))
+  :commands (apheleia-mode
+             apheleia-global-mode)
+  :hook ((prog-mode . apheleia-mode)))
 
 (use-package devdocs
   :ensure t)
@@ -491,6 +509,14 @@
   :defer t)
 
 (use-package standard-themes
+  :ensure t
+  :defer t)
+
+(use-package modus-themes
+  :ensure t
+  :defer t)
+
+(use-package leuven-theme
   :ensure t
   :defer t)
 
@@ -504,11 +530,15 @@
   (highlight-parentheses-colors '("RoyalBlue" "firebrick2" "DarkOrange" "MediumSeaGreen"))
   :hook (after-init . global-highlight-parentheses-mode))
 
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/" 'nomessage)
+(add-to-list 'load-path "~/.emacs.d/themes/" 'nomessage)
+
+
 (use-package auto-dark
   :ensure t
   :demand t
   :custom
-  (auto-dark-themes '((monokai-pro-classic) (modus-operandi-tinted)))
+  (auto-dark-themes '((monokai-pro-classic) (twilight-bright)))
   (auto-dark-polling-interval-seconds 5)
   (auto-dark-allow-osascript t)
   :init (auto-dark-mode))
@@ -529,15 +559,15 @@
 (setq-default treesit-font-lock-level 4)
 
 (setq major-mode-remap-alist
- '((yaml-mode . yaml-ts-mode)
-   (bash-mode . bash-ts-mode)
-   (js2-mode . js-ts-mode)
-   (typescript-mode . typescript-ts-mode)
-   (json-mode . json-ts-mode)
-   (css-mode . css-ts-mode)
-   (python-mode . python-ts-mode)
-   (c++-mode . c++-ts-mode)
-   (c-mode . c-ts-mode)))
+      '((yaml-mode . yaml-ts-mode)
+        (bash-mode . bash-ts-mode)
+        (js2-mode . js-ts-mode)
+        (typescript-mode . typescript-ts-mode)
+        (json-mode . json-ts-mode)
+        (css-mode . css-ts-mode)
+        (python-mode . python-ts-mode)
+        (c++-mode . c++-ts-mode)
+        (c-mode . c-ts-mode)))
 
 (setq-default treesit-font-lock-level 4)
 
