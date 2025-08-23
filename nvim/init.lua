@@ -190,7 +190,7 @@ require("lazy").setup({
                 set_dark_mode = function()
                     vim.api.nvim_set_option("background", "dark")
                     -- Choose your preferred dark colorscheme here
-                    vim.cmd.colorscheme("classic-monokai") -- alternatives: tokyonight, onedark, gruvbox-material
+                    vim.cmd.colorscheme("default") -- alternatives: tokyonight, onedark, gruvbox-material
                 end,
                 set_light_mode = function()
                     vim.api.nvim_set_option("background", "light")

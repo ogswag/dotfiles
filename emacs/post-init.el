@@ -34,7 +34,7 @@
         ))
  ((eq system-type 'darwin)
   (cond ((member "JetBrains Mono" (font-family-list))
-         (set-frame-font "JetBrains Mono 12" t t)
+         (set-frame-font "JetBrains Mono 14" t t)
          (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono")
          (set-face-attribute 'variable-pitch nil :family "Helvetica Neue"))
         ((member "Menlo" (font-family-list))
@@ -87,6 +87,7 @@
 ;; Do not wrap line by default, unless in specific modes
 (setq-default truncate-lines t)
 (global-visual-wrap-prefix-mode t)
+()
 
 
 (global-hl-line-mode t)
@@ -520,6 +521,10 @@
   :ensure t
   :defer t)
 
+(use-package uwu-theme
+  :ensure t
+  :defer t)
+
 (use-package ansi-color
   :hook (compilation-filter . ansi-color-compilation-filter))
 
@@ -538,7 +543,7 @@
   :ensure t
   :demand t
   :custom
-  (auto-dark-themes '((monokai-pro-classic) (twilight-bright)))
+  (auto-dark-themes '((uwu) (twilight-bright)))
   (auto-dark-polling-interval-seconds 5)
   (auto-dark-allow-osascript t)
   :init (auto-dark-mode))
