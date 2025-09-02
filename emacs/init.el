@@ -549,6 +549,11 @@
                            dired-find-alternate-file set-goal-column))
   (put cmd 'disabled nil))
 
+(setq bookmark-save-flag 1)
+(require 'bookmark)
+(list-bookmarks)
+(switch-to-buffer "*Bookmark List*")
+
 ;;; Load post init
 (when (fboundp 'minimal-emacs-load-user-init)
   (minimal-emacs-load-user-init "post-init.el"))

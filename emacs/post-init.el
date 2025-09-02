@@ -33,9 +33,9 @@
          (set-face-attribute 'variable-pitch nil :family "Calibri"))
         ))
  ((eq system-type 'darwin)
-  (cond ((member "JetBrains Mono" (font-family-list))
-         (set-frame-font "JetBrains Mono 14" t t)
-         (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono")
+  (cond ((member "Terminality" (font-family-list))
+         (set-frame-font "Terminality 14" t t)
+         (set-face-attribute 'fixed-pitch nil :family "Terminality")
          (set-face-attribute 'variable-pitch nil :family "Helvetica Neue"))
         ((member "Menlo" (font-family-list))
          (set-frame-font "Menlo 12" t t)
@@ -53,31 +53,66 @@
 (use-package ligature
   :ensure
   :config
-  ;; Enable the "www" ligature in every possible major mode
-  ;; (ligature-set-ligatures 't '("www"))
-  ;; Enable traditional ligature support in eww-mode, if the
-  ;; `variable-pitch' face supports it
-  ;; (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
   ;; Enables ligature checks globally in all buffers. You can also do it
-  (ligature-set-ligatures 'prog-mode '("--" "---" "==" "===" "!=" "!==" "=!="
-                                       "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
-                                       "??" "???" "?:" "?." "?=" "<:" ":<" ":>" ">:" "<:<" "<>" "<<<" ">>>"
-                                       "<<" ">>" "||" "-|" "_|_" "|-" "||-" "|=" "||=" "##" "###" "####"
-                                       "#{" "#[" "]#" "#(" "#?" "#_" "#_(" "#:" "#!" "#=" "^=" "<$>" "<$"
-                                       "$>" "<+>" "<+" "+>" "<*>" "<*" "*>" "</" "</>" "/>" "<!--" "<#--"
-                                       "-->" "->" "->>" "<<-" "<-" "<=<" "=<<" "<<=" "<==" "<=>" "<==>"
-                                       "==>" "=>" "=>>" ">=>" ">>=" ">>-" ">-" "-<" "-<<" ">->" "<-<" "<-|"
-                                       "<=|" "|=>" "|->" "<->" "<~~" "<~" "<~>" "~~" "~~>" "~>" "~-" "-~"
-                                       "~@" "[||]" "|]" "[|" "|}" "{|" "[<" ">]" "|>" "<|" "||>" "<||"
-                                       "|||>" "<|||" "<|>" "..." ".." ".=" "..<" ".?" "::" ":::" ":=" "::="
-                                       ":?" ":?>" "//" "///" "/*" "*/" "/=" "//=" "/==" "@_" "__" "???"
-                                       "<:<" ";;;"))
+  (ligature-set-ligatures 't
+                          '(;; ;; ;;;
+                            (";" (rx (+ ";")))
+                            ;; && &&&
+                            ("&" (rx (+ "&")))
+                            ;; !! !!! !. !: !!. != !== !~
+                            ("!" (rx (+ (or "=" "!" "\." ":" "~"))))
+                            ;; ?? ??? ?:  ?=  ?.
+                            ("?" (rx (or ":" "=" "\." (+ "?"))))
+                            ;; %% %%%
+                            ("%" (rx (+ "%")))
+                            ;; |> ||> |||> ||||> |] |} || ||| |-> ||-||
+                            ;; |->>-||-<<-| |- |== ||=||
+                            ;; |==>>==<<==<=>==//==/=!==:===>
+                            ("|" (rx (+ (or ">" "<" "|" "/" ":" "!" "}" "\]" "-" "=" ))))
+
+                            ;; ++ +++ ++++ +>
+                            ("+" (rx (or ">" "=" (+ "+"))))
+                            ;; -- --- ---- -~ -> ->> -| -|->-->>->--<<-|
+                            ("-" (rx (+ (or ">" "<" "|" "~" "-" "*" "="))))
+                            ;; *> */ *)  ** *** **** =* *=
+                            ("*" (rx (or ">" "/" ")" "=" "-" (+ "*"))))
+                            ;; :: ::: :::: :> :< := :// ::=
+                            (":" (rx (or ">" "<" "=" "//" ":=" (+ ":"))))
+                            ;; == === ==== => =| =>>=>=|=>==>> ==< =/=//=// =~ =:= =!=
+                            ("=" (rx (+ (or ">" "<" "|" "/" "~" ":" "!" "=" "*" "-" "+"))))
+
+                            ;; // /// //// /\ /* /> /===:===!=//===>>==>==/
+                            ("/" (rx (+ (or ">"  "<" "|" "/" "\\" "\*" ":" "!" "="))))
+                            ;; .. ... .... .= .- .? ..= ..<
+                            ("\." (rx (or "=" "-" "\?" "\.=" "\.<" (+ "\."))))
+
+                            ;; www wwww
+                            ("w" (rx (+ "w")))
+                            ;; <> <!-- <|> <: <~ <~> <~~ <+ <* <$ </  <+> <*>
+                            ;; <$> </> <|  <||  <||| <|||| <- <-| <-<<-|-> <->>
+                            ;; <<-> <= <=> <<==<<==>=|=>==/==//=!==:=>
+                            ;; << <<< <<<<p
+                            ("<" (rx (+ (or "\+" "\*" "\$" "<" ">" ":" "~"  "!" "-"  "/" "|" "="))))
+                            ;; >: >- >>- >--|-> >>-|-> >= >== >>== >=|=:=>> >> >>> >>>>
+                            (">" (rx (+ (or ">" "<" "|" "/" ":" "=" "-"))))
+                            ;; #: #= #! #( #? #[ #{ #_ #_( ## ### #####
+                            ("#" (rx (or ":" "=" "!" "(" "\?" "\[" "{" "_(" "_" (+ "#"))))
+                            ;; ~~ ~~~ ~=  ~-  ~@ ~> ~~>
+                            ("~" (rx (or ">" "=" "-" "@" "~>" (+ "~"))))
+                            ;; The few not covered by the regexps.
+                            "{|"  "[|"  "]#"  "(*"  "}#"  "$>"  "^=" "-*-"))
   ;; per mode with `ligature-mode'.
+  (add-hook 'minibuffer-setup-hook #'ligature-mode) ; Critical for minibuffer
+
   (global-ligature-mode t))
 
 
+
 (add-hook 'prog-mode-hook #'column-number-mode)
-(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+;; (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(use-package display-line-numbers-mode
+  :ensure nil
+  :hook (prog-mode text-mode))
 ;; (setq-default display-line-numbers 'relative)
 ;; (setq-default display-line-numbers-type 'relative)
 (setq-default display-line-numbers-grow-only t)
@@ -87,8 +122,9 @@
 ;; Do not wrap line by default, unless in specific modes
 (setq-default truncate-lines t)
 (global-visual-wrap-prefix-mode t)
-()
-
+(use-package visual-line-mode
+  :ensure nil
+  :hook (text-mode))
 
 (global-hl-line-mode t)
 
@@ -500,7 +536,8 @@
           file))
   :commands (apheleia-mode
              apheleia-global-mode)
-  :hook ((prog-mode . apheleia-mode)))
+  :hook ((prog-mode . apheleia-mode)
+         (text-mode . apheleia-mode)))
 
 (use-package devdocs
   :ensure t)
@@ -514,6 +551,22 @@
   :defer t)
 
 (use-package modus-themes
+  :ensure t
+  :defer t)
+
+(setq modus-vivendi-palette-overrides
+      '((comment green-cooler)
+        (operator red)
+        ))
+
+(setq modus-operandi-palette-overrides
+      '((comment red-intense)
+        (operator red)
+        ))
+
+(setq-default modus-themes-bold-constructs t)
+
+(use-package doric-themes
   :ensure t
   :defer t)
 
@@ -543,7 +596,7 @@
   :ensure t
   :demand t
   :custom
-  (auto-dark-themes '((uwu) (twilight-bright)))
+  (auto-dark-themes '((modus-vivendi) (modus-operandi)))
   (auto-dark-polling-interval-seconds 5)
   (auto-dark-allow-osascript t)
   :init (auto-dark-mode))
