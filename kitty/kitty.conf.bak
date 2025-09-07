@@ -1,0 +1,68 @@
+font_family       JetBrains Mono
+font_size         15.0
+disable_ligatures never
+
+scrollback_lines 20000
+# url_color #0087bd
+url_style wavy
+open_url_with default
+url_prefixes file ftp ftps gemini git gopher http https irc ircs kitty mailto news sftp ssh
+detect_urls yes
+# show_hyperlink_targets no
+underline_hyperlinks hover
+allow_hyperlinks yes
+
+copy_on_select no
+
+paste_actions quote-urls-at-prompt,confirm,replace-newline,confirm-if-large
+strip_trailing_spaces smart
+
+select_by_word_characters @-./_~?&=%+#
+
+enable_audio_bell no
+visual_bell_duration 0.0
+
+shell_integration no-cursor
+
+notify_on_cmd_finish unfocused
+
+enabled_layouts grid
+
+hide_window_decorations titlebar-only
+
+remember_window_size  no
+initial_window_width  84c
+initial_window_height 36c
+
+window_margin_width 0
+window_padding_width 5
+single_window_margin_width -1
+# wayland_titlebar_color dark
+# macos_titlebar_color dark
+# background #000000
+background_opacity 1
+background_blur 0
+
+# Tab Bar
+tab_bar_edge bottom
+tab_bar_margin_width 0.0
+tab_bar_margin_height 2.0 2.0
+
+tab_bar_style powerline
+tab_powerline_style slanted
+# tab_bar_background #000000
+# tab_bar_margin_color #000000
+
+kitty_mod ctrl+shift
+mouse_map shift+left release grabbed,ungrabbed mouse_handle_click link
+map kitty_mod+delete clear_terminal reset active
+map cmd+m minimize_macos_window
+map cmd+q quit
+
+cursor_chape block
+cursor_blink_interval 1
+
+# BEGIN_KITTY_THEME
+# Gruvbox Material Dark Hard
+include current-theme.conf
+# END_KITTY_THEME
