@@ -172,11 +172,11 @@ require("lazy").setup({
     {
         "miikanissi/modus-themes.nvim",
         priority = 1000,
-        config = function()
-            require("modus-themes").setup({
-                variant = "tinted",
-            })
-        end,
+        -- config = function()
+        --     require("modus-themes").setup({
+        --         variant = "tinted",
+        --     })
+        -- end,
     },
 
     -- Auto dark/light mode detection
@@ -190,12 +190,12 @@ require("lazy").setup({
                 set_dark_mode = function()
                     vim.api.nvim_set_option("background", "dark")
                     -- Choose your preferred dark colorscheme here
-                    vim.cmd.colorscheme("default") -- alternatives: tokyonight, onedark, gruvbox-material
+                    vim.cmd.colorscheme("modus_vivendi")
                 end,
                 set_light_mode = function()
                     vim.api.nvim_set_option("background", "light")
                     -- Choose your preferred light colorscheme here
-                    vim.cmd.colorscheme("modus_operandi") -- alternatives: tokyonight-day, gruvbox-material-light
+                    vim.cmd.colorscheme("modus_operandi")
                 end,
             })
 

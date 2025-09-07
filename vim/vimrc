@@ -77,9 +77,10 @@ augroup END
 function! ChangeBackground()
     if system("defaults read -g AppleInterfaceStyle") =~ '^Dark'
         set background=dark   " for the dark version of the theme
-        colors unokai
+        colors habamax
     else
         set background=light  " for the light version of the theme
+        colors lunaperche
     endif
 endfunction
 
@@ -110,12 +111,9 @@ function! EnableTermGuicolorsIfSupported()
         endif
 
         set termguicolors
-        colorscheme unokai
 
         return 1
     endif
-
-    colorscheme unokai
 
     return 0
 endfunction

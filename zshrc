@@ -1,4 +1,4 @@
-export PS1="%n@%m %F{red}%1~%f %% "
+export PS1="%F{red}%n@%m%f %F{green}%1~%f %F{blue}%%%f "
 
 # alias l="eza --group-directories-first -lhU --time-style='long-iso'"
 alias l="eza --sort=type -al --hyperlink"
@@ -23,7 +23,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     export PATH="/usr/local/opt/llvm/bin:$PATH"
     export PATH="/usr/local/bin:$PATH"
     export PATH="$(brew --prefix)/bin:$PATH"
-    eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib=$HOME/perl5)"
 fi
 
 ##? Clone a plugin, identify its init file, source it, and add it to your fpath.
@@ -204,3 +203,4 @@ setopt extended_glob            # enable extended globbing
 setopt numeric_glob_sort        # sort numbered files numerically
 unsetopt case_glob              # make globbing case-sensitive
 
+export PATH="/usr/local/opt/jpeg/bin:$PATH"
