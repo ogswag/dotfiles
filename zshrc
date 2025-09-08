@@ -1,11 +1,52 @@
-export PS1="%F{red}%n@%m%f %F{green}%1~%f %F{blue}%%%f "
+# Clone Moarram/headline if not already present
+if [[ ! -d ~/.config/zsh/headline ]]; then
+    echo "Cloning Moarram/headline into ~/.config/zsh/headline..."
+    mkdir -p ~/.config/zsh
+    git clone https://github.com/Moarram/headline.git ~/.config/zsh/headline
+    if [[ $? -eq 0 ]]; then
+        echo "Successfully cloned headline."
+    else
+        echo "Failed to clone headline. Please check your internet or Git configuration."
+    fi
+fi
+source ~/.config/zsh/headline/headline.zsh-theme
+
+HL_SEP_MODE='on'
+
+HL_LAYOUT_TEMPLATE=(
+  _PRE    "${IS_SSH+ssh }" # shows "ssh " if this is an ssh session
+  USER    '...'
+  HOST    ' @ ...'
+  VENV    ' (...)'
+  PATH    ' in ...'
+  _SPACER '' # special, only shows when compact, otherwise fill with space
+  BRANCH  ' ...'
+  STATUS  ' (...)'
+  _POST   ''
+)
+HL_CONTENT_TEMPLATE=(
+  USER   "%{$bold$red%}..."
+  HOST   "%{$bold$yellow%}..."
+  VENV   "%{$bold$green%}..."
+  PATH   "%{$bold$blue%}..."
+  BRANCH "%{$bold$cyan%}..."
+  STATUS "%{$bold$magenta%}..."
+)
+HL_GIT_COUNT_MODE='on'
+HL_GIT_SEP_SYMBOL='|'
+HL_GIT_STATUS_SYMBOLS[STAGED]="%{$green%}+"
+HL_GIT_STATUS_SYMBOLS[CHANGED]="%{$yellow%}!"
+HL_GIT_STATUS_SYMBOLS[CONFLICTS]="%{$red%}X"
+HL_GIT_STATUS_SYMBOLS[CLEAN]="%{$green%}✓"
+HL_ERR_MODE='detail'
+
 
 # alias l="eza --group-directories-first -lhU --time-style='long-iso'"
-alias l="eza --sort=type -al --hyperlink"
-alias n="nvim"
-alias nv="nvim"
-alias v="vim"
-alias vim="nvim"
+alias l="eza --sort=type -a --hyperlink"
+# alias n="nvim"
+# alias nv="nvim"
+# alias v="vim"
+# alias vim="nvim"
 
 export EDITOR='nvim'
 export VISUAL='nvim'
@@ -204,3 +245,15 @@ setopt numeric_glob_sort        # sort numbered files numerically
 unsetopt case_glob              # make globbing case-sensitive
 
 export PATH="/usr/local/opt/jpeg/bin:$PATH"
+
+function cling() {
+    local folders=()
+    for arg in "$@"; do
+        if [ -d "$arg" ]; then
+            folders+=("$arg")
+        else [ -f "$arg" ]
+            folders+=("$(dirname "$arg")")
+        fi
+    done
+    open -a Cling "${folders[@]}"
+}
