@@ -32,6 +32,7 @@ HL_CONTENT_TEMPLATE=(
   BRANCH "%{$bold$cyan%}..."
   STATUS "%{$bold$magenta%}..."
 )
+HL_PROMPT='❯ ' # consider '%#'
 HL_GIT_COUNT_MODE='on'
 HL_GIT_SEP_SYMBOL='|'
 HL_GIT_STATUS_SYMBOLS[STAGED]="%{$green%}+"
@@ -43,10 +44,10 @@ HL_ERR_MODE='detail'
 
 # alias l="eza --group-directories-first -lhU --time-style='long-iso'"
 alias l="eza --sort=type -a --hyperlink"
-# alias n="nvim"
-# alias nv="nvim"
-# alias v="vim"
-# alias vim="nvim"
+alias n="nvim"
+alias nv="nvim"
+alias v="nvim"
+alias vim="nvim"
 
 export EDITOR='nvim'
 export VISUAL='nvim'
