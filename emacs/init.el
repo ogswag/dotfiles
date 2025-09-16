@@ -39,7 +39,6 @@
   (advice-add 'yes-or-no-p :override #'y-or-n-p))
 
 ;;; Undo/redo
-
 (setq undo-limit (* 13 160000)
       undo-strong-limit (* 13 240000)
       undo-outer-limit (* 13 24000000))

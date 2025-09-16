@@ -156,6 +156,7 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+vim.cmd("set notermguicolors")
 -- Set up plugins
 require("lazy").setup({
     -- Colorschemes with both light and dark variants
@@ -190,7 +191,7 @@ require("lazy").setup({
                 set_dark_mode = function()
                     vim.api.nvim_set_option("background", "dark")
                     -- Choose your preferred dark colorscheme here
-                    vim.cmd.colorscheme("modus_vivendi")
+                    vim.cmd.colorscheme("habamax")
                 end,
                 set_light_mode = function()
                     vim.api.nvim_set_option("background", "light")

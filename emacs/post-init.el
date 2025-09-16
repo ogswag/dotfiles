@@ -18,8 +18,13 @@
 (setq-default default-input-method 'russian-computer)
 
 (load (expand-file-name "keys.el" user-emacs-directory) nil t t)
+(load (expand-file-name "fast-latex-input.el" user-emacs-directory) nil t t)
 
 (context-menu-mode 1)
+
+(setq-default show-paren-style 'expression)
+;; (setq show-paren-when-point-inside-paren t)
+
 
 (cond
  ((eq system-type 'windows-nt)
@@ -33,10 +38,10 @@
          (set-face-attribute 'variable-pitch nil :family "Calibri"))
         ))
  ((eq system-type 'darwin)
-  (cond ((member "Terminality" (font-family-list))
-         (set-frame-font "Terminality 14" t t)
-         (set-face-attribute 'fixed-pitch nil :family "Terminality")
-         (set-face-attribute 'variable-pitch nil :family "Helvetica Neue"))
+  (cond ((member "Palo Alto" (font-family-list))
+         (set-frame-font "Palo Alto 13" t t)
+         (set-face-attribute 'fixed-pitch nil :family "Palo Alto")
+         (set-face-attribute 'variable-pitch nil :family "SF Pro Text"))
         ((member "Menlo" (font-family-list))
          (set-frame-font "Menlo 12" t t)
          (set-face-attribute 'fixed-pitch nil :family "Menlo")
@@ -259,6 +264,8 @@
   (after-init . save-place-mode)
   :custom
   (save-place-limit 400))
+
+
 
 
 (use-package exec-path-from-shell
@@ -506,24 +513,6 @@
   :commands undo-fu-session-global-mode
   :hook (after-init . undo-fu-session-global-mode))
 
-
-;; (use-package format-all
-;;   :ensure t
-;;   :commands format-all-mode
-;;   ;; :hook (prog-mode . format-all-mode)
-;;   :config
-;;   (setq-default format-all-formatters
-;;                 '(
-;;                   ("C++"    (clang-format "--style=file" "--fallback-style=Microsoft"))
-;;                   ("C"    (clang-format "--style=file" "--fallback-style=Microsoft"))
-;;                   ("Shell"  (shfmt "-i" "4" "-ci"))
-;;                   ("Python" (ruff))
-;;                   ("JSON"   (prettier))
-;;                   ("LaTeX"  (latexindent))
-;;                   )
-;;                 )
-;;   )
-
 ;; Apheleia is an Emacs package designed to run code formatters (e.g., Shfmt,
 ;; Black and Prettier) asynchronously without disrupting the cursor position.
 (use-package apheleia
@@ -534,6 +523,10 @@
           "--style=file"
           "--fallback-style=Google"
           file))
+  (add-to-list 'apheleia-formatters
+               '(tex-fmt-tabs . ("tex-fmt" "--wraplen" "120" "--usetabs" "--tabsize" "1" file)))
+  (add-to-list 'apheleia-mode-alist '(latex-mode . tex-fmt-tabs))
+  (add-to-list 'apheleia-mode-alist '(tex-mode . tex-fmt-tabs))
   :commands (apheleia-mode
              apheleia-global-mode)
   :hook ((prog-mode . apheleia-mode)
@@ -541,6 +534,22 @@
 
 (use-package devdocs
   :ensure t)
+
+(use-package grayscale-theme
+  :ensure t
+  :defer t)
+
+(use-package chyla-theme
+  :ensure t
+  :defer t)
+
+(use-package moe-theme
+  :ensure t
+  :defer t)
+
+(use-package chyla-dark-theme
+  :ensure t
+  :defer t)
 
 (use-package monokai-pro-theme
   :ensure t
@@ -554,29 +563,7 @@
   :ensure t
   :defer t)
 
-(setq modus-vivendi-palette-overrides
-      '((comment green-cooler)
-        (operator red)
-        ))
-
-(setq modus-operandi-palette-overrides
-      '((comment red-intense)
-        (operator red)
-        ))
-
 (setq-default modus-themes-bold-constructs t)
-
-(use-package doric-themes
-  :ensure t
-  :defer t)
-
-(use-package leuven-theme
-  :ensure t
-  :defer t)
-
-(use-package uwu-theme
-  :ensure t
-  :defer t)
 
 (use-package ansi-color
   :hook (compilation-filter . ansi-color-compilation-filter))
@@ -596,7 +583,7 @@
   :ensure t
   :demand t
   :custom
-  (auto-dark-themes '((modus-vivendi) (modus-operandi)))
+  (auto-dark-themes '((brutalist-dark) (brutalist)))
   (auto-dark-polling-interval-seconds 5)
   (auto-dark-allow-osascript t)
   :init (auto-dark-mode))

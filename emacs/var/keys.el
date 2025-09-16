@@ -120,6 +120,13 @@
 ;; Bookmarks
 (keymap-global-set "s-b" #'consult-bookmark)
 
+
+;; -----------------------------------------------------------------------------
+;;;; EDITING
+;; -----------------------------------------------------------------------------
+
+(keymap-global-set "s-j" #'join-line)
+
 (use-package puni
   :ensure t
   :defer t)
@@ -167,4 +174,6 @@ Otherwise delete only the inner content."
 (keymap-global-set "s-d" #'az/change-forward-inside)
 (keymap-global-set "s-a" #'az/change-forward-around)
 
-;; Movement
+;; -----------------------------------------------------------------------------
+;;;; MOVEMENT
+;; -----------------------------------------------------------------------------

@@ -28,6 +28,10 @@ Temporary Items
 
 # ---> Emacs
 # -*- mode: gitignore; -*-
+emacs/var/saveplace
+emacs/elpa/
+emacs/eln-cache/
+*.eld
 *~
 \#*\#
 /.emacs.desktop
@@ -99,3 +103,9 @@ tags
 
 
 lazy-lock.json
+
+emacs/custom.el
+emacs/var/eln-cache/
+emacs/var/elpa/
+emacs/var/history
+emacs/var/undo-fu-session/

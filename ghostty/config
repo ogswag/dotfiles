@@ -1,5 +1,6 @@
-font-family = "Lilex Nerd Font"
+font-family = "Palo Alto Terminal"
 window-inherit-font-size = false
-font-size = 14
-theme = "light:xcodelighthc,dark:deep"
+font-size = 16
+font-feature=-dlig
+theme = "light:Apple System Colors Light,dark:Apple System Colors"
 link-url = true
