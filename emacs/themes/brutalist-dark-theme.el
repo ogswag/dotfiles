@@ -1,4 +1,4 @@
-;;; brutalist-dark-theme.el --- Brutalist theme, dark variant -*- lexical-binding: nil -*-
+;;; brutalist-dark-theme.el --- Brutalist theme, dark variant
 
 ;; Copyright (C) 2013-2016 Marian Schubert
 ;; Copyright (C) 2018-2023 Gergely Nagy
@@ -48,17 +48,24 @@
    (fg-table "DeepSkyBlue1")
    (fg-dim "gray50")
    (fg-slight-dim "gray60")
-   (fg-bright "gray90")
+   (fg-bright "white")
    (fg-light "#ddddd8")
-   (bg "#2e2e2e")
+   (bg "#000000")
    (bg-light "gray24")
-   (bg-highlight "gray45")
+
    (bg-highlight-2 "LightCyan")
    (bg-highlight-3 "DarkGreen")
    (bg-highlight-dim "sea green")
 
-   (bg-paren-range "#664D8C")
-   (fg-paren-range "#D4D4D4")
+   (bg-highlight "#ddd")
+   (fg-highlight "#1700FF")
+
+   (bt-type "#FFBF00")
+
+   (bg-modeline "blue")
+   (fg-modeline "white")
+   (bg-modeline-unfocused "#3e3e3e")
+   (fg-modeline-unfocused "white")
 
    (diff-added "#334433")
    (diff-added-highlight "#336633")
@@ -68,15 +75,15 @@
    (powerline1 "gray50")
    (powerline2 "gray60")
 
-   (string "#B078FF")
+   (string "#FFBF00")
    (cursor "snow4")
-
-   (error "LightGoldenrod3")
-   (warning "red")
 
    (latex-folded "DeepSkyBlue1")
    (latex-unfolded "NavyBlue")
-   (latex-math "#B078FF")
+   (latex-math "#FFBF00")
+
+   (error "OrangeRed")
+   (warning "red")
 
    (paren-match "DeepSkyBlue1"))
 

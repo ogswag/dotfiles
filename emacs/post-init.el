@@ -12,7 +12,8 @@
   ;; this version of Emacs natively supports smooth scrolling.
   ;; https://bitbucket.org/mituharu/emacs-mac/commits/65c6c96f27afa446df6f9d8eff63f9cc012cc738
   (setq pixel-scroll-precision-use-momentum nil) ; Precise/smoother scrolling
-  (pixel-scroll-precision-mode 1))
+  (pixel-scroll-precision-mode 1)
+  (add-to-list 'default-frame-alist '(undecorated-round . t)))
 
 
 (setq-default default-input-method 'russian-computer)
@@ -22,7 +23,7 @@
 
 (context-menu-mode 1)
 
-(setq-default show-paren-style 'expression)
+;; (setq-default show-paren-style 'expression)
 ;; (setq show-paren-when-point-inside-paren t)
 
 

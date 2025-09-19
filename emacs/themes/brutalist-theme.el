@@ -51,16 +51,23 @@
    (fg-dim "dim gray")
    (fg-slight-dim "grey70")
    (fg-bright "black")
+   (fg-light "#ddddd8")
    (bg "#fffff8")
    (bg-light "#ddddd8")
-   (fg-light "#ddddd8")
-   (bg-highlight "#FFF1AA")
+
    (bg-highlight-2 "LightCyan")
    (bg-highlight-3 "LightGreen")
    (bg-highlight-dim "#eeeee8")
 
-   (bg-paren-range "#FFF1AA")
-   (fg-paren-range nil)
+   (bg-highlight "#FFF1AA")
+   (fg-highlight "OrangeRed")
+
+   (bg-modeline "OrangeRed")
+   (fg-modeline "white")
+   (bg-modeline-unfocused "#bbbbb8")
+   (fg-modeline-unfocused "#333")
+
+   (bt-type "blue")
 
    (diff-added "#e9ffe9")
    (diff-added-highlight "#a4f4a3")
@@ -76,7 +83,6 @@
    (latex-folded "#7900A5")
    (latex-unfolded "#F6E8FF")
    (latex-math "DarkBlue")
-
 
    (error "OrangeRed")
    (warning "DarkOrange")

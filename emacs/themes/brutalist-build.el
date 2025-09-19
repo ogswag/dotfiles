@@ -56,12 +56,14 @@ function in a let."
    ;; generic stuff
    `(default ((t (:background ,bg :foreground ,fg))))
    `(fringe ((t (:inherit default))))
-   `(line-number ((t (:foreground ,fg-dim))))
+   `(line-number ((t (:foreground ,error))))
+   `(line-number-current-line ((t (:foreground ,fg-modeline :background ,bg-modeline))))
+
    ;; `(separator-line ((t (:foreground ,fg-dim :background nil))))
    ;; `(window-divider ((t (:inherit separator-line))))
    ;; `(border ((t (:inherit separator-line))))
    ;; `(internal-border ((t (:inherit separator-line))))
-   `(border             ((t :background ,bg :foreground ,fg-dim)))
+   `(border             ((t :background nil :foreground ,fg-dim)))
    `(vertical-border    ((t :inherit border)))
    `(corfu-border       ((t :inherit border)))
    `(child-frame-border ((t :inherit border)))
@@ -97,7 +99,7 @@ function in a let."
    `(font-lock-preprocessor-face ((t (:foreground ,fg-dim))))
    `(font-lock-reference-face ((t (:foreground ,fg))))
    `(font-lock-string-face ((t (:foreground ,string))))
-   `(font-lock-type-face ((t (:foreground ,fg :underline t))))
+   `(font-lock-type-face ((t (:foreground ,bt-type))))
    `(font-lock-variable-name-face ((t (:foreground ,fg))))
    `(font-lock-warning-face ((t (:inherit error))))
    `(fringe ((t (:background ,bg :foreground ,fg))))
@@ -111,16 +113,13 @@ function in a let."
    `(link ((t (:foreground ,string :underline t))))
    `(minibuffer-prompt ((t (:foreground ,fg :inherit bold))))
 
-   `(mode-line           ((t (:foreground ,fg-bright :background ,bg-highlight :box (:line-width -1 :style released-button)))))
-   `(mode-line-buffer-id ((t (:foreground ,fg-bright :background nil))))
-   `(mode-line-emphasis  ((t (:foreground ,fg-bright :slant italic))))
-   `(mode-line-highlight ((t (:foreground ,string :box nil :weight bold))))
-   `(mode-line-inactive  ((t (:foreground ,fg-dim :background ,bg-light :box (:line-width -1 :style released-button)))))
+   `(mode-line           ((t (:foreground ,fg-modeline :background ,bg-modeline :box (:line-width -1 :style released-button)))))
+   `(mode-line-buffer-id ((t (:foreground nil :weight bold))))
+   `(mode-line-emphasis  ((t (:foreground ,fg-modeline :slant italic))))
+   `(mode-line-highlight ((t (:foreground ,string))))
+   `(mode-line-inactive  ((t (:foreground ,fg-modeline-unfocused :background ,bg-modeline-unfocused :box (:line-width -1 :style released-button)))))
 
-
-
-
-   `(region ((t (:background ,bg-highlight :foreground ,fg :inverse-video nil))))
+   `(region ((t (:background ,bg-highlight :foreground ,fg-highlight :inverse-video nil))))
    `(slime-repl-inputed-output-face ((t (:foreground ,fg))))
    `(whitespace-line ((t (:background ,bg-highlight-2 :foreground ,fg))))
 
@@ -273,7 +272,7 @@ function in a let."
    `(sp-show-pair-match-face ((t (:foreground ,paren-match :inherit bold))))
    `(sp-show-pair-mismatch-face ((t (:background ,warning :foreground ,paren-match :inherit bold))))
    `(show-paren-match ((t (:foreground ,paren-match :inherit bold))))
-   `(show-paren-match-expression ((t (:foreground ,fg-paren-range :background ,bg-paren-range))))
+   `(show-paren-match-expression ((t (:inherit region))))
    `(show-paren-mismatch ((t (:background ,warning :foreground ,paren-match :inherit bold))))
 
    ;; sh
