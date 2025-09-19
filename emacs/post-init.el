@@ -222,7 +222,7 @@
   (after-init . recentf-mode)
 
   :custom
-  (recentf-auto-cleanup (if (daemonp) 300 'never))
+  (recentf-auto-cleanup 'mode)
   (recentf-exclude
    (list "\\.tar$" "\\.tbz2$" "\\.tbz$" "\\.tgz$" "\\.bz2$"
          "\\.bz$" "\\.gz$" "\\.gzip$" "\\.xz$" "\\.zip$"
