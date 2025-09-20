@@ -15,7 +15,6 @@
   (pixel-scroll-precision-mode 1)
   (add-to-list 'default-frame-alist '(undecorated-round . t)))
 
-
 (setq-default default-input-method 'russian-computer)
 
 (load (expand-file-name "keys.el" user-emacs-directory) nil t t)
@@ -25,7 +24,6 @@
 
 ;; (setq-default show-paren-style 'expression)
 ;; (setq show-paren-when-point-inside-paren t)
-
 
 (cond
  ((eq system-type 'windows-nt)
@@ -280,7 +278,8 @@
 (use-package eglot
   :ensure nil
   :defer t
-  ;; :hook
+  :hook
+  ((plain-tex-mode . eglot-ensure)) ; adapt mode accordingly
   ;; ((c++-ts-mode . eglot-ensure)  ; For Tree-sitter C++ mode
   ;;  (c-ts-mode . eglot-ensure)
   ;;  (python-ts-mode . eglot-ensure))   ; For Tree-sitter C mode
@@ -290,7 +289,11 @@
              eglot-ensure
              eglot-rename
              eglot-format-buffer))
-
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               '(plain-tex-mode . ("texlab"))) ; or latex-mode, depending on your files
+  (add-to-list 'eglot-server-programs
+               '(latex-mode . ("texlab"))))
 (setq-default eglot-workspace-configuration
               `(:pylsp (:plugins
                         (;; Fix imports and syntax using `eglot-format-buffer`
@@ -307,7 +310,13 @@
 
                          :yapf (:enabled :json-false)
                          :rope_autoimport (:enabled :json-false)))))
-
+(setq-default eglot-workspace-configuration
+              `(:texlab
+                (:completion (:additionalTexFiles ["macros.tex"])
+                             :diagnostics (:parse (:enable t))
+                             :tex (:format "plain") ; or "latex"
+                             ))
+              )
 
 ;; Corfu enhances in-buffer completion by displaying a compact popup with
 ;; current candidates, positioned either below or above the point. Candidates
@@ -318,7 +327,10 @@
 
   :hook ((prog-mode . corfu-mode)
          (shell-mode . corfu-mode)
-         (eshell-mode . corfu-mode))
+         (eshell-mode . corfu-mode)
+         (plain-tex-mode . corfu-mode)
+         (LaTeX-mode . corfu-mode)
+         (TeX-mode . corfu-mode))
 
   :custom
   ;; Hide commands in M-x which do not apply to the current mode.
@@ -326,7 +338,10 @@
   ;; Disable Ispell completion function. As an alternative try `cape-dict'.
   (text-mode-ispell-word-completion nil)
   (tab-always-indent 'complete)
-
+  (corfu-auto t)
+  (corfu-cycle t)
+  (corfu-auto-delay 0.1)
+  (corfu-auto-prefix 2)
   ;; Enable Corfu
   :config
   (global-corfu-mode))
@@ -530,8 +545,7 @@
   (add-to-list 'apheleia-mode-alist '(tex-mode . tex-fmt-tabs))
   :commands (apheleia-mode
              apheleia-global-mode)
-  :hook ((prog-mode . apheleia-mode)
-         (text-mode . apheleia-mode)))
+  :hook ((prog-mode . apheleia-mode)))
 
 (use-package devdocs
   :ensure t)
@@ -636,3 +650,9 @@
   ([remap describe-variable] . helpful-variable)
   :custom
   (helpful-max-buffers 7))
+
+;; TeX mode configurations
+(setq-default TeX-default-mode #'plain-tex-mode)
+(setq-default tex-default-mode #'plain-tex-mode)
+(setq-default LaTeX-indent-level 4)
+(setq-default TeX-brace-indent-level 4)
