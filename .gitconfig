@@ -1,0 +1,11 @@
+[gpg]
+	format = ssh
+[user]
+	signingkey = /home/az/.ssh/ogswag_git.pub
+	email = apsacharow@mail.ru
+[commi]
+	gpgsign = true
+[tag]
+	gpgsign = true
+[gpg "ssh"]
+	allowedSignersFile = /home/az/.ssh/allowed_signers
