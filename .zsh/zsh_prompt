@@ -1481,7 +1481,7 @@ prompt_pure_setup() {
 		execution_time       yellow
 		git:arrow            cyan
 		git:stash            cyan
-		git:branch           242
+		git:branch           15
 		git:branch:cached    red
 		git:action           yellow
 		git:dirty            13
