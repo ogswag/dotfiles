@@ -833,13 +833,14 @@ prompt_pure_preprompt_render() {
 	local expanded_prompt
 	expanded_prompt="${(S%%)PROMPT}"
 
-	if [[ $1 == precmd ]]; then
-		# Initial newline, for spaciousness.
-		print
-	elif [[ $prompt_pure_last_prompt != $expanded_prompt ]]; then
-		# Redraw the prompt.
-		prompt_pure_reset_prompt
-	fi
+	# if [[ $1 == precmd ]]; then
+	# 	# Initial newline, for spaciousness.
+	# 	print
+	# elif [[ $prompt_pure_last_prompt != $expanded_prompt ]]; then
+	# 	# Redraw the prompt.
+	# 	prompt_pure_reset_prompt
+	# fi
+    prompt_pure_reset_prompt
 
 	typeset -g prompt_pure_last_prompt=$expanded_prompt
 }
@@ -1485,13 +1486,13 @@ prompt_pure_setup() {
 		git:branch:cached    red
 		git:action           yellow
 		git:dirty            13
-		host                 10
+		host                 2
 		path                 blue
 		prompt:error         9
-		prompt:success       15
+		prompt:success       5
 		prompt:continuation  11
 		suspended_jobs       red
-		user                 10
+		user                 2
 		user:root            default
 		virtualenv           3
 	)
@@ -1539,18 +1540,7 @@ prompt_pure_setup() {
 	psvar[13]=1
 	PROMPT='%(12V.%F{$prompt_pure_colors[suspended_jobs]}%12v%f .)'
 	PROMPT+='%(13V.%F{$prompt_pure_colors['"${prompt_pure_state[user_color]:-user}"']}%n%f%F{$prompt_pure_colors[host]}@%m%f:.)'
-	PROMPT+='%F{${prompt_pure_colors[path]}}%~%f'
-	PROMPT+='%(14V. %F{${prompt_pure_git_branch_color}}%14v%(15V.%F{$prompt_pure_colors[git:dirty]}%15v.)%f .)'
-	PROMPT+='%(16V. %F{$prompt_pure_colors[git:action]}%16v%f.)'
-	PROMPT+='%(17V. %F{$prompt_pure_colors[git:arrow]}%17v%f .)'
-	PROMPT+='%(18V. %F{$prompt_pure_colors[git:stash]}${PURE_GIT_STASH_SYMBOL:-≡}%f.)'
-	PROMPT+='%(19V. %F{$prompt_pure_colors[execution_time]}%19v%f .)'
-
-	# Newline separating preprompt from prompt.
-	# PROMPT+='${prompt_newline}'
-
-	# Prompt line: virtualenv and prompt symbol.
-	PROMPT+='%(20V.%F{$prompt_pure_colors[virtualenv]}(%20v)%f .)'
+	PROMPT+='%F{${prompt_pure_colors[path]}}%~%f '
 	# Prompt symbol: turns red if the previous command didn't exit with 0.
 	local prompt_indicator='%(?.%F{$prompt_pure_colors[prompt:success]}.%F{$prompt_pure_colors[prompt:error]})${prompt_pure_state[prompt]}%f '
 	PROMPT+=$prompt_indicator
@@ -1558,26 +1548,18 @@ prompt_pure_setup() {
 	# Indicate continuation prompt by … and use a darker color for it.
 	PROMPT2='%F{$prompt_pure_colors[prompt:continuation]}… %(1_.%_ .%_)%f'$prompt_indicator
 
-	# PROMPT='%(12V.%F{$prompt_pure_colors[suspended_jobs]}%12v%f .)'
-	# PROMPT+='%(13V.%F{$prompt_pure_colors['"${prompt_pure_state[user_color]:-user}"']}%n%f%F{$prompt_pure_colors[host]}@%m%f .)'
-	# PROMPT+='%F{${prompt_pure_colors[path]}}%~%f'
-	# PROMPT+='%(14V. %F{${prompt_pure_git_branch_color}}%14v%(15V.%F{$prompt_pure_colors[git:dirty]}%15v.)%f.)'
-	# PROMPT+='%(16V. %F{$prompt_pure_colors[git:action]}%16v%f.)'
-	# PROMPT+='%(17V. %F{$prompt_pure_colors[git:arrow]}%17v%f.)'
-	# PROMPT+='%(18V. %F{$prompt_pure_colors[git:stash]}${PURE_GIT_STASH_SYMBOL:-≡}%f.)'
-	# PROMPT+='%(19V. %F{$prompt_pure_colors[execution_time]}%19v%f.)'
-	#
+	# Newline separating preprompt from prompt.
+	# PROMPT+='${prompt_newline}'
+
+	RPROMPT+='%(20V. %F{$prompt_pure_colors[virtualenv]}(%20v)%f .)'
+	RPROMPT+='%(14V. %F{${prompt_pure_git_branch_color}}%14v%(15V.%F{$prompt_pure_colors[git:dirty]}%15v.)%f.)'
+	RPROMPT+='%(16V. %F{$prompt_pure_colors[git:action]}%16v%f.)'
+	RPROMPT+='%(17V. %F{$prompt_pure_colors[git:arrow]}%17v%f.)'
+	RPROMPT+='%(18V. %F{$prompt_pure_colors[git:stash]}${PURE_GIT_STASH_SYMBOL:-≡}%f.)'
+	RPROMPT+='%(19V. %F{$prompt_pure_colors[execution_time]}%19v%f.)'
+
 	# # Newline separating preprompt from prompt.
 	# PROMPT+='${prompt_newline}'
-	#
-	# # Prompt line: virtualenv and prompt symbol.
-	# PROMPT+='%(20V.%F{$prompt_pure_colors[virtualenv]}%20v%f .)'
-	# # Prompt symbol: turns red if the previous command didn't exit with 0.
-	# local prompt_indicator='%(?.%F{$prompt_pure_colors[prompt:success]}.%F{$prompt_pure_colors[prompt:error]})${prompt_pure_state[prompt]}%f '
-	# PROMPT+=$prompt_indicator
-	#
-	# # Indicate continuation prompt by … and use a darker color for it.
-	# PROMPT2='%F{$prompt_pure_colors[prompt:continuation]}… %(1_.%_ .%_)%f'$prompt_indicator
 
 	# Store prompt expansion symbols for in-place expansion via (%). For
 	# some reason it does not work without storing them in a variable first.
