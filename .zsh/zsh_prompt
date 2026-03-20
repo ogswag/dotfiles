@@ -1557,6 +1557,12 @@ prompt_pure_setup() {
 	RPROMPT+='%(17V. %F{$prompt_pure_colors[git:arrow]}%17v%f.)'
 	RPROMPT+='%(18V. %F{$prompt_pure_colors[git:stash]}${PURE_GIT_STASH_SYMBOL:-≡}%f.)'
 	RPROMPT+='%(19V. %F{$prompt_pure_colors[execution_time]}%19v%f.)'
+	# SSH-aware RPROMPT
+	if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+	  RPROMPT+=' %F{red}[SSH@%m]%f'
+	else
+	  RPROMPT+=''
+	fi
 
 	# # Newline separating preprompt from prompt.
 	# PROMPT+='${prompt_newline}'
