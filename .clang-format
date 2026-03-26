@@ -1,8 +1,7 @@
+---
 BasedOnStyle: LLVM
-BreakBeforeBraces: Allman
-BreakTemplateDeclarations: Yes
-IndentWidth: 4
-NamespaceIndentation: Inner
-TabWidth: 4
-UseTab: Never
+UseTab: Always
 ColumnLimit: 120
+IndentWidth: 8
+TabWidth: 8
+ObjCBlockIndentWidth: 8
