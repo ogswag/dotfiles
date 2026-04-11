@@ -1,12 +1,12 @@
-font-family = "Mononoki Nerd Font"
+font-family = "Menlo"
 font-thicken = true
 font-thicken-strength = 10
 # font-style = "Medium"
-font-size = 15
+font-size = 12
 
 # theme = Material Darker
-theme = light:Apple System Colors Light,dark:Tomorrow Night Bright
-background-opacity = 0.9
+theme = light:Monokai Pro Light Sun,dark:Catppuccin Mocha
+# background-opacity = 0.9
 # macos-titlebar-style = native
 macos-icon = custom-style
 macos-icon-ghost-color = #ffffff
@@ -19,5 +19,5 @@ cursor-text = #190F01
 shell-integration-features = no-cursor,ssh-terminfo,sudo,title
 
 # window-inherit-font-size = false
-window-height = 37
-window-width= 97
+window-height = 27
+window-width= 92
