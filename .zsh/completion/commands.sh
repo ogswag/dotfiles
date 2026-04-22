@@ -1,10 +1,10 @@
 #
 ## Docker
 #
-docker completion zsh > ~/.zsh/completion/_docker;
+docker completion zsh > $HOME/.zsh/completion/_docker;
 
 #
 ## uv (python package and project manager)
 #
-uv generate-shell-completion zsh > ~/.zfunc/_uv;
+uv generate-shell-completion zsh > $HOME/.zsh/completion/_uv;
 
