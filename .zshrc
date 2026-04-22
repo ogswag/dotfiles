@@ -45,12 +45,6 @@ typeset -U PATH path
 if [[ $os == "Linux" ]]; then
 	export LD_LIBRARY_PATH=/usr/local/lib
 elif [[ $os == "Darwin" ]]; then
-	export PATH="/usr/local/opt/jpeg/bin:$PATH"
-	export PATH="$HOME/.local/bin:$PATH"
-	export PATH="/usr/local/sbin:$PATH"
-	export PATH="/usr/local/opt/llvm/bin:$PATH"
-	export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
-	export PATH="$(brew --prefix)/bin:$PATH"
 else
 	echo "Unknown operating system."
 fi
