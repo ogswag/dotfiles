@@ -27,10 +27,11 @@ fi
 source $ZPLUGINDIR/zsh_unplugged/zsh_unplugged.zsh
 
 repos=(
-    zdharma-continuum/fast-syntax-highlighting
+    # zdharma-continuum/fast-syntax-highlighting
     zsh-users/zsh-history-substring-search
     ael-code/zsh-colored-man-pages
     urbainvaes/fzf-marks
+	zsh-users/zsh-completions
 )
 plugin-load $repos
 # zsh-history-substring-search configuration

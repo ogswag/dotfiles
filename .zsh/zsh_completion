@@ -1,4 +1,7 @@
+fpath=(~/.zsh/completion $fpath)
+
 autoload -Uz compinit
+
 if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
 	compinit -i  # only load completions if dump file is older than 24 hours
 else
