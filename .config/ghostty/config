@@ -1,10 +1,26 @@
-font-family = "Liga mononoki"
-font-thicken = true
-font-size = 14
+font-family = "JetBrains Mono"
+# font-feature = ss05, cv10, ss01, ss03, cv14, cv15, cv31, cv26, cv32, ss08, ss10 # Fira Code
+# font-feature = zero, cv13, cv15, ss02, ss04 # Lilex
+font-feature = zero, cv01, cv03, cv10, cv19, cv20, ss19 # JetBrains Mono
 
-theme = light:Atom One Light,dark:Spacegray Eighties
+font-size = 12
+font-thicken = true
+font-thicken-strength = 122
+
+background-opacity = 0.92
+background-blur = 50
+
+theme = light:Xcode Light,dark:Nord Wave
+macos-icon = custom
+macos-custom-icon = ~/.config/ghostty/dotted-blue.icns
 
 cursor-style = block
-cursor-color = #FB9912
-cursor-text = #190F01
+cursor-color = #3B86F7
+cursor-text = #FFF
+
 shell-integration-features = no-cursor,ssh-terminfo,sudo,title
+
+bell-features = system
+
+window-height = 26
+window-width = 95
