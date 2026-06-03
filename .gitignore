@@ -1,0 +1,4 @@
+.zsh/cache/
+.zsh/completion/_docker
+.zsh/completion/_uv
+
