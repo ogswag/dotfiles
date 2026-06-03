@@ -10,29 +10,29 @@ export RUFF_CONFIG_FILE="$HOME/ruff.toml"
 [[ -o interactive ]] || return
 
 if [ -f ~/.zsh/zsh_plugins ]; then
-   source ~/.zsh/zsh_plugins
+    source ~/.zsh/zsh_plugins
 fi
 if [ -f ~/.zsh/zsh_completion ]; then
-   source ~/.zsh/zsh_completion
+    source ~/.zsh/zsh_completion
 fi
 
 if [ -f ~/.zsh/zsh_aliases ]; then
-   source ~/.zsh/zsh_aliases
+    source ~/.zsh/zsh_aliases
 fi
 
 if [ -f ~/.zsh/zsh_prompt ]; then
-	source ~/.zsh/zsh_prompt
+    source ~/.zsh/zsh_prompt
 fi
 
 
 if [[ $os == "Linux" ]]; then
-	export EDITOR='nano'
-	export SUDO_EDITOR='nano'
-	export VISUAL='nano'
+    export EDITOR='nano'
+    export SUDO_EDITOR='nano'
+    export VISUAL='nano'
 elif [[ $os == "Darwin" ]]; then
-	export EDITOR='micro'
-	export SUDO_EDITOR='micro'
-	export VISUAL='micro'
+    export EDITOR='micro'
+    export SUDO_EDITOR='micro'
+    export VISUAL='micro'
 fi
 
 mkcd () {

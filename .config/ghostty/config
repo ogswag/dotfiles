@@ -1,9 +1,9 @@
 font-family = "JetBrains Mono"
 # font-feature = ss05, cv10, ss01, ss03, cv14, cv15, cv31, cv26, cv32, ss08, ss10 # Fira Code
 # font-feature = zero, cv13, cv15, ss02, ss04 # Lilex
-font-feature = zero, cv01, cv03, cv10, cv19, cv20, ss19 # JetBrains Mono
+font-feature = zero, cv01, cv03, cv19, cv20, ss19 # JetBrains Mono
 
-font-size = 12
+font-size = 14
 font-thicken = true
 font-thicken-strength = 122
 
@@ -22,5 +22,5 @@ shell-integration-features = no-cursor,ssh-terminfo,sudo,title
 
 bell-features = system
 
-window-height = 26
-window-width = 95
+window-height = 32
+window-width = 115
