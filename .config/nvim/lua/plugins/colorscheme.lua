@@ -1,15 +1,26 @@
 return {
 	{
-		"f-person/auto-dark-mode.nvim",
-		opts = {
-			set_dark_mode = function()
-				vim.api.nvim_set_option_value("background", "dark", {})
-			end,
-			set_light_mode = function()
-				vim.api.nvim_set_option_value("background", "light", {})
-			end,
-			update_interval = 3000,
-			fallback = "dark",
-		},
+		"kungfusheep/mfd.nvim",
+		lazy = false,
+	},
+	{
+		"IroncladDev/osmium",
+		lazy = false,
+		config = function()
+			require("osmium").setup({
+				integrations = {
+					gitsigns = true,
+					telescope = true,
+				},
+				transparent_bg = false,
+				show_end_of_buffer = false,
+			})
+			vim.cmd([[colors osmium]])
+		end,
+	},
+	{
+		"wtfox/jellybeans.nvim",
+		lazy = false,
+		priority = 1000,
 	},
 }

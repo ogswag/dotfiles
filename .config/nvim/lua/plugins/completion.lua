@@ -40,7 +40,7 @@ return {
 
 			sources = {
 				-- Order matters: LSP → path → snippets → buffer words
-				default = { "lsp", "path", "snippets", "buffer" },
+				default = { "lsp", "path", "snippets" },
 			},
 
 			-- Rust-based fuzzy matcher (blink's default and fastest option)

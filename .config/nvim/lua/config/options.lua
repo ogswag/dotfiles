@@ -53,3 +53,11 @@ opt.foldmethod = "expr"
 opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldenable = true -- was false
 opt.foldlevel = 99
+
+-- Language
+vim.opt.langmap =
+	"ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯЖ;ABCDEFGHIJKLMNOPQRSTUVWXYZ:,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz"
+-- -- switch between layouts using Ctrl+^ in insert mode
+-- vim.opt.keymap = "russian-jcukenwin"
+-- vim.opt.iminsert = 0 -- Start with English input
+-- vim.opt.imsearch = 0 -- Start search with English

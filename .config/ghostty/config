@@ -3,16 +3,19 @@ font-family = "JetBrains Mono"
 # font-feature = zero, cv13, cv15, ss02, ss04 # Lilex
 font-feature = zero, cv01, cv03, cv19, cv20, ss19 # JetBrains Mono
 
-font-size = 14
+font-size = 12
 font-thicken = true
 font-thicken-strength = 122
 
 background-opacity = 0.92
 background-blur = 50
 
-theme = light:Xcode Light,dark:Nord Wave
+theme = Nord Wave
 macos-icon = custom
 macos-custom-icon = ~/.config/ghostty/dotted-blue.icns
+macos-titlebar-style = hidden
+window-padding-y = 0,2
+window-padding-x = 3,0
 
 cursor-style = block
 cursor-color = #3B86F7

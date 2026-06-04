@@ -36,15 +36,15 @@ return {
 			default_component_configs = {
 				git_status = {
 					symbols = {
-						added = "✚",
-						modified = "",
+						added = "✚", -- NOTE: you can set any of these to an empty string to not show them
+						modified = "[+] ",
 						deleted = "✖",
-						renamed = "➜",
-						untracked = "★",
-						ignored = "◌",
-						unstaged = "✗",
-						staged = "✓",
-						conflict = "",
+						renamed = "",
+						untracked = "?",
+						ignored = "I",
+						unstaged = "U",
+						staged = "S",
+						conflict = "!",
 					},
 				},
 			},
