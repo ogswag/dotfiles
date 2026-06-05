@@ -11,6 +11,10 @@ if [[ $os == "Linux" ]]; then
 	# some more ls aliases
 	alias la='ls -A'
 
+    alias vim='nvim'
+    alias vi='nvim'
+    alias n='nvim'
+    alias v='nvim'
 	alias open='xdg-open'
 
 	if [[ $host == "barashek-pc" ]]; then
