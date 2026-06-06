@@ -70,3 +70,34 @@ autocmd("FileType", {
 		-- latexindent will clean it up on format anyway.
 	end,
 })
+
+-- Ensure '#' comments for hash-style config files so mini.comment (gc/gcc)
+-- works. Plain `conf` filetype and ghostty's config don't always set this.
+autocmd("FileType", {
+	group = augroup("HashCommentString"),
+	pattern = { "conf", "config", "gitconfig", "ghostty", "tmux", "fish" },
+	callback = function()
+		vim.bo.commentstring = "# %s"
+	end,
+})
+
+-- ghostty's config file has no extension, so pin its filetype + commentstring.
+autocmd({ "BufRead", "BufNewFile" }, {
+	group = augroup("GhosttyConfig"),
+	pattern = { "*/ghostty/config", "*/ghostty/themes/*" },
+	callback = function()
+		vim.bo.filetype = "conf"
+		vim.bo.commentstring = "# %s"
+	end,
+})
+
+-- auto create missing directories
+vim.api.nvim_create_autocmd("BufWritePre", {
+	pattern = "*",
+	callback = function()
+		local dir = vim.fn.expand("<afile>:p:h")
+		if dir ~= "" and vim.fn.isdirectory(dir) == 0 then
+			vim.fn.mkdir(dir, "p")
+		end
+	end,
+})

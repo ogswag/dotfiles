@@ -33,6 +33,7 @@ elif [[ $os == "Darwin" ]]; then
     export EDITOR='micro'
     export SUDO_EDITOR='micro'
     export VISUAL='micro'
+    export HOMEBREW_REQUIRE_TAP_TRUST=1
 fi
 
 mkcd () {

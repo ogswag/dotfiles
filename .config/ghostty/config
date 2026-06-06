@@ -7,15 +7,10 @@ font-size = 12
 font-thicken = true
 font-thicken-strength = 122
 
-background-opacity = 0.92
-background-blur = 50
+# background-opacity = 0.92
+# background-blur = 50
 
-theme = Nord Wave
-macos-icon = custom
-macos-custom-icon = ~/.config/ghostty/dotted-blue.icns
-macos-titlebar-style = hidden
-window-padding-y = 0,2
-window-padding-x = 3,0
+theme = Tokyonight Moon
 
 cursor-style = block
 cursor-color = #3B86F7
@@ -25,5 +20,8 @@ shell-integration-features = no-cursor,ssh-terminfo,sudo,title
 
 bell-features = system
 
+
 window-height = 32
 window-width = 115
+# window-padding-y = 0,2
+# window-padding-x = 3,0

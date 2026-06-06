@@ -4,9 +4,14 @@ return {
 	{
 		"saghen/blink.cmp",
 		version = "1.*", -- pin to stable v1.x; check docs if upgrading breaks things
+		dependencies = { "echasnovski/mini.snippets" },
 		---@module 'blink.cmp'
 		---@type blink.cmp.Config
 		opts = {
+			-- Use mini.snippets as the snippet engine; the "snippets" source
+			-- below then surfaces them (incl. friendly-snippets) in the popup.
+			snippets = { preset = "mini_snippets" },
+
 			keymap = {
 				preset = "super-tab", -- Tab accepts/jumps; C-n/C-p navigates
 				["<CR>"] = { "accept", "fallback" }, -- Enter also accepts (VS Code feel)
