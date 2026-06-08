@@ -11,7 +11,6 @@ return {
 		},
 		config = function(_, opts)
 			require("valve-olive").setup(opts)
-			vim.cmd.colorscheme("valve-olive")
 		end,
 	},
 	{
