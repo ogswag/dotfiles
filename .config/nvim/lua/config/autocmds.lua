@@ -63,8 +63,6 @@ autocmd("FileType", {
 		vim.opt_local.wrap = true
 		vim.opt_local.spell = true
 		vim.opt_local.spelllang = "en_us,ru_yo"
-		vim.opt_local.textwidth = 100
-		vim.opt_local.colorcolumn = "100"
 		-- Don't trim LaTeX trailing whitespace at the file level;
 		-- trailing whitespace in tex sources is usually harmless and
 		-- latexindent will clean it up on format anyway.
@@ -99,5 +97,13 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 		if dir ~= "" and vim.fn.isdirectory(dir) == 0 then
 			vim.fn.mkdir(dir, "p")
 		end
+	end,
+})
+
+-- Stop auto comment-leader insertion and auto-wrapping everywhere
+autocmd({ "BufWinEnter", "FileType", "OptionSet" }, {
+	group = augroup("FormatOptions"),
+	callback = function()
+		vim.opt_local.formatoptions:remove({ "t", "l", "c", "r", "o", "q" })
 	end,
 })

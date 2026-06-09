@@ -11,16 +11,19 @@ return {
 			vim.g.vimtex_view_skim_sync = 1 -- jump to position in Skim after compile
 			vim.g.vimtex_view_skim_activate = 1 -- bring Skim to front
 
+			vim.g.vimtex_view_skim_reading_bar = 1
 			-- Compiler: latexmk (comes with MacTeX)
 			vim.g.vimtex_compiler_method = "latexmk"
 			vim.g.vimtex_compiler_latexmk = {
 				options = {
-					"-pdf",
+					"-pdflua",
 					"-shell-escape", -- needed for minted, tikz-externalize, etc.
 					"-verbose",
 					"-file-line-error",
 					"-synctex=1",
 					"-interaction=nonstopmode",
+					"-f",
+					"-auxdir=build",
 				},
 			}
 

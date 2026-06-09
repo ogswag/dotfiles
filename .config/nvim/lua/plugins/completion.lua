@@ -14,7 +14,7 @@ return {
 
 			keymap = {
 				preset = "super-tab", -- Tab accepts/jumps; C-n/C-p navigates
-				["<CR>"] = { "accept", "fallback" }, -- Enter also accepts (VS Code feel)
+				-- ["<CR>"] = { "accept", "fallback" }, -- Enter also accepts (VS Code feel)
 			},
 
 			appearance = {

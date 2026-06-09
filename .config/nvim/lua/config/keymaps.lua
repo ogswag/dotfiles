@@ -15,10 +15,6 @@ map("n", "<C-Right>", ":vertical resize +2<CR>", { silent = true, desc = "Grow w
 -- Clear search highlight on Escape
 map("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
--- Move selected lines up/down in visual mode
-map("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
-map("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
-
 -- Stay in indent mode after indenting
 map("v", "<", "<gv", { desc = "Outdent" })
 map("v", ">", ">gv", { desc = "Indent" })
@@ -34,6 +30,7 @@ map("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Delete buffer" })
 
 -- Save with Ctrl+S (VS Code muscle memory)
 map({ "n", "i", "v" }, "<C-s>", "<Esc><cmd>w<CR>", { desc = "Save" })
+map({ "n", "i", "v" }, "<C-s>", "<Esc><cmd>w<CR>", { desc = "Save" })
 
 -- Plugin managers
 map("n", "<leader>L", "<cmd>Lazy<CR>", { desc = "Lazy (plugins)" })
@@ -43,3 +40,17 @@ map("n", "<leader>M", "<cmd>Mason<CR>", { desc = "Mason (LSPs)" })
 map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Diagnostic float" })
 map("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
 map("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+
+-- Center search results
+map("n", "n", "nzz")
+map("n", "N", "Nzz")
+
+-- Insert-mode line home/end
+map("i", "<C-a>", "<C-o>I", { silent = true })
+map("i", "<C-e>", "<C-o>A", { silent = true })
+
+-- Insert-mode movement
+map("i", "<C-k>", "<Up>", { silent = true })
+map("i", "<C-j>", "<Down>", { silent = true })
+map("i", "<C-h>", "<Left>", { silent = true })
+map("i", "<C-l>", "<Right>", { silent = true })
