@@ -1,10 +1,17 @@
 return {
 	{
+		"lunacookies/vim-colors-xcode",
+		config = function()
+			vim.o.background = "dark"
+			vim.cmd.colorscheme("xcodedark")
+		end,
+	},
+	{
 		"ogswag/valve-olive.nvim",
 		lazy = false,
 		priority = 1000,
 		opts = {
-			darker_bg = false,
+			darker_bg = true,
 			transparent = false,
 			italic_comments = true,
 			bold_functions = true,
@@ -19,7 +26,15 @@ return {
 		priority = 1000,
 	},
 	{ "oonamo/ef-themes.nvim", lazy = false, priority = 1000 },
-	{ "ogswag/vim-envy", lazy = false, priority = 1000 },
+	{
+		"ogswag/envy.nvim", -- or your fork/path
+		lazy = false,
+		priority = 1000,
+		opts = {}, -- see Configuration
+		config = function(_, opts)
+			require("envy").setup(opts)
+		end,
+	},
 	{ "NLKNguyen/papercolor-theme", lazy = false, priority = 1000 },
 	{ "jonathanfilip/vim-lucius", lazy = false, priority = 1000 },
 	{
@@ -78,19 +93,5 @@ return {
 		"wtfox/jellybeans.nvim",
 		lazy = false,
 		priority = 1000,
-	},
-	{
-		"f-person/auto-dark-mode.nvim",
-		opts = {
-			update_interval = 3000,
-			set_dark_mode = function()
-				vim.o.background = "dark"
-				vim.cmd.colorscheme("valve-olive")
-			end,
-			set_light_mode = function()
-				vim.o.background = "light"
-				vim.cmd.colorscheme("zenbones")
-			end,
-		},
 	},
 }

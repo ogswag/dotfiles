@@ -1,5 +1,4 @@
 return {
-
 	{ "bullets-vim/bullets.vim" },
 	{
 		"folke/zen-mode.nvim",
