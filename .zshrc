@@ -85,3 +85,7 @@ bindkey -e
 bindkey '^[[1;5C' forward-word      # Ctrl+Right
 bindkey '^[[1;5D' backward-word     # Ctrl+Left
 bindkey '^H' vi-backward-kill-word
+
+# mimocode
+export PATH=/Users/az/.mimocode/bin:$PATH
+export PATH="/Users/az/.local/bin:$PATH"  # Added by Deck.app

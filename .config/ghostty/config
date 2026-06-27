@@ -1,27 +1,26 @@
-font-family = "JetBrains Mono"
+font-family = "Liga SFMono Nerd Font"
 # font-feature = ss05, cv10, ss01, ss03, cv14, cv15, cv31, cv26, cv32, ss08, ss10 # Fira Code
 # font-feature = zero, cv13, cv15, ss02, ss04 # Lilex
-font-feature = zero, cv01, cv03, cv19, cv20, ss19 # JetBrains Mono
+# font-feature = zero, cv01, cv03, cv19, cv20, ss19 # JetBrains Mono
+
+theme = Kitty Default
 
 font-size = 12
 font-thicken = true
-font-thicken-strength = 122
+# font-thicken-strength = 122
 
-# background-opacity = 0.92
-# background-blur = 50
-
-theme = Tokyonight Moon
+background-opacity = 0.95
+background-blur = 50
 
 cursor-style = block
 cursor-color = #3B86F7
 cursor-text = #FFF
 
-shell-integration-features = no-cursor,ssh-terminfo,sudo,title
+shell-integration-features = no-cursor,sudo,title
 
 bell-features = system
 
+window-decoration = none
 
-window-height = 32
-window-width = 115
-# window-padding-y = 0,2
-# window-padding-x = 3,0
+window-height = 35
+window-width = 120
