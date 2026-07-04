@@ -1,0 +1,5 @@
+.zsh/cache/
+.zsh/completion/_docker
+.zsh/completion/_uv
+.config/nvim/lazy-lock.json
+.DS_Store
