@@ -1,52 +1,5 @@
 ;; -*- lexical-binding: t; -*-
 
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/m/t"))
-(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/m/t/"))
-
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/m/t/base2tone"))
-(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/m/t/base2tone"))
-
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/m/t/base16"))
-(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/m/t/base16"))
-
-(setq custom-safe-themes t)
-(global-font-lock-mode 1)
-
-;; (load-theme 'base16-gruvbox-dark-medium t)
-
-(defun my/apply-theme (appearance)
-  "Load theme, taking current system APPEARANCE into consideration."
-  (mapc #'disable-theme custom-enabled-themes)
-  (pcase appearance
-    ('light (load-theme 'flexoki-light t))
-    ('dark (load-theme 'base16-gruvbox-dark-medium t))))
-
-(add-hook 'ns-system-appearance-change-functions #'my/apply-theme)
-
-;; make the initial frame positioned at the top of screen
-(push '(top . 100) initial-frame-alist)
-(push '(left . 300) initial-frame-alist)
-
-;; set width and height of any new window
-(push '(width . 120) default-frame-alist)
-(push '(height . 50) default-frame-alist)
-
-;; remove the big ugly tool bar
-(push '(tool-bar-lines . 0) default-frame-alist)
-
-(fset 'display-startup-echo-area-message #'ignore)
-(setq-default initial-major-mode 'fundamental-mode
-	      initial-scratch-message nil
-	      inhibit-splash-screen t)
-
-(add-hook 'before-init-hook
-	  (lambda ()
-		  (tool-bar-mode -1)
-		  (tooltip-mode t)
-		  (context-menu-mode t)
-		  (column-number-mode t)
-		  (size-indication-mode t))
-
 ;; Backup of `gc-cons-threshold' and `gc-cons-percentage' before startup.
 (defvar my-backup-gcct gc-cons-threshold)
 (defvar my-backup-gccp gc-cons-percentage)

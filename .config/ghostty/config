@@ -3,7 +3,7 @@ font-family = "Fira Code"
 # font-feature = zero, cv13, cv15, ss02, ss04 # Lilex
 # font-feature = zero, cv01, cv03, cv19, cv20, ss19 # JetBrains Mono
 
-theme = light:Neobones Light, dark:Tokyonight Moon
+theme = light:Xcode Light, dark:Gruber Darker
 
 font-size = 13
 font-thicken = true

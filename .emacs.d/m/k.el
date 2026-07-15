@@ -46,6 +46,9 @@
 ;; (keymap-global-unset  "s-j")
 ;; (keymap-global-unset "s-k")
 
+(keymap-global-unset "C-<SPC>")
+(keymap-global-unset "C-@")
+
 
 ;;>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
 ;;
@@ -181,21 +184,37 @@ The DWIM behaviour of this command is as follows:
 ;; TURN ESCAPE INTO A LEADER KEY
 ;;>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
 ;;
-(define-prefix-command 'my-esc-map)
-(keymap-global-set "<escape>" 'my-esc-map)
+(define-prefix-command 'my-semicol-map)
+(keymap-global-set ";" 'my-semicol-map)
 
-(keymap-set my-esc-map "<ESC>" #'keyboard-quit)
+(keymap-set my-semicol-map ";" #'self-insert-command)
 
-(keymap-set my-esc-map "f r" #'recentf-open)
+(keymap-set my-semicol-map "a" #'align-regexp)
 
-(keymap-set my-esc-map "r s" #'replace-string)
-(keymap-set my-esc-map "r r" #'replace-regexp)
+(keymap-set my-semicol-map "b b" #'switch-to-buffer)
+(keymap-set my-semicol-map "b k" #'kill-current-buffer)
 
-(keymap-set my-esc-map "c c" #'compile)
-(keymap-set my-esc-map "c r" #'recompile)
+(keymap-set my-semicol-map "c c" #'compile)
+(keymap-set my-semicol-map "c r" #'recompile)
 
-(keymap-set my-esc-map "1" #'shell-command)
-(keymap-set my-esc-map "2" #'async-shell-command)
+(keymap-set my-semicol-map "f f" #'find-file)
+(keymap-set my-semicol-map "f r" #'recentf-open)
+
+(keymap-set my-semicol-map "g" #'my/keyboard-quit-dwim)
+
+(keymap-set my-semicol-map "r r" #'replace-regexp)
+(keymap-set my-semicol-map "r s" #'replace-string)
+
+(keymap-set my-semicol-map "m m" #'set-mark-command)
+(keymap-set my-semicol-map "m b" #'bookmark-set)
+(keymap-set my-semicol-map "m j" #'bookmark-jump)
+
+(keymap-set my-semicol-map "x" #'execute-extended-command)
+
+(keymap-set my-semicol-map "1" #'shell-command)
+(keymap-set my-semicol-map "2" #'async-shell-command)
+
+(keymap-set my-semicol-map "3" #'my/open-curdir)
 
 (defun my/open-curdir ()
   "Open the current file's directory in Finder on macOS."
@@ -204,6 +223,6 @@ The DWIM behaviour of this command is as follows:
                       (file-name-directory buffer-file-name))
                  default-directory)))
     (shell-command (concat "open " (shell-quote-argument dir)))))
-(keymap-set my-esc-map "3" #'my/open-curdir)
+
 
 ;;; input.el ends here

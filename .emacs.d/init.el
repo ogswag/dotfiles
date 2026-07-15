@@ -2,16 +2,61 @@
 
 ;;; Code:
 
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/m/t"))
+(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/m/t/"))
+
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/m/t/base2tone"))
+(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/m/t/base2tone"))
+
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/m/t/base16"))
+(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/m/t/base16"))
+
+(setq custom-safe-themes t)
+(global-font-lock-mode 1)
+
+;; (defun my/apply-theme (appearance)
+;;   "Load theme, taking current system APPEARANCE into consideration."
+;;   (mapc #'disable-theme custom-enabled-themes)
+;;   (pcase appearance
+;;     ('light (load-theme 'tango t))
+;;     ('dark (load-theme 'base2tone-cave-dark t))))
+
+;; (add-hook 'ns-system-appearance-change-functions #'my/apply-theme)
+
+;; make the initial frame positioned at the top of screen
+(push '(top . 100) initial-frame-alist)
+(push '(left . 330) initial-frame-alist)
+
+;; set width and height of any new window
+(push '(width . 120) default-frame-alist)
+(push '(height . 50) default-frame-alist)
+
+;; remove the big ugly tool bar
+(push '(tool-bar-lines . 0) default-frame-alist)
+
+(fset 'display-startup-echo-area-message #'ignore)
+(setq-default initial-major-mode 'fundamental-mode
+	      initial-scratch-message nil
+	      inhibit-splash-screen t)
+
+(tool-bar-mode -1)
+(tooltip-mode t)
+(context-menu-mode t)
+(column-number-mode t)
+(size-indication-mode t)
+
 ;; set fonts
 (set-frame-font
  (let ((fontlist (font-family-list)))
    (cond
-    ((member "NRK Mono" fontlist) "NRK Mono")
-    ((member "JetBrains Mono" fontlist) "JetBrains Mono")
-    ((member "Cascadia Code" fontlist) "Cascadia Code")
-    ((member "Consolas" fontlist) "Consolas")
+    ((member "Liga mononoki" fontlist) "Liga mononoki 16")
+    ((member "mononoki" fontlist) "mononoki")
+    ((member "Hack Nerd Font" fontlist) "Hack Nerd Font")
+    ((member "Hack" fontlist) "Hack")
+    ((member "Hasklig" fontlist) "Hasklig")
     ((member "Menlo" fontlist) "Menlo")
     ((member "DejaVu Sans Mono" fontlist) "DejaVu Sans Mono")
+    ((member "Consolas" fontlist) "Consolas")
     (t nil)))
  t t)
 
@@ -19,11 +64,14 @@
 		    (let ((fontlist (font-family-list)))
 		      (cond
 		       ;; Size MUST NOT be set here - otherwise the font will not scale with the main frame font
-		       ((member "Liga mononoki" fontlist) "Liga mononoki")
-		       ((member "Cascadia Mono" fontlist) "Cascadia Mono")
-		       ((member "Consolas" fontlist) "Consolas")
+		       ((member "Liga mononoki" fontlist) "Liga mononoki 16")
+		       ((member "mononoki" fontlist) "mononoki")
+		       ((member "Hack Nerd Font" fontlist) "Hack Nerd Font")
+		       ((member "Hack" fontlist) "Hack")
+		       ((member "Hasklig" fontlist) "Hasklig")
 		       ((member "Menlo" fontlist) "Menlo")
 		       ((member "DejaVu Sans Mono" fontlist) "DejaVu Sans Mono")
+		       ((member "Consolas" fontlist) "Consolas")
 		       (t nil))))
 
 (set-face-attribute 'variable-pitch nil :family
@@ -59,8 +107,14 @@
   (setq scroll-margin 10)
   (setq scroll-conservatively 101))
 
-(setq display-line-numbers-grow-only t)
-(setq display-line-numbers-width-start t)
+(use-package display-line-numbers :ensure nil
+  :demand t
+  :hook (prog-mode text-mode LaTeX-mode conf-mode)
+  :custom
+  (display-line-numbers-grow-only t)
+  (display-line-numbers-width-start t)
+  ;; (display-line-numbers-type 'relative)
+  )
 
 (setq default-input-method nil)
 
@@ -266,6 +320,51 @@
   ;; the mode `compile-angel-on-load-mode' was activated.
   (compile-angel-on-load-mode 1))
 
+(use-package atom-one-dark-theme :ensure t)
+(use-package lab-themes :ensure t)
+(use-package pache-dark-theme :ensure t)
+(use-package madhat2r-theme :ensure t)
+(use-package thankful-eyes-theme :ensure t)
+
+(setq modus-themes-bold-constructs t)
+(setq modus-themes-italic-constructs t)
+(setq modus-themes-common-palette-overrides
+      '((fg-main "#c2c0a1")
+	(fg-dim "#89806e")
+	(comment bg-added-fringe)
+	(constant cyan)
+	(fnname blue-faint)
+	(fnname-call blue-faint)
+	(docstring yellow-faint)
+        (string red-intense)
+	(preprocessor green)
+	(property yellow)
+	(variable yellow)
+	(variable-use yellow-faint)
+	(type maroon)
+	(keyword blue-intense)
+	(builtin magenta-intense)
+	(bg-mode-line-active "#404040")
+	(bg-mode-line-inactive bg-main)
+	(fg-mode-line-inactive "#89806e")
+	(bg-line-number-active bg-main)
+	(bg-line-number-inactive bg-main)
+	(fg-line-number-inactive bg-active)
+	(border-mode-line-active border)
+	(border-mode-line-inactive border)))
+(defun my-modus-themes-custom-faces (&rest _)
+  (modus-themes-with-colors
+    (custom-set-faces
+     `(font-latex-math-face ((,c :foreground ,gold)))
+     `(font-latex-bold-face ((,c :weight bold :foreground ,magenta-cooler)))
+     `(font-latex-italic-face ((,c :slant italic :foreground ,magenta-cooler)))
+     )))
+
+(add-hook 'enable-theme-functions #'my-modus-themes-custom-faces)
+
+
+(load-theme 'modus-vivendi t)
+
 (use-package which-key :ensure nil
   :commands which-key-mode
   :hook (after-init . which-key-mode)
@@ -362,7 +461,6 @@
 ;;   :config
 ;;   (echo-bar-mode 1))
 
-
 (setq-default default-input-method 'russian-computer) ; add russian-computer to input languages
 
 (use-package reverse-im :ensure t :demand t
@@ -426,13 +524,15 @@
 ;;><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
 ;;
 ;;
-;; C
+;; Bash
+(setq-default sh-basic-offset 4)
 
 ;; LaTeX
 (load "~/.emacs.d/m/l.el" 'no-message)
 (add-to-list 'auto-mode-alist '("\\.tex\\'" . latex-mode))
 (setq tex-default-mode 'latex-mode)
 (setq TeX-force-default-mode t)
+
 
 ;;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;END;
 

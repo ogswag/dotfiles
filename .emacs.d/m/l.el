@@ -67,3 +67,5 @@
     ;; add accent snippets
     :cond #'laas-object-on-left-condition
     "qq" (lambda () (interactive) (laas-wrap-previous-object "sqrt"))))
+
+(add-hook 'LaTeX-mode-hook #'visual-line-mode)
