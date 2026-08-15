@@ -14,7 +14,6 @@ return {
 		opts = {
 			ensure_installed = {
 				"zls", -- Zig Language Server
-				"texlab", -- LaTeX
 				"lua_ls", -- Lua (for editing this config)
 				-- gleam is NOT in Mason; must be installed via `brew install gleam`
 			},
@@ -75,40 +74,6 @@ return {
 						enable_ast_check_diagnostics = true,
 						enable_autofix = true,
 						semantic_tokens = "partial",
-					},
-				},
-			})
-
-			-- gleam: no extra settings needed; `gleam lsp` is in PATH via `brew install gleam`
-
-			vim.lsp.config("texlab", {
-				settings = {
-					texlab = {
-						-- Let vimtex drive compilation; texlab just provides diagnostics + search
-						build = {
-							executable = "latexmk",
-							args = {
-								"-pdf",
-								"-interaction=nonstopmode",
-								"-synctex=1",
-								"%f",
-							},
-							onSave = false,
-							forwardSearchAfter = false,
-						},
-						chktex = { onOpenAndSave = true, onEdit = false },
-						-- Forward search: jump from .tex cursor position to PDF page in Skim
-						forwardSearch = {
-							executable = "displayline", -- Skim's CLI tool
-							args = { "-revert", "%l", "%p", "%f" },
-						},
-						diagnostics = {
-							ignoredPatterns = {
-								"^Underfull",
-								"^Overfull",
-								"specifier changed",
-							},
-						},
 					},
 				},
 			})

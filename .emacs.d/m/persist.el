@@ -1,8 +1,7 @@
 ;;; persist.el --- State that survives restarts -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-;; History, cursor positions, recent files, and keeping buffers in sync with
-;; what is on disk.
+;; history, cursor positions, recent files, auto-revert.
 
 ;;; Code:
 
@@ -17,13 +16,24 @@
   (savehist-additional-variables
    '(kill-ring                        ; clipboard
      register-alist                   ; macros
-     mark-ring global-mark-ring       ; marks
-     search-ring regexp-search-ring))
+     ;; Not `mark-ring': m/edit.el clears it on every `deactivate-mark'.
+     global-mark-ring                 ; marks
+     search-ring regexp-search-ring
+     optex-macro-history              ; m/optex.el: recent macros after \
+     my/tex-symbol-history            ; m/tex-symbols.el
+     my/tex-surround-history
+     my/task-selection                ; m/task.el: which command Run/Build start
+     my/task-user-commands            ; m/task.el: commands added from the picker
+     my/python-env-selection          ; m/py.el: the virtualenv chosen per project
+     my/sar-style                     ; m/sar.el: plain, wildcard or regex
+     my/sar-case-sensitive            ; m/sar.el: the Aa toggle
+     my/sar-whole-word                ; m/sar.el: the ab| toggle
+     my/sar-max-depth                 ; m/sar.el: how far down a folder search goes
+     my/sar-search-file-regexp        ; m/sar.el: which files are read
+     my/sar-replace-file-regexp       ; m/sar.el: which of those are rewritten
+     corfu-history))                  ; m/cmpl.el: candidate ordering
   :init
   (setq history-length 300)
-  ;; Without a per-variable cap the kill-ring inherits `history-length' 300,
-  ;; and every large kill gets written to and re-read from the history file —
-  ;; that is how it grew to 10 MB.
   (put 'kill-ring 'history-length 25))
 
 ;;;; Cursor position per file
@@ -53,10 +63,6 @@
               "-autoloads\\.el$" "autoload\\.el$"))
 
   :config
-  ;; A cleanup depth of -90 ensures that `recentf-cleanup' runs before
-  ;; `recentf-save-list', allowing stale entries to be removed before the list
-  ;; is saved by `recentf-save-list', which is automatically added to
-  ;; `kill-emacs-hook' by `recentf-mode'.
   (add-hook 'kill-emacs-hook #'recentf-cleanup -90))
 
 ;;;; Reverting

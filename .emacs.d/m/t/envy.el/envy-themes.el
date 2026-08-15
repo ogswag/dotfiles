@@ -1,7 +1,6 @@
 ;;; envy-themes.el --- Shared engine for the Envy light themes -*- no-byte-compile: t; lexical-binding: t; -*-
 
-;; Author: ported from envy.nvim (Alexander Zakharov), originally vim-envy by
-;;         Gadzhi Kharkharov.
+;; Author: created by Alexander Zakharov
 ;; URL: https://github.com/ogswag/envy.el
 ;; Package-Requires: ((emacs "30.1"))
 ;; Version: 1.0.0
@@ -10,90 +9,71 @@
 
 ;;; Commentary:
 ;;
-;; Envy is a calm, light theme.  This is an Emacs port of the Neovim
-;; colorscheme `envy.nvim'.  It ships two variants that share one palette and
-;; an identical UI, differing only in how syntax tokens are coloured:
-;;
-;;   envy           minimal / near-monochrome (black fg, bold keywords, grey
-;;                  italic comments, green strings, blue numbers).  The
-;;                  original look.
-;;   envy-colorful  moderate extra syntax colour (purple keywords, blue
-;;                  functions, cyan types, red constants, muted properties).
-;;
-;; This file is the shared engine.  The user-facing themes live in
-;; `envy-theme.el' and `envy-colorful-theme.el', which simply require this and
-;; expand the `envy-themes-deftheme' macro.  Load either with, e.g.:
-;;
-;;   (add-to-list 'custom-theme-load-path "/path/to/envy.el/")
-;;   (load-theme 'envy t)            ; or 'envy-colorful
-;;
-;; The palette is ported verbatim from envy.nvim/lua/envy/palette.lua and the
-;; per-token specs from groups/syntax.lua `M.tokens'.
-
+;; Envy is a light theme made to be as legible as possbile at all times.
 ;;; Code:
 
 (defconst envy-themes-palette
-  '((bg      . "#eeeeee")   ; background
-    (fg      . "#000000")   ; foreground / black
+  '((bg      . "#fefefe")
+    (fg      . "#000000")
     (black   . "#000000")
-    (brblack . "#144E40")   ; muted fg (properties / params in colorful)
+    (brblack . "#144E40")
     (blue    . "#005fd7")
-    (lblue   . "#afd7ff")   ; visual / search / matchparen bg
-    (green   . "#005f00")
+    (lblue   . "#afd7ff")
+    (green   . "#009400")
     (red     . "#d70000")
-    (lred    . "#ffafaf")   ; error bg
-    (orange  . "#d75f00")   ; "yellow" in the original (regexp / warnings)
-    (lyellow . "#ffd787")   ; warning bg
+    (lred    . "#ffafaf")
+    (orange  . "#E16500")
+    (lyellow . "#ffd787")
     (purple  . "#350075")
     (pink    . "#ffafff")
-    (cyan    . "#005670")
-    (lcyan   . "#afd7af")   ; hint bg
+    (cyan    . "#007994")
+    (lcyan   . "#52DFFF")
     (white   . "#ffffff")
-    (grey    . "#6c6c6c")   ; comments
-    (lgrey1  . "#e4e4e4")   ; cursorline / colorcolumn / folds
-    (lgrey2  . "#c6c6c6")   ; nontext / tabline / statuslinenc
-    (lgrey3  . "#b2b2b2"))  ; statusline bg
+    (grey    . "#6c6c6c")
+    (lgrey1  . "#eee")
+    (lgrey2  . "#ddd")
+    (lgrey3  . "#ccc"))
   "The Envy colour palette, ported verbatim from envy.nvim.")
 
 (defun envy-themes--faces (variant)
   "Return the face spec list for VARIANT (`envy' or `colorful').
 Each element is suitable as an argument to `custom-theme-set-faces'."
   (let* ((p envy-themes-palette)
-         (bg		(cdr (assq 'bg p)))
-         (fg		(cdr (assq 'fg p)))
-         (black	(cdr (assq 'black p)))
-         (brblack	(cdr (assq 'brblack p)))
-         (blue		(cdr (assq 'blue p)))
-         (lblue		(cdr (assq 'lblue p)))
-         (green	(cdr (assq 'green p)))
-         (red		(cdr (assq 'red p)))
-         (lred		(cdr (assq 'lred p)))
-         (orange	(cdr (assq 'orange p)))
-         (lyellow	(cdr (assq 'lyellow p)))
-         (purple	(cdr (assq 'purple p)))
-         (cyan		(cdr (assq 'cyan p)))
-         (lcyan		(cdr (assq 'lcyan p)))
-         (white	(cdr (assq 'white p)))
-         (grey		(cdr (assq 'grey p)))
-         (lgrey1	(cdr (assq 'lgrey1 p)))
-         (lgrey2	(cdr (assq 'lgrey2 p)))
-         (lgrey3	(cdr (assq 'lgrey3 p)))
+         (bg            (cdr (assq 'bg p)))
+         (fg            (cdr (assq 'fg p)))
+         (black         (cdr (assq 'black p)))
+         (brblack       (cdr (assq 'brblack p)))
+         (blue          (cdr (assq 'blue p)))
+         (lblue         (cdr (assq 'lblue p)))
+         (green         (cdr (assq 'green p)))
+         (red           (cdr (assq 'red p)))
+         (lred          (cdr (assq 'lred p)))
+         (orange        (cdr (assq 'orange p)))
+         (lyellow       (cdr (assq 'lyellow p)))
+         (purple        (cdr (assq 'purple p)))
+         (cyan          (cdr (assq 'cyan p)))
+         (lcyan         (cdr (assq 'lcyan p)))
+         (white         (cdr (assq 'white p)))
+         (grey  (cdr (assq 'grey p)))
+         (lgrey1        (cdr (assq 'lgrey1 p)))
+         (lgrey2        (cdr (assq 'lgrey2 p)))
+         (lgrey3        (cdr (assq 'lgrey3 p)))
          (colorful (eq variant 'colorful))
          ;; Per-variant token specs
          (tk-keyword (if colorful `(:foreground ,fg :weight bold)
                        `(:foreground ,fg :weight bold)))
-         (tk-func    (if colorful `(:foreground ,blue) `(:foreground ,fg)))
+         (tk-func    `(:foreground "white" :background "#FF4F00"))
          (tk-type    `(:foreground ,cyan))
          (tk-const   `(:foreground ,cyan))
          (tk-string  `(:foreground ,green))
          (tk-number  `(:foreground ,blue))
          ;; `property' and `parameter' share a spec (brblack in colorful);
-	 ;; Emacs has no distinct parameter face, so both use `tk-prop'.
+         ;; Emacs has no distinct parameter face, so both use `tk-prop'.
          (tk-prop    (if colorful `(:foreground ,brblack) `(:foreground ,fg)))
          (tk-op      `(:foreground ,fg))
          (tk-ident   `(:foreground ,fg))
          (tk-special `(:foreground ,fg))
-         (tk-comment `(:foreground "#42668F" :background "#DDE3E9" :slant italic))
+         (tk-comment `(:foreground "#000" :background "#CCFF00"))
          (tk-macro   `(:foreground ,purple))
          (tk-regexp  `(:foreground ,orange)))
     (list
@@ -216,7 +196,7 @@ Each element is suitable as an argument to `custom-theme-set-faces'."
      `(font-lock-doc-markup-face        ((t ,tk-macro)))
      `(font-lock-string-face            ((t ,tk-string)))
      `(font-lock-keyword-face           ((t ,tk-keyword)))
-     `(font-lock-builtin-face           ((t ,tk-keyword)))
+     `(font-lock-builtin-face           ((t (:foreground ,fg :weight bold))))
      `(font-lock-function-name-face     ((t ,tk-func)))
      `(font-lock-function-call-face     ((t ,tk-func)))
      `(font-lock-variable-name-face     ((t ,tk-ident)))
@@ -711,12 +691,12 @@ Each element is suitable as an argument to `custom-theme-set-faces'."
 
      ;; AUCTeX / font-latex
      `(font-latex-math-face         ((t (:foreground ,blue))))
-     `(font-latex-sedate-face       ((t (:foreground ,grey))))
+     `(font-latex-sedate-face       ((t (:foreground ,red))))
      `(font-latex-script-char-face  ((t (:foreground ,grey))))
      `(font-latex-string-face       ((t ,tk-string)))
      `(font-latex-warning-face      ((t (:foreground ,red :weight bold))))
-     `(font-latex-bold-face         ((t (:foreground ,fg :weight bold))))
-     `(font-latex-italic-face       ((t (:foreground ,fg :slant italic))))
+     `(font-latex-bold-face         ((t (:foreground ,green :weight bold))))
+     `(font-latex-italic-face       ((t (:foreground ,green :slant italic))))
      `(font-latex-verbatim-face     ((t (:inherit font-lock-comment-face))))
      `(font-latex-doctex-documentation-face ((t (:inherit font-lock-comment-face))))
      `(font-latex-doctex-preprocessor-face  ((t (:foreground ,purple))))

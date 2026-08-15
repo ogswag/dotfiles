@@ -1,17 +1,13 @@
 ;;; pkg.el --- Package system bootstrap -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-;; Loaded first by init.el.  Everything after this point may assume that
-;; `use-package' is available and that ELPA packages are on `load-path'.
+;; package.el + use-package bootstrap. load this first.
 
 ;;; Code:
 
 (setq use-package-expand-minimally t)
 (setq use-package-minimum-reported-time 0.1)
 (setq use-package-enable-imenu-support t)
-
-(setq package-quickstart-file
-      (expand-file-name "package-quickstart.el" user-emacs-directory))
 
 (setq package-archives '(("melpa"        . "https://melpa.org/packages/")
                          ("gnu"          . "https://elpa.gnu.org/packages/")
@@ -28,9 +24,6 @@
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
-(when (and (version< emacs-version "29.1")
-           (not (package-installed-p 'use-package)))
-  (package-install 'use-package))
 (require 'use-package)
 
 ;; Keep package installation from stealing a window.
@@ -66,12 +59,10 @@
   ;; Set to nil to stop compile-angel from reporting what it compiles.
   (setq compile-angel-verbose t)
 
-  ;; `compile-angel-excluded-files' is obsolete as of compile-angel 1.2.1.
   (dolist (file '("/init.el" "/early-init.el"))
     (push file compile-angel-excluded-path-suffixes))
 
-  ;; Compiles .el files prior to loading them via `load' or `require', and
-  ;; compiles everything already loaded when the mode is switched on.
+  ;; Compiles .el files prior to loading them via `load' or `require'.
   (compile-angel-on-load-mode 1))
 
 ;;; pkg.el ends here

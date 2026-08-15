@@ -1,20 +1,62 @@
 ;;; k.el --- Keybindings -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-;; Loaded last, so every command bound here already exists.
+;; keybindings.
 
 ;;; Code:
 
 (use-package no-wheel
-  :load-path "~/.emacs.d/m/p")
+  :load-path my-vendor-directory)
 
-;;>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
-;;
-;; UNBINDS
-;;>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
-;;
-;; Wheel/trackpad zooming — no-wheel-mode also shadows these, but unbinding
-;; them keeps the global map honest.
+;; Bound below but defined in packages that load earlier; named here so.
+(declare-function my/speedbar-detach "tree" ())
+(declare-function my/speedbar-toggle "tree" ())
+(declare-function my/sar-find "sar" (&optional backward))
+(declare-function my/sar-replace "sar" ())
+(declare-function my/sar-panel-project "sar" ())
+(declare-function my/sar-panel-folder "sar" ())
+(declare-function my/sar-panel-file "sar" ())
+(declare-function my/sar-panel-replace "sar" ())
+(declare-function my/sar-panel-toggle "sar" ())
+(declare-function my/speedbar-reveal "tree" ())
+(declare-function which-key-add-keymap-based-replacements "which-key"
+                  (keymap key replacement &rest more))
+(declare-function my/open-curdir "mac" ())
+(declare-function homebrew-dispatch "homebrew" ())
+(declare-function my/tab-prev "tabs" (&optional n))
+(declare-function my/tab-next "tabs" (&optional n))
+(declare-function my/tab-select "tabs" ())
+(declare-function flymake-show-buffer-diagnostics "flymake" ())
+(declare-function flymake-show-diagnostic "flymake" (pos &optional other-window))
+(declare-function my/format-dwim "fmt" ())
+(declare-function my/add-project "proj" (dir))
+(declare-function my/delete-project "proj" (root))
+(declare-function my/project-discover "proj" (&optional quiet))
+(declare-function my/edit-projects "proj" (&optional generated))
+(declare-function my/term-toggle "term" ())
+(declare-function my/term-new "term" (&optional force-ask))
+(declare-function my/term-new-here "term" ())
+(declare-function my/term-close "term" (&optional session))
+(declare-function my/term-rename "term" (session new-name))
+(declare-function my/term-next "term" (&optional n))
+(declare-function my/term-prev "term" (&optional n))
+(declare-function my/term-select "term" (session))
+(declare-function my/term-focus-list "term" ())
+(declare-function my/term-set-backend "term" (backend))
+(declare-function my/term-cd "term" (directory))
+(declare-function my/task-run "task" (&optional pick))
+(declare-function my/task-build "task" (&optional pick))
+(declare-function my/task-stop "task" ())
+(declare-function my/task-select "task" (kind))
+(declare-function my/task-add "task" (kind &optional ask-directory))
+(declare-function my/task-env-select "task" ())
+(declare-function my/tool-bar-toggle "bar" ())
+(declare-function neofile-new-file-fast "neofile" ())
+(declare-function neofile-new-file-with-type "neofile" ())
+(declare-function imgdrop-insert-image "imgdrop" ())
+(declare-function imgdrop-insert-image-gui "imgdrop" ())
+(declare-function imgdrop-mode "imgdrop" (&optional arg))
+
 (keymap-global-unset "C-M-<wheel-down>" t) ; mouse-wheel-global-text-scale
 (keymap-global-unset "C-M-<wheel-up>" t)   ; mouse-wheel-global-text-scale
 (keymap-global-unset "C-<wheel-down>" t)   ; mouse-wheel-text-scale
@@ -24,7 +66,7 @@
 (keymap-global-unset "C-M-<mouse-5>")      ; mouse-wheel-global-text-scale down
 (keymap-global-unset "C-M-<mouse-4>")      ; mouse-wheel-global-text-scale up
 
-;; Secondary selection — too easy to trigger by accident.
+;; Secondary selection - too easy to trigger by accident.
 (keymap-global-unset "<mouse-2>")          ; middle click secondary yank
 (keymap-global-unset "M-<mouse-1>")        ; set secondary selection start
 (keymap-global-unset "M-<mouse-3>")        ; set secondary selection end
@@ -43,12 +85,6 @@
 
 (keymap-global-unset "C-M-/" t)
 
-;;>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
-;;
-;; GENERAL
-;;>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
-;;
-;; Case conversion: dwim variants act on the region when there is one.
 (keymap-global-set "M-l" #'downcase-dwim)    ; downcase-word
 (keymap-global-set "M-u" #'upcase-dwim)      ; upcase-word
 (keymap-global-set "M-c" #'capitalize-dwim)  ; capitalize-word
@@ -65,15 +101,32 @@
 (keymap-global-set "s-S" #'write-file)
 (keymap-global-set "s-l" #'my/mark-line)
 (keymap-global-set "s-L" #'goto-line)
-(keymap-global-set "s-f" #'isearch-forward)
-(keymap-global-set "s-F" #'isearch-backward)
+(keymap-global-set "s-f" #'my/sar-find)            ; isearch, with m/sar.el's styles
+(keymap-global-set "s-F" #'my/sar-panel-project)   ; the side panel, over the project
 (keymap-global-set "s-g" #'isearch-repeat-forward)
-(keymap-global-set "s-w" #'delete-window)
+(keymap-global-set "s-r" #'my/sar-replace)         ; the side panel, over this buffer
+(keymap-global-set "s-R" #'my/sar-panel-replace)   ; the side panel, replacement focused
+(keymap-global-set "s-t" #'neofile-new-file-fast)
+(keymap-global-set "s-w" #'tab-close)
 (keymap-global-set "s-W" #'delete-frame)
-(keymap-global-set "s-n" #'make-frame-command)
+(keymap-global-set "s-q" #'save-buffers-kill-emacs)
+(keymap-global-set "s-Q" #'restart-emacs)
+(keymap-global-set "s-n" #'neofile-new-file-fast)
+(keymap-global-set "s-N" #'neofile-new-file-with-type)
 (keymap-global-set "s-m" #'iconify-frame)
 (keymap-global-set "s-`" #'other-frame)
 (keymap-global-set "C-s-f" #'toggle-frame-fullscreen)
+
+;;;; Undo
+
+(keymap-global-set "<remap> <undo>" #'undo-fu-only-undo)
+(keymap-global-set "<remap> <undo-redo>" #'undo-fu-only-redo)
+
+(dotimes (i 9)
+  (keymap-global-set (format "s-%d" (1+ i)) #'my/tab-select))
+
+(keymap-global-set "C-<tab>" #'my/tab-next)
+(keymap-global-set "C-S-<tab>" #'my/tab-prev)
 
 (keymap-global-set "C-=" #'text-scale-increase)
 (keymap-global-set "C--" #'text-scale-decrease)
@@ -93,14 +146,6 @@
 (keymap-global-unset "C-/")
 (keymap-global-set "C-/" #'comment-line)
 
-;;>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
-;;
-;; SET ARROW KEYS IN ISEARCH
-;; left/right is backward/forward.
-;; up/down is search history.
-;; This way, searching forward/backward is just one single key press, no key combination.
-;;>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
-;;
 (keymap-set isearch-mode-map "<up>" #'isearch-ring-retreat)
 (keymap-set isearch-mode-map "<down>" #'isearch-ring-advance)
 
@@ -116,14 +161,6 @@
 (keymap-set minibuffer-local-map "C-p" #'previous-line-or-history-element)
 (keymap-set minibuffer-local-map "C-n" #'next-line-or-history-element)
 
-;;>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
-;;
-;; WORD MOTION
-;; viper's notion of a word stops at punctuation boundaries the way vi does,
-;; which is less jumpy than `forward-word'.  Autoloaded rather than required,
-;; so viper is only pulled in on first use.
-;;>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
-;;
 (autoload 'viper-forward-word "viper-cmd" nil t)
 (autoload 'viper-backward-word "viper-cmd" nil t)
 
@@ -154,9 +191,6 @@
   (interactive "p")
   (delete-region (point) (progn (viper-forward-word arg) (point))))
 
-;; Without this `delete-selection-mode' ignores them, so with a region up they
-;; would eat a word and leave the selection behind.  `shift-select-mode' is
-;; `permanent' (see m/edit.el), so regions linger and that case is common.
 (put 'my/backward-delete-word 'delete-selection 'supersede)
 (put 'my/forward-delete-word 'delete-selection 'supersede)
 
@@ -165,28 +199,15 @@
 (keymap-global-set "M-d" #'my/forward-delete-word)
 (keymap-global-set "C-<delete>" #'my/forward-delete-word)
 
-;;>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
-;;
-;; COMMANDS
-;;>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
-;;
 (defun my/mark-line (&optional arg allow-extend)
-  "Mark ARG whole lines, trailing newline included.
-
-Mark goes to the beginning of the current line, point to the beginning
-of the line after the last one marked.  A negative ARG marks upward.
-
-Repeating the command -- e.g. hitting its key again -- or invoking it
-with an active region grows the selection by ARG lines instead of
-starting over, snapping both ends to line boundaries."
+  "Mark ARG whole lines, trailing newline included."
   (interactive "P\np")
   (if (and allow-extend
            (or (and (eq last-command this-command) (mark t))
                (use-region-p)))
       (let* ((backward (< (point) (mark)))
              (n (if arg (prefix-numeric-value arg) (if backward -1 1))))
-        ;; Keep the anchor on a line boundary, in case the region came
-        ;; from somewhere else (mouse drag, C-SPC, ...).
+        ;; Keep the anchor on a line boundary.
         (set-mark (save-excursion
                     (goto-char (mark))
                     (line-beginning-position (if backward 2 1))))
@@ -196,18 +217,7 @@ starting over, snapping both ends to line boundaries."
       (goto-char (line-beginning-position (if (> n 0) (1+ n) (+ 2 n)))))))
 
 (defun my/keyboard-quit-dwim ()
-  "Do-What-I-Mean behaviour for a general `keyboard-quit'.
-
-The generic `keyboard-quit' does not do the expected thing when
-the minibuffer is open.  Whereas we want it to close the
-minibuffer, even without explicitly focusing it.
-
-The DWIM behaviour of this command is as follows:
-
-- When the region is active, disable it.
-- When a minibuffer is open, but not focused, close the minibuffer.
-- When the Completions buffer is selected, close it.
-- In every other case use the regular `keyboard-quit'."
+  "DWIM `keyboard-quit': deactivate the region, close an unfocused minibuffer, close the Completions buffer, or fall back to `keyboard-quit'."
   (interactive)
   (cond
    ((region-active-p)
@@ -221,43 +231,129 @@ The DWIM behaviour of this command is as follows:
 
 (keymap-global-set "C-g" #'my/keyboard-quit-dwim)
 
-;;>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
-;;
-;; TURN FORWARD SLASH INTO A LEADER KEY
-;; "/" itself is rebound to self-insert inside the map, so typing a literal
-;; slash is "//".
-;;>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<
-;;
-(define-prefix-command 'my-fwdslash-map)
-(keymap-global-set "/" 'my-fwdslash-map)
+(define-prefix-command 'my-leader-map)
 
-(keymap-set my-fwdslash-map "/" #'self-insert-command)
+(keymap-global-set "<escape>" 'my-leader-map)
 
-(keymap-set my-fwdslash-map "a" #'align-regexp)
+(keymap-set minibuffer-local-map "<escape>" #'abort-minibuffers)
 
-(keymap-set my-fwdslash-map "b b" #'switch-to-buffer)
-(keymap-set my-fwdslash-map "b k" #'kill-current-buffer)
+;;;; Meta
+(keymap-set my-leader-map "SPC" #'execute-extended-command)
+(keymap-set my-leader-map "x" #'execute-extended-command)
+(keymap-set my-leader-map "g" #'my/keyboard-quit-dwim)
+(keymap-set my-leader-map "a" #'align-regexp)
+(keymap-set my-leader-map "/" #'isearch-forward)
+(keymap-set my-leader-map "L" #'list-packages)
 
-(keymap-set my-fwdslash-map "c c" #'compile)
-(keymap-set my-fwdslash-map "c r" #'recompile)
+;;;; Explorer (speedbar)
+(keymap-set my-leader-map "e" #'my/speedbar-toggle)  ; open docked / close
+(keymap-set my-leader-map "E" #'my/speedbar-reveal)  ; reveal file
 
-(keymap-set my-fwdslash-map "f f" #'find-file)
-(keymap-set my-fwdslash-map "f r" #'recentf-open)
+;;;; Find / files
+(keymap-set my-leader-map "f f" #'find-file)
+(keymap-set my-leader-map "f r" #'recentf-open)
+(keymap-set my-leader-map "f b" #'switch-to-buffer)
+(keymap-set my-leader-map "f h" #'describe-symbol)
+(keymap-set my-leader-map "f d" #'flymake-show-buffer-diagnostics)
+(keymap-set my-leader-map "f n" #'neofile-new-file-fast)
+(keymap-set my-leader-map "f t" #'neofile-new-file-with-type)  ; asks for a type
 
-(keymap-set my-fwdslash-map "g" #'my/keyboard-quit-dwim)
+;;;; Images (m/p/imgdrop.el)
+(keymap-set my-leader-map "i i" #'imgdrop-insert-image)      ; picker, with preview
+(keymap-set my-leader-map "i g" #'imgdrop-insert-image-gui)  ; macOS file panel
+(keymap-set my-leader-map "i d" #'imgdrop-mode)              ; arm/disarm dropping
 
-(keymap-set my-fwdslash-map "r r" #'replace-regexp)
-(keymap-set my-fwdslash-map "r s" #'replace-string)
+;;;; Buffers
+(keymap-set my-leader-map "b b" #'switch-to-buffer)
+(keymap-set my-leader-map "b p" #'switch-to-buffer)
+(keymap-set my-leader-map "b d" #'kill-current-buffer)
+(keymap-set my-leader-map "b k k" #'kill-current-buffer)
+(keymap-set my-leader-map "b k w" #'kill-buffer-and-window)
 
-(keymap-set my-fwdslash-map "m m" #'set-mark-command)
-(keymap-set my-fwdslash-map "m b" #'bookmark-set)
-(keymap-set my-fwdslash-map "m j" #'bookmark-jump)
+;;;; Projects  (see m/proj.el)
+(keymap-set my-leader-map "p p" #'project-switch-project)
+(keymap-set my-leader-map "p f" #'project-find-file)
+(keymap-set my-leader-map "p g" #'project-find-regexp)
+(keymap-set my-leader-map "p b" #'project-switch-to-buffer)
+(keymap-set my-leader-map "p d" #'project-find-dir)
+(keymap-set my-leader-map "p c" #'project-compile)
+(keymap-set my-leader-map "p a" #'my/add-project)
+(keymap-set my-leader-map "p r" #'my/delete-project)
+(keymap-set my-leader-map "p s" #'my/project-discover)  ; scan
+(keymap-set my-leader-map "p e" #'my/edit-projects)
 
-(keymap-set my-fwdslash-map "x" #'execute-extended-command)
+;;;; Code
+(keymap-set my-leader-map "c c" #'compile)
+(keymap-set my-leader-map "c r" #'recompile)
+(keymap-set my-leader-map "c f" #'my/format-dwim)
+(keymap-set my-leader-map "c d" #'flymake-show-diagnostic)
+(keymap-set my-leader-map "c a" #'xref-find-apropos)
 
-(keymap-set my-fwdslash-map "1" #'shell-command)
-(keymap-set my-fwdslash-map "2" #'async-shell-command)
+;; Run/build per language (m/task.el).  `c c' and `c r' above stay what they
+(keymap-set my-leader-map "c R" #'my/task-run)
+(keymap-set my-leader-map "c b" #'my/task-build)
+(keymap-set my-leader-map "c s" #'my/task-stop)
+(keymap-set my-leader-map "c t" #'my/task-select)
+(keymap-set my-leader-map "c n" #'my/task-add)      ; new command
+(keymap-set my-leader-map "c e" #'my/task-env-select) ; m/py.el answers this
 
-(keymap-set my-fwdslash-map "3" #'my/open-curdir)  ; defined in m/mac.el
+;;;; Replace / rename
+(keymap-set my-leader-map "r r" #'replace-regexp)
+(keymap-set my-leader-map "r s" #'replace-string)
+(keymap-set my-leader-map "r n" #'xref-find-references)
+;; m/sar.el's panel: p over the project.
+(keymap-set my-leader-map "r p" #'my/sar-panel-project)
+(keymap-set my-leader-map "r f" #'my/sar-panel-folder)
+(keymap-set my-leader-map "r b" #'my/sar-panel-file)
+(keymap-set my-leader-map "r t" #'my/sar-panel-toggle)
+
+;;;; Mark and bookmarks
+(keymap-set my-leader-map "m m" #'set-mark-command)
+(keymap-set my-leader-map "m b" #'bookmark-set)
+(keymap-set my-leader-map "m j" #'bookmark-jump)
+
+;;;; Windows
+(keymap-set my-leader-map "w d d" #'delete-window)
+(keymap-set my-leader-map "w d o" #'delete-other-windows)
+(keymap-set my-leader-map "w s" #'split-window-below)
+(keymap-set my-leader-map "w v" #'split-window-right)
+(keymap-set my-leader-map "w t" #'my/tool-bar-toggle)  ; m/bar.el
+
+;;;; Shell
+(keymap-set my-leader-map "1" #'shell-command)
+(keymap-set my-leader-map "2" #'async-shell-command)
+(keymap-set my-leader-map "3" #'my/open-curdir)  ; defined in m/mac.el
+
+;;;; Terminal panel (m/term.el)
+(keymap-set my-leader-map "t t" #'my/term-toggle)
+(keymap-set my-leader-map "t n" #'my/term-new)
+(keymap-set my-leader-map "t N" #'my/term-new-here)  ; no project question
+(keymap-set my-leader-map "t k" #'my/term-close)
+(keymap-set my-leader-map "t r" #'my/term-rename)
+(keymap-set my-leader-map "t s" #'my/term-select)
+(keymap-set my-leader-map "t l" #'my/term-focus-list)
+(keymap-set my-leader-map "t ]" #'my/term-next)
+(keymap-set my-leader-map "t [" #'my/term-prev)
+(keymap-set my-leader-map "t b" #'my/term-set-backend)
+(keymap-set my-leader-map "t d" #'my/term-cd)
+
+(keymap-global-set "C-`" #'my/term-toggle)
+
+;;;; Homebrew (macOS)
+(keymap-set my-leader-map "o h" #'homebrew-dispatch)
+
+(with-eval-after-load 'which-key
+  (which-key-add-keymap-based-replacements my-leader-map
+    "b" "buffer"
+    "c" "code"
+    "f" "find/files"
+    "i" "image"
+    "m" "mark/bookmark"
+    "o" "os"
+    "o h" "Homebrew menu"
+    "p" "project"
+    "r" "replace"
+    "t" "terminal"
+    "w" "window"))
 
 ;;; k.el ends here

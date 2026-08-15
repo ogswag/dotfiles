@@ -36,5 +36,8 @@ if [[ $os == "Linux" ]]; then
 elif [[ $os == "Darwin" ]]; then
 	alias l='gls -AF --group-directories-first --color=always'
 	alias ll='gls -lAhF --group-directories-first --time-style=long-iso --color=always'
-    alias v='vim'
+    alias v='nvim'
+    alias vim='nvim'
+    alias nv='nvim'
+    alias n='nvim'
 fi

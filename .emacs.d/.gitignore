@@ -1,27 +1,12 @@
-# Generated / machine-local state — nothing here belongs in the repo.
+# Generated / machine-local state - nothing here belongs in the repo.
 
-# Packages
-elpa/
-package-quickstart.el
-package-quickstart.el.eln
+# All machine-local package/session state -- see the `user-emacs-directory'
+# redirect in init.el (elpa, eln-cache, tree-sitter, transient,
+# auto-save-list, eshell, recentf, savehist, save-place, project lists...).
+local/
 
 # Compilation output
 *.elc
-eln-cache/
-
-# Persisted session state
-history
-places.eld
-recentf.eld
-*.eld
-auto-save-list/
-undo-fu-session/
-transient/
-tramp
-url/
-
-# Set by Custom, machine-specific
-custom.el
 
 # Backups / autosaves, in case the "off" settings ever change
 *~

@@ -1,11 +1,14 @@
 ;;; mac.el --- macOS integration and input methods -*- lexical-binding: t; -*-
 
+;;; Commentary
+;; macOS related options.
+
 ;;; Code:
 
 ;;;; Modifiers
 
 (setq mac-option-modifier 'meta)
-(setq mac-right-option-modifier 'meta)
+(setq mac-right-option-modifier '(:function alt :mouse alt))
 (setq mac-command-modifier 'super)
 (setq mac-right-command-modifier 'super)
 
@@ -18,12 +21,9 @@
 (setq-default default-input-method 'russian-computer)
 
 ;; emacs-mac: fall back to ASCII input for key sequences, so C-x etc. keep
-;; working while a non-Latin input source is active.
 (when (fboundp 'mac-auto-ascii-mode)
   (mac-auto-ascii-mode 1))
 
-;; Makes Emacs bindings work under a Russian system layout by translating
-;; keys back through the input method.
 (use-package reverse-im :ensure t :demand t
   :custom
   (reverse-im-input-methods '("russian-computer"))
@@ -39,5 +39,26 @@
                       (file-name-directory buffer-file-name))
                  default-directory)))
     (shell-command (concat "open " (shell-quote-argument dir)))))
+
+;;;; Homebrew
+
+(use-package homebrew
+  :load-path my-vendor-directory
+  :if (eq system-type 'darwin)
+  :defer t
+  :commands (homebrew-status
+             homebrew-dispatch
+             homebrew-search
+             homebrew-info
+             homebrew-install
+             homebrew-uninstall
+             homebrew-upgrade
+             homebrew-upgrade-all
+             homebrew-update))
+
+(add-to-list 'display-buffer-alist
+             '("\\`\\*homebrew\\(?:-[^*]*\\)?\\*\\'"
+               (display-buffer-reuse-window display-buffer-below-selected)
+               (window-height . 0.4)))
 
 ;;; mac.el ends here

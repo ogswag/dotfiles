@@ -1,0 +1,42 @@
+#+TITLE: Tables
+#+OPTIONS: toc:nil num:nil
+
+~C-c t~ / ~C-c m~ in ~m/tbl.el~. Type an org table, convert to tex when done.
+
+* Loop
+
+1. ~C-c t~ - start table (in math -> matrix prompts)
+2. edit with orgtbl keys
+3. ~C-c C-c~ - dump tex, key goes back to TeX-command-master
+
+* Output
+
+| Where        | Result                          |
+|--------------+---------------------------------|
+| optex, text  | ~\table{SPEC}{...}~             |
+| latex, text  | ~\begin{tabular}{SPEC}...~      |
+| optex, math  | ~\pmatrix~ etc                  |
+| latex, math  | ~\begin{pmatrix}...~            |
+
+Math check is ~my/math-in-math-p~. Force dialect with ~my/tex-table-dialect~.
+
+* Keys
+
+| Key           | What                        |
+|---------------+-----------------------------|
+| ~C-c t~       | start table                 |
+| ~C-u 4 C-c t~ | 4 body rows                 |
+| ~C-c m~       | start matrix                |
+| ~C-c C-c~     | convert at point            |
+
+* Orgtbl (while editing)
+
+| Key                      | What            |
+|--------------------------+-----------------|
+| ~TAB~ / ~S-TAB~          | next/prev field |
+| ~RET~                    | next row        |
+| ~M-<left/right/up/down>~ | move col/row    |
+| ~M-S-<right/left>~       | insert/del col  |
+| ~M-S-<down/up>~          | insert/kill row |
+| ~C-c -~                  | hline           |
+| ~S-RET~                  | copy field down |

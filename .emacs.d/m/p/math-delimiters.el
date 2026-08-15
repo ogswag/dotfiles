@@ -22,39 +22,7 @@
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-
-;; This package provides the command `math-delimiters-insert' to
-;; insert TeX/LaTeX math delimiters. This command is meant to be bound
-;; to $ in buffers where the user wants to use it. The author, for
-;; example, binds it in `LaTeX-mode-map' and in `org-mode-map'.
-;;
-;; Note that the excellent `cdlatex' includes a `cdlatex-dollar'
-;; command that it binds to $.  Users of both packages will probably
-;; want to unbind $ in `cdlatex-mode-map'.
-;;
-;; The delimiters used for inline math and display math by
-;; `math-delimiters-insert' are customizable, defaulting to \(...\) and
-;; \[...\] respectively.  A command `math-delimiters-toggle' is
-;; provided to quickly toggle between $...$ and \(...\) for inline
-;; math and between $$...$$ and \[...\] for display math.
-;;
-;; By default, inline math is translated into display math with no
-;; additional line breaks. This can be modified by setting
-;; `math-delimiters-compressed-display-math' to `nil'. For example,
-;; expression of the form \(...\) will then be translated to
-;; \n\[\n...\n\]\n.
-;;
-;; When translating inline math to display math, often it is desirable
-;; to include punctuation into the display math and exclude it from of
-;; the inline math environment. For that purpose, the variable
-;; `math-delimiters-include-characters' is available; it takes a list of
-;; characters to act upon.  For example, setting it to (list ?.) and
-;; then toggling to display math on the expression "\(\eta\)." would
-;; turn it into "\[\eta.\]" .
-;;
-;; Finally, a command `math-delimiters-no-dollars' is provided to
-;; replace all $...$ and $$...$$ delimiters with \(...\) and \[...\],
-;; respectively.
+;; insert/cycle tex math delimiters on $. upstream: oantolin/math-delimiters.
 
 ;;; Code:
 

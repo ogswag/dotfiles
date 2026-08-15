@@ -1,0 +1,96 @@
+#+TITLE: Search and Replace
+#+OPTIONS: toc:nil num:nil
+
+~m/sar.el~. One matcher, two front ends: an isearch in the buffer, a panel over
+a folder or a project. The panel is a ~sidepanel~ (~m/p/sidepanel.el~), on the
+right.
+
+* Keys
+
+| Key             | What                                       |
+|-----------------+--------------------------------------------|
+| ~s-f~           | search this buffer (isearch)               |
+| ~s-F~           | panel, over the project                    |
+| ~s-r~           | panel, over this buffer                    |
+| ~s-R~           | panel, point in the replacement            |
+| ~<escape> r p~  | panel, over the project                    |
+| ~<escape> r f~  | panel, over this file's folder             |
+| ~<escape> r b~  | panel, over this buffer                    |
+| ~<escape> r t~  | show/hide the panel                        |
+
+In the panel: ~TAB~ / ~S-TAB~ between fields, ~RET~ in a field runs the search,
+~RET~ on a row opens it, ~TAB~ on a file heading collapses it, ~n~ / ~p~ between
+rows, ~M-n~ / ~M-p~ between files, ~g~ re-runs, ~q~ hides. ~C-c C-c~ search,
+~C-c C-r~ replace all, ~C-c C-s~ save all, ~C-c C-k~ revert all.
+
+Single letters work only over the results - in a field they type.
+
+* Styles
+
+| Style      | ~a.b~ matches | Notes                            |
+|------------+---------------+----------------------------------|
+| ~plain~    | ~a.b~         | literal; replacement literal too |
+| ~wildcard~ | ~a.b~         | only ~*~ and ~?~ are special     |
+| ~regex~    | ~axb~, ~a.b~  | PCRE as written elsewhere        |
+
+~regex~ is translated by =pcre2el=. Groups are ~(a|b)~, repeats ~{2,4}~, and
+~\d \w \s \b~ mean what they do everywhere else. ~\Q..\E~, ~(?#comments)~, the
+~s~ and ~x~ flags and POSIX classes work too.
+
+*Not supported*, because Emacs's regexp engine has no equivalent and a pattern
+that meant two different things in the buffer and the panel would be worse:
+lookaround (~(?=~ ~(?!~ ~(?<=~ ~(?<!~), named groups, ~\p{...}~, atomic groups
+and possessive quantifiers. Each is refused with a message saying which.
+
+* Replacement
+
+~$1~ or ~${1}~ for a group, ~$&~ or ~$0~ for the whole match, ~$$~ for a
+dollar, ~\n~ and ~\t~ for the characters. Emacs's own ~\1~ works as well. In
+~plain~ style the replacement goes in exactly as typed.
+
+* Scope, depth and filters
+
+Scope is ~file~ / ~folder~ / ~project~, and the radio row names the folder and
+the project it would actually search, so there is no guessing which is which.
+An active region forces ~file~ and confines both search and replace to it.
+
+~⌄ more~ opens three fields:
+
+| Field       | What                                          |
+|-------------+-----------------------------------------------|
+| ~depth~     | levels below the root; blank means no limit   |
+| ~search~    | regex on the relative path; only these read   |
+| ~replace~   | regex on the relative path; only these written |
+
+The two filters are separate on purpose: you can search ~\.el$~ but rewrite only
+~^m/~. Files the replace filter excludes still show their matches, greyed and
+marked with a lock, and Replace All steps over them.
+
+Folder and project scans shell out to ~rg~, which is required for them. It only
+answers /which file, which line, what does the line say/ - every match position
+is worked out again with Emacs's own engine, so nothing depends on the two
+agreeing and there is no byte arithmetic to get wrong on a non-ASCII line.
+
+~my/sar-rg-extra-arguments~ defaults to ~--hidden --glob !.git/~. The ~--hidden~
+matters: ripgrep skips dot-directories by default, so a project living in one -
+~~/dotfiles/.emacs.d~, say - would return nothing at all. Version-control
+ignores still apply.
+
+* Replace and undo
+
+Replacements land in buffers and are *left unsaved*. ~Save All~ is the commit
+point; ~Revert All~ throws them away.
+
+Each file is edited between a pair of ~undo-boundary~, so one ~s-z~ in a file
+takes back all of its replacements. The whole multi-file walk sits in one change
+group, so an error or ~C-g~ part way through rolls back /every/ file rather than
+leaving a project half rewritten.
+
+Backups and autosave are both off (~m/edit.el~) and ~undo-fu-session~ only
+persists saved files, so an unsaved replace set does not survive a crash.
+
+* Live or not
+
+The buffer search is live - it re-runs as you type, highlights every match, and
+counts them. Folder and project searches wait for ~RET~ or ~Find~: each one
+spawns ~rg~, and doing that per keystroke would thrash.

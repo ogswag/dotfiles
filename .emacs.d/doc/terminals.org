@@ -1,0 +1,27 @@
+#+TITLE: Terminals
+#+OPTIONS: toc:nil num:nil
+
+Backends for ~my/term-backend~ (~m/term.el~). Config actually uses ~ghostel~;
+~term~ is just the safe default if nothing else is installed.
+
+* Cheat sheet
+
+| Package   | What                | Deps        | Speed   | TUI      | Notes          |
+|-----------+---------------------+-------------+---------+----------+----------------|
+| ~term~    | lisp vt100          | none        | slow    | yes      | built-in       |
+| ~shell~   | comint, TERM=dumb   | none        | fast    | no       | built-in       |
+| ~eshell~  | elisp shell         | none        | ok      | via term | tramp king     |
+| ~vterm~   | libvterm            | cmake + C   | fastest | yes      |                |
+| ~ghostel~ | libghostty-vt       | prebuilt    | fastest | yes      | what I run     |
+| ~eat~     | lisp emulator       | nongnu elpa | good    | yes      | upstream quiet |
+| ~mistty~  | term + edit overlay | elpa        | term's  | yes      |                |
+
+* Setup
+
+#+begin_src elisp
+  (setopt my/term-backend 'ghostel)
+#+end_src
+
+Or ~<escape> t b~ for the session. Existing sessions keep their backend.
+
+Missing package -> ~user-error~, nothing else breaks.
