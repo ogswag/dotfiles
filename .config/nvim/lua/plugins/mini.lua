@@ -3,10 +3,10 @@
 return {
 	-- Icons provider. Replaces nvim-web-devicons: faster, better maintained.
 	-- mock_nvim_web_devicons() makes plugins that `require("nvim-web-devicons")`
-	-- (lualine, neo-tree, bufferline, telescope) transparently use mini.icons.
+	-- (lualine, bufferline, telescope) transparently use mini.icons.
 	{
 		"echasnovski/mini.icons",
-		lazy = false, -- needed early by statusline/tabline/tree at startup
+		lazy = false, -- needed early by statusline/tabline at startup
 		opts = {},
 		config = function(_, opts)
 			require("mini.icons").setup(opts)
@@ -31,29 +31,11 @@ return {
 		opts = {},
 	},
 
-	-- Snippet engine. Wired into blink.cmp via snippets.preset = "mini_snippets"
-	-- (see lua/plugins/completion.lua), so snippets show up in the completion
-	-- popup alongside LSP items.
-	{
-		"echasnovski/mini.snippets",
-		dependencies = {
-			-- Community-maintained prewritten snippets (VSCode-style JSON).
-			-- mini.snippets reads them off the runtimepath via gen_loader.from_lang().
-			"rafamadriz/friendly-snippets",
-		},
-		event = "InsertEnter",
-		config = function()
-			local snippets = require("mini.snippets")
-			snippets.setup({
-				snippets = {
-					-- Your own global snippets, if you create the file (optional).
-					snippets.gen_loader.from_file("~/.config/nvim/snippets/global.json"),
-					-- Per-language snippets from friendly-snippets + ~/.config/nvim/snippets/<lang>.
-					snippets.gen_loader.from_lang(),
-				},
-			})
-		end,
-	},
+	-- NOTE: the snippet engine is LuaSnip, not mini.snippets -- see
+	-- lua/plugins/completion.lua. mini.snippets cannot auto-expand (its own docs:
+	-- "'LuaSnip' can autoexpand snippets, while this module always requires" a
+	-- keypress), which rules out the regex math abbreviations used for ConTeXt.
+
 	{
 		"echasnovski/mini.bufremove",
 		lazy = false,

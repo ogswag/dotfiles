@@ -14,7 +14,6 @@
 
 ;;;; Chrome
 
-(tool-bar-mode -1)
 (context-menu-mode t)
 (column-number-mode t)
 (size-indication-mode t)
@@ -126,49 +125,69 @@
 
 (require 'icons)
 
-(defface my/outline-margin '((t nil))
-  "Face for the outline fold markers in the margin.
-Colour only.  No `:family': the markers are images now, and the characters
-behind them are ones every font has -- see below."
-  :group 'outline)
+;; The markers are characters, and Emacs's own are images.
+;;
+;; An image in the margin has to be told how big to be, and every way of
+;; telling it turned out to be either wrong or unfollowable.  `:width font'
+;; -- the stock answer -- reads the *frame's* font, so it ignores
+;; `text-scale-adjust' entirely.  `:height line' does follow the window, and is
+;; a whole line tall, which for a fold marker is enormous.  And anything in
+;; between has to be recomputed and the buttons re-placed on every scale step,
+;; because `outline-minor-mode' builds the marker strings once into
+;; `outline--button-icons' and copies them from then on.
+;;
+;; A character needs none of that.  It is drawn in the buffer's own font at the
+;; buffer's own size, so it follows `text-scale-adjust' the way the text does --
+;; not because anything recomputes it, but because there is no size to
+;; recompute.  The small triangles rather than the full-size ones: U+25BE is
+;; already what `my/tool-bar-pick-glyph' uses, so it is known to be in the
+;; family here, and a gutter marker wants to be smaller than the text beside
+;; it, not equal to it.  `icon-string' drops a `symbol' variant whose glyph is
+;; not displayable, so a terminal that cannot draw them falls through to the
+;; ASCII pair on its own.
 
+(defface my/outline-margin '((t :inherit line-number))
+  "Face for the outline fold markers in the margin.
+`line-number', so a marker reads as part of the same gutter the line numbers
+are in rather than as buffer text.  Colour and weight only, never a size or a
+family: the markers are characters, and taking the buffer's own font is exactly
+what makes them scale with it."
+  :group 'outline)
 
 (with-eval-after-load 'outline
   (define-icon outline-open-in-margins nil
-    '((image "outline-open.svg" "outline-open.pbm" :height line)
-      (symbol "▼" :face my/outline-margin)
-      (text "v"))
+    '((symbol "▾" :face my/outline-margin)
+      (text "v" :face my/outline-margin))
     "Opened-section marker in the margin.
-An image, so it is the same marker in every font; sized per window, so it
-follows `text-scale-adjust'."
+A character, so it scales with the text and cannot be out of proportion to it."
+    ;; Unquoted: `define-icon' quotes the whole keyword list itself.
     :group outline
     :version "31.1")
 
   (define-icon outline-close-in-margins nil
-    '((image "outline-open.svg" "outline-open.pbm" :height line :rotation -90)
-      (symbol "▶" :face my/outline-margin)
-      (text ">"))
+    '((symbol "▸" :face my/outline-margin)
+      (text ">" :face my/outline-margin))
     "Closed-section marker in the margin.
-The opened marker turned a quarter turn, which is how Emacs's own default
-draws it."
+The opened marker turned a quarter turn, as Emacs's own default draws it."
     :group outline
     :version "31.1"))
 
 (defvar outline--margin-width)
 (defvar outline--use-rtl)
-(defvar outline--button-icons)
-(declare-function outline--create-button-icons "outline" ())
-(declare-function outline--fix-buttons "outline" (&optional beg end))
 
 (defun my/outline-refit-margin ()
-  "Redraw the outline markers at the buffer's current text scale."
+  "Widen the outline margin to fit the marker at this buffer's text scale.
+
+The marker itself needs no help -- it is a character, and characters grow with
+the buffer.  The margin holding it does: `left-margin-width' counts columns of
+the *frame's* font, which a buffer-local text scale does not touch, so a marker
+that has grown is clipped by a margin that has not.  `string-pixel-width' is
+passed the buffer so it measures the marker as that buffer draws it, scale and
+all."
   (when (and (bound-and-true-p outline-minor-mode)
              (eq outline-minor-mode-use-buttons 'in-margins)
              outline--margin-width
              (not outline--use-rtl))
-    ;; Rebuild at the size in force now, then re-place every button from them.
-    (setq-local outline--button-icons (outline--create-button-icons))
-    (outline--fix-buttons (point-min) (point-max))
     (let ((new (max 1 (ceiling (/ (string-pixel-width
                                    (icon-string 'outline-open-in-margins)
                                    (current-buffer))
@@ -176,10 +195,10 @@ draws it."
       (unless (= new outline--margin-width)
         (setq-local left-margin-width
                     (+ (- left-margin-width outline--margin-width) new))
-        (setq outline--margin-width new))
-      ;; Margins are read when a buffer is put in a window.
-      (when (eq (current-buffer) (window-buffer))
-        (set-window-buffer nil (window-buffer))))))
+        (setq outline--margin-width new)
+        ;; Margins are read when a buffer is put in a window, not on redisplay.
+        (when (eq (current-buffer) (window-buffer))
+          (set-window-buffer nil (window-buffer)))))))
 
 (add-hook 'text-scale-mode-hook #'my/outline-refit-margin)
 

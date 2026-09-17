@@ -16,9 +16,9 @@
 
 (setq valve-olive-contrast-comments t)
 
-(defvar my/dark-theme 'modus-vivendi)
+(defvar my/dark-theme 'wombat)
 
-(defvar my/light-theme 'envy)
+(defvar my/light-theme 'leuven)
 
 (defun my/system-dark-p ()
   "Non-nil if macOS is in dark mode, nil otherwise (including non-Mac builds)."

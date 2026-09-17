@@ -3,3 +3,4 @@
 .zsh/completion/_uv
 .config/nvim/lazy-lock.json
 .DS_Store
+.emacs.d/icons.bak/

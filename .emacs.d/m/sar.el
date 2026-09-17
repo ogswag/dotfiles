@@ -9,6 +9,8 @@
 (require 'seq)
 (require 'subr-x)
 (require 'wid-edit)
+;; Button faces live in m/bar.el (`my/tool-bar-button' and friends), which
+;; loads after this file and themes them before any panel is drawn.
 
 ;; m/p is not on `load-path' by default.
 (eval-and-compile
@@ -23,6 +25,7 @@
 (declare-function project-current "project" (&optional maybe-prompt directory))
 (declare-function project-root "project" (project))
 (declare-function my/tool-bar-refresh "bar" ())
+(declare-function my/tool-bar--image "bar" (key))
 (declare-function undo-fu-disable-checkpoint "undo-fu" ())
 
 (defvar my/tab-exempt-regexps)
@@ -243,7 +246,11 @@ the whole buffer.  Returns the number of replacements made."
 
 (defun my/sar--isearch-search-fun ()
   "A searcher reading `isearch-string' under the current style and toggles."
-  (lambda (string bound noerror count)
+  ;; BOUND, NOERROR and COUNT are all optional: isearch calls this with three
+  ;; arguments from `isearch-search', and lazy highlighting with three as well.
+  ;; Demanding four is what made `my/sar-find' fail with
+  ;; "wrong-number-of-arguments (4 . 4) 3" the moment it searched.
+  (lambda (string &optional bound noerror count)
     (when-let* ((regexp (condition-case nil (my/sar--matcher string) (error nil)))
                 ((not (string-empty-p regexp))))
       (let ((case-fold-search (not my/sar-case-sensitive)))
@@ -634,6 +641,8 @@ m/tabs.el's exempt list skips such names, so it never takes a tab of its own.")
 (defvar-local my/sar--results-start nil "Marker where the results begin.")
 (defvar-local my/sar--process nil "The running ripgrep, or nil.")
 (defvar-local my/sar--touched nil "Buffers the last replace changed.")
+(defvar-local my/sar--bounds nil
+  "Region the `file' scope is confined to, as markers, or nil for all of it.")
 (defvar-local my/sar--last-query nil "Query as of the last live pass.")
 (defvar-local my/sar--report nil
   "What the last replace did, held across the re-search that follows it.
@@ -673,15 +682,15 @@ Not persisted: it lasts the session, the way the terminal panel's height does.
     (setq my/sar--saved-width (window-total-width window))))
 
 (sidepanel-define 'search
-  :buffer-function #'my/sar--panel-buffer
-  :owner-p (lambda (buffer) (eq buffer (get-buffer my/sar--buffer-name)))
-  :side (lambda () my/sar-panel-side)
-  :slot 0
-  :size #'my/sar--width
-  :fixed 'width
-  :resizable t
-  :reachable t
-  :on-hide #'my/sar--remember-width)
+		  :buffer-function #'my/sar--panel-buffer
+		  :owner-p (lambda (buffer) (eq buffer (get-buffer my/sar--buffer-name)))
+		  :side (lambda () my/sar-panel-side)
+		  :slot 0
+		  :size #'my/sar--width
+		  :fixed 'width
+		  :resizable t
+		  :reachable t
+		  :on-hide #'my/sar--remember-width)
 
 (defun my/sar--panel-body-width ()
   "Columns available inside the panel."
@@ -709,6 +718,142 @@ On `window-size-change-functions'."
                      (when (buffer-live-p buffer)
                        (with-current-buffer buffer
                          (unless my/sar--rendering (my/sar--render)))))))))
+
+;;;;; Buttons
+;; Drawn by hand rather than with widget.el, and drawn with the *tool bar's*
+;; faces and icons, so the panel's controls and the bar above the buffer are
+;; recognisably the same thing.  widget.el is kept for the editable fields
+;; alone, which is the one job it does that text properties cannot.
+;;
+;; The tool bar's own idea of state is `:toggle', which it draws as a
+;; pressed-in button; the same is done here with the `-checked' faces.
+
+(defvar-keymap my/sar-button-map
+  :doc "Keymap on a panel button."
+  ;; `widget-keymap' is this mode map's parent and takes `down-mouse-1'; see
+  ;; `my/sar-results-map' for the same problem in the results.
+  "<down-mouse-1>" #'ignore
+  "<mouse-1>" #'my/sar-button-press
+  "RET" #'my/sar-button-press
+  "SPC" #'my/sar-button-press)
+
+(defun my/sar-button-press (&optional event)
+  "Run the button EVENT landed on, or the one at point."
+  (interactive (list last-nonmenu-event))
+  (let* ((target (and (consp event) (my/sar--event-target event)))
+         (buffer (or (car-safe target) (current-buffer)))
+         (position (or (cdr-safe target) (point))))
+    (when-let* ((action (with-current-buffer buffer
+                          (get-text-property position 'my/sar-action))))
+      (with-current-buffer buffer (funcall action)))))
+
+(defun my/sar--button-image (key)
+  "KEY's icon, sitting centred on the line it is drawn in.
+
+`my/tool-bar--image' hands back the descriptor `find-image' built, which
+carries no `:ascent' -- the frame tool bar adds one as it draws, so a panel
+drawing its own buttons has to do the same or every icon sits on the baseline
+with its top poking above the label.  The vertical margin stays 0: a margin
+there would make the whole row taller."
+  (when-let* (((fboundp 'my/tool-bar--image))
+              (image (my/tool-bar--image key)))
+    ;; `append', not `nconc': the descriptor is cached and shared with the bar.
+    (append image '(:ascent center :margin (2 . 0)))))
+
+(defun my/sar--insert-button (key label action &optional checked help icon-only)
+  "Insert a button reading LABEL that runs ACTION when pressed.
+
+KEY names its icon in `my/tool-bar-icons'; CHECKED draws it pressed in.  The
+separating spaces are left outside the button's own properties, so neighbouring
+boxes do not run together and each highlights on its own.
+
+ICON-ONLY drops LABEL, but only once the icon has actually resolved: LABEL
+stays as the fallback for an icon source that has no image to offer, so the
+button never comes out blank.  This is the bargain `my/tool-bar--button' makes
+with its own ICON-ONLY argument.  HELP carries the whole meaning of a button
+drawn that way, so it is worth writing properly."
+  (let* ((face (if checked 'my/tool-bar-button-checked 'my/tool-bar-button))
+         (hover (if checked 'my/tool-bar-button-checked-hover
+                  'my/tool-bar-button-hover))
+         (image (my/sar--button-image key))
+         (text (if (and icon-only image) "" label))
+         start)
+    (widget-insert " ")
+    (setq start (point))
+    (widget-insert " ")
+    (when image
+      (widget-insert (propertize " " 'display image)))
+    (if (string-empty-p text)
+        (widget-insert " ")
+      (when image (widget-insert " "))
+      (widget-insert text " "))
+    (add-text-properties start (point)
+                         `( face ,face
+                            mouse-face ,hover
+                            keymap ,my/sar-button-map
+                            my/sar-action ,action
+                            help-echo ,(or help label)))))
+
+(defun my/sar--control-changed ()
+  "Redraw the header for a changed control, then re-run the search.
+
+Deferred: the click that got here is still being delivered, and a redraw tears
+the editable fields down and builds them again."
+  (my/sar--read-header)
+  (let ((buffer (current-buffer)))
+    (run-at-time 0 nil
+                 (lambda ()
+                   (when (buffer-live-p buffer)
+                     (with-current-buffer buffer
+                       (my/sar--render)
+                       (my/sar-search)))))))
+
+(defvar my/sar-header-close-map
+  (let ((map (make-sparse-keymap)))
+    ;; Header-line clicks arrive under a `header-line' prefix, so the plain
+    ;; `<mouse-1>' the in-buffer buttons use would never be looked up here.
+    (define-key map [header-line down-mouse-1] #'ignore)
+    (define-key map [header-line mouse-1] #'my/sar-panel-hide)
+    map)
+  "Keymap on the close button in the panel's header line.")
+
+(defun my/sar--header-line ()
+  "The panel's top line: its name, and a close button at the right.
+
+In the header line rather than the buffer because the header line does not
+scroll -- a close button drawn in the buffer would slide away the moment the
+results were long enough to scroll, which is the one time it is wanted."
+  (let* ((image (my/sar--button-image 'sar-close))
+         (glyph (if image
+                    (propertize " " 'display image)
+                  "\N{MULTIPLICATION SIGN}"))
+          (close (propertize (concat " " glyph " ")
+                             'face 'my/tool-bar-button
+                             'mouse-face 'my/tool-bar-button-hover
+                             'keymap my/sar-header-close-map
+                             'help-echo "Close the search panel"))
+         ;; Measured in pixels, and on the finished string: an icon is one
+         ;; character to `string-width' and rather wider than that on screen --
+         ;; the same trap the terminal list's close button fell into.
+         (pixels (+ (string-pixel-width close) (max 1 (frame-char-width)))))
+    (concat " "
+            (propertize "SEARCH" 'face 'my/sar-heading)
+            (propertize " " 'display `(space :align-to (- right (,pixels))))
+            close)))
+
+(defun my/sar-style-menu ()
+  "Offer the search styles in a menu."
+  (interactive)
+  (let ((map (make-sparse-keymap "Search style")))
+    (dolist (style my/sar--styles)
+      (define-key-after map (vector style)
+        `(menu-item ,(symbol-name style)
+                    (lambda ()
+                      (interactive)
+                      (setq my/sar-style ',style)
+                      (my/sar--control-changed))
+                    :button (:radio . (eq my/sar-style ',style)))))
+    (popup-menu map)))
 
 ;;;;; Header
 
@@ -743,114 +888,112 @@ On `window-size-change-functions'."
         my/sar--widgets))
 
 (defun my/sar--insert-header ()
-  "Draw the query, the replacement, the toggles and the filters."
+  "Draw the search controls: the fields, the buttons and the scope."
   (let* ((width (my/sar--panel-body-width))
-         (field-size (max 8 (- width 14))))
+         (field-size (max 8 (- width 4))))
     (setq my/sar--drawn-width width)
-    (widget-insert (propertize " SEARCH" 'face 'my/sar-heading) "  ")
-    (push (cons 'case
-                (widget-create 'toggle
-                               :value my/sar-case-sensitive
-                               :on "[Aa]" :off " Aa "
-                               :format "%[%v%]"
-                               :help-echo "Match case"
-                               :notify (lambda (widget &rest _)
-                                         (setq my/sar-case-sensitive (widget-value widget))
-                                         (my/sar-search))))
-          my/sar--widgets)
-    (widget-insert " ")
-    (push (cons 'word
-                (widget-create 'toggle
-                               :value my/sar-whole-word
-                               :on "[ab|]" :off " ab| "
-                               :format "%[%v%]"
-                               :help-echo "Whole words only"
-                               :notify (lambda (widget &rest _)
-                                         (setq my/sar-whole-word (widget-value widget))
-                                         (my/sar-search))))
-          my/sar--widgets)
-    (widget-insert " ")
-    (push (cons 'style
-                (widget-create 'menu-choice
-                               :value my/sar-style
-                               :tag "style"
-                               :format "%[%v%]"
-                               :help-echo "How the query is read"
-                               :notify (lambda (widget &rest _)
-                                         (setq my/sar-style (widget-value widget))
-                                         (my/sar-search))
-                               '(item :tag "plain" :value plain :format "%t")
-                               '(item :tag "wildcard" :value wildcard :format "%t")
-                               '(item :tag "regex" :value regex :format "%t")))
-          my/sar--widgets)
-    (widget-insert (propertize " \N{BLACK DOWN-POINTING SMALL TRIANGLE}\n"
-                               'face 'my/sar-count))
 
+    ;; The panel's name and its close button live in the header line, which is
+    ;; drawn once here so redisplay is not made to rebuild it.
+    (setq-local header-line-format (my/sar--header-line))
+
+    ;; How the query is read.
+    ;; Icon-only where there is an icon: these two are square little state
+    ;; buttons and the words crowd the row.  The labels stay behind them for
+    ;; the `text' icon source, and for an icon file that has gone missing.
+    (my/sar--insert-button
+     'sar-case "Aa"
+     (lambda ()
+       (setq my/sar-case-sensitive (not my/sar-case-sensitive))
+       (my/sar--control-changed))
+     my/sar-case-sensitive "Match case" 'icon-only)
+    (my/sar--insert-button
+     'sar-word "ab|"
+     (lambda ()
+       (setq my/sar-whole-word (not my/sar-whole-word))
+       (my/sar--control-changed))
+     my/sar-whole-word "Whole words only" 'icon-only)
+    (my/sar--insert-button
+     'sar-style
+     (concat (symbol-name my/sar-style)
+             " \N{BLACK DOWN-POINTING SMALL TRIANGLE}")
+     #'my/sar-style-menu nil "How the query is read")
+    (widget-insert "\n")
+
+    ;; What to look for, and what to put in its place.
     (my/sar--field 'query my/sar--query field-size)
-    (widget-insert " ")
-    (widget-create 'push-button
-                   :notify (lambda (&rest _) (my/sar-search))
-                   "Find")
     (widget-insert "\n")
-
     (my/sar--field 'replacement my/sar--replacement field-size)
-    (widget-insert " ")
-    (widget-create 'push-button
-                   :notify (lambda (&rest _) (my/sar-replace-all))
-                   "Repl")
     (widget-insert "\n")
 
-    (widget-create 'push-button
-                   ;; The one control that really does change the header's shape.
-                   :notify (lambda (&rest _)
-                             (my/sar--read-header)
-                             (setq my/sar--more (not my/sar--more))
-                             (let ((buffer (current-buffer)))
-                               (run-at-time 0 nil
-                                            (lambda ()
-                                              (when (buffer-live-p buffer)
-                                                (with-current-buffer buffer
-                                                  (my/sar--render)))))))
-                   (if my/sar--more "\N{DOWNWARDS ARROW} less" "\N{RIGHTWARDS ARROW} more"))
+    ;; What to do about it.  Undo, Save and Revert are drawn whether or not a
+    ;; replacement has run: showing them conditionally would mean rebuilding
+    ;; the header the moment one did, and the header is deliberately left alone
+    ;; outside structural changes.
+    (my/sar--insert-button 'sar-find "Find" (lambda () (my/sar-search))
+                           nil "Run the search")
+    (my/sar--insert-button 'sar-replace "Repl" (lambda () (my/sar-replace-all))
+                           nil "Replace every match shown")
+    (my/sar--insert-button 'sar-undo "Undo" (lambda () (my/sar-undo-replace))
+                           nil "Take back the last replacement")
+    (my/sar--insert-button 'sar-save "Save" (lambda () (my/sar-save-all))
+                           nil "Save every buffer the replacement changed")
+    (my/sar--insert-button 'sar-revert "Revert" (lambda () (my/sar-revert-all))
+                           nil "Discard the replacement in every buffer")
     (widget-insert "\n")
-    ;; Each scope says what it would actually search.
+
+    ;; Where to look.  Each scope says what it would actually search, so there
+    ;; is no guessing which folder "folder" means or where the project root
+    ;; landed.  Checked is how the chosen one is shown -- the same pressed-in
+    ;; state the tool bar gives a `:toggle' button.
     (let* ((directory (my/sar--origin-directory))
-           (folder (my/sar--short-name directory))
-           (project (my/sar--short-name (my/sar--project-root directory)))
-           (room (max 6 (/ (- width 18) 2))))
-      (push (cons 'scope
-                  (widget-create
-                   'radio-button-choice
-                   :value my/sar--scope
-                   :entry-format "%b %v  "
-                   :help-echo (format "buffer / %s / %s"
-                                      (abbreviate-file-name directory)
-                                      (abbreviate-file-name
-                                       (my/sar--project-root directory)))
-                   :notify (lambda (widget &rest _)
-                             (setq my/sar--scope (widget-value widget))
-                             (my/sar-search))
-                   '(item :tag "file" :value file :format "%t")
-                   `(item :tag ,(concat "folder "
-                                        (truncate-string-to-width folder room 0 nil t))
-                          :value folder :format "%t")
-                   `(item :tag ,(concat "project "
-                                        (truncate-string-to-width project room 0 nil t))
-                          :value project :format "%t")))
-            my/sar--widgets))
+           (root (my/sar--project-root directory))
+           (room (max 4 (/ (- width 22) 2))))
+      (my/sar--insert-button
+       'sar-file "In File"
+       (lambda () (setq my/sar--scope 'file) (my/sar--control-changed))
+       (eq my/sar--scope 'file)
+       (concat "Search this buffer alone"
+               (when my/sar--bounds " (the region)")))
+      (my/sar--insert-button
+       'sar-folder
+       (truncate-string-to-width (concat "In Dir: " (my/sar--short-name directory)) room 0 nil t)
+       (lambda () (setq my/sar--scope 'folder) (my/sar--control-changed))
+       (eq my/sar--scope 'folder)
+       (concat "Search " (abbreviate-file-name directory)))
+      (my/sar--insert-button
+       'sar-project
+       (truncate-string-to-width (concat "In Proj: "(my/sar--short-name root)) room 0 nil t)
+       (lambda () (setq my/sar--scope 'project) (my/sar--control-changed))
+       (eq my/sar--scope 'project)
+       (concat "Search " (abbreviate-file-name root))))
     (widget-insert "\n")
 
+    ;; Depth and the two file filters, behind a disclosure.
+    (my/sar--insert-button
+     'sar-more
+     (concat "More " (if my/sar--more
+                         "\N{BLACK DOWN-POINTING SMALL TRIANGLE}"
+                       "\N{BLACK RIGHT-POINTING SMALL TRIANGLE}")
+             )
+     (lambda ()
+       (setq my/sar--more (not my/sar--more))
+       (my/sar--control-changed))
+     my/sar--more "Depth and file filters")
+    (widget-insert "\n")
     (when my/sar--more
-      (widget-insert " depth   ")
-      (my/sar--field 'depth
-                     (if (natnump my/sar-max-depth)
-                         (number-to-string my/sar-max-depth) "")
-                     (max 4 (- width 12)))
-      (widget-insert "\n search  ")
-      (my/sar--field 'include my/sar-search-file-regexp (max 4 (- width 12)))
-      (widget-insert "\n replace ")
-      (my/sar--field 'exclude my/sar-replace-file-regexp (max 4 (- width 12)))
-      (widget-insert "\n"))))
+      (let ((filter-size (max 4 (- width 12))))
+        (widget-insert " depth   ")
+        (my/sar--field 'depth
+                       (if (natnump my/sar-max-depth)
+                           (number-to-string my/sar-max-depth) "")
+                       filter-size)
+        (widget-insert "\n search  ")
+        (my/sar--field 'include my/sar-search-file-regexp filter-size)
+        (widget-insert "\n replace ")
+        (my/sar--field 'exclude my/sar-replace-file-regexp filter-size)
+        (widget-insert "\n")))))
+
 
 ;;;;; Results
 
@@ -1050,7 +1193,7 @@ On `window-size-change-functions'."
                 (let ((buffer (if (buffer-live-p my/sar--origin)
                                   my/sar--origin
                                 (current-buffer))))
-                  (my/sar--finish (my/sar--scan-buffer regexp buffer)
+                  (my/sar--finish (my/sar--scan-buffer regexp buffer my/sar--bounds)
                                   (file-name-directory
                                    (or (buffer-file-name buffer) default-directory))
                                   regexp))
@@ -1071,26 +1214,17 @@ On `window-size-change-functions'."
                my/sar--status (error-message-string err))
          (my/sar--render-results))))))
 
-(defun my/sar--sync-widgets ()
-  "Push the option values into the header widgets already on screen."
-  (let ((my/sar--rendering t))
-    (pcase-dolist (`(,name . ,value) `((case . ,my/sar-case-sensitive)
-                                       (word . ,my/sar-whole-word)
-                                       (style . ,my/sar-style)))
-      (when-let* ((widget (my/sar--widget name))
-                  ((not (equal (widget-value widget) value))))
-        (widget-value-set widget value)))))
-
 (defun my/sar--panel-restyle ()
-  "Follow a toggle that was flipped from outside the panel."
+  "Follow a toggle that was flipped from outside the panel.
+
+The controls are drawn text now rather than widgets, so their pressed-in state
+only changes when the header is drawn again.  Only while the panel is on
+screen: one that is put away picks the new settings up when it next opens."
   (when-let* (((not my/sar--rendering))
-              (buffer (get-buffer my/sar--buffer-name)))
+              (buffer (get-buffer my/sar--buffer-name))
+              ((get-buffer-window buffer t)))
     (with-current-buffer buffer
-      ;; The widgets are updated in place rather than rebuilt: a rebuild is what breaks a click that is.
-      (my/sar--sync-widgets)
-      ;; The search itself only when there is something to look at.
-      (when (get-buffer-window buffer t)
-        (my/sar-search)))))
+      (my/sar--control-changed))))
 
 ;;;;; Moving about
 
@@ -1227,13 +1361,24 @@ than leaving a project half rewritten."
      (t
       (let* ((skipped (seq-count (lambda (g) (not (my/sar-group-replaceable g)))
                                  my/sar--groups))
+             ;; Read out here, before any `with-current-buffer': the query, the
+             ;; replacement and the region are all buffer-local to the panel,
+             ;; so reading them inside the buffer being edited would get the
+             ;; global defaults -- an empty query, which quietly replaced
+             ;; nothing at all.
+             (query my/sar--query)
+             (template my/sar--replacement)
+             (bounds my/sar--bounds)
              (result (if (eq my/sar--scope 'file)
-                         (let ((buffer (if (buffer-live-p my/sar--origin)
-                                           my/sar--origin
-                                         (current-buffer))))
+                         (let ((buffer (and (buffer-live-p my/sar--origin)
+                                            my/sar--origin)))
+                           (unless buffer
+                             (user-error "The buffer this searched is gone"))
                            (cons (with-current-buffer buffer
-                                   (my/sar--replace-in-buffer
-                                    my/sar--query my/sar--replacement))
+                                   (undo-boundary)
+                                   (prog1 (my/sar--replace-in-buffer
+                                           query template bounds)
+                                     (undo-boundary)))
                                  (list buffer)))
                        (my/sar--replace-groups my/sar--groups)))
              (count (car result))
@@ -1249,6 +1394,34 @@ than leaving a project half rewritten."
                       (if (> skipped 0) (format " (%d skipped)" skipped) "")))
         (setq my/sar--status my/sar--report)
         (my/sar-search))))))
+
+;;;###autoload
+(defun my/sar-undo-replace ()
+  "Take the last replacement back, in every buffer it changed.
+
+One `undo' per buffer is enough: the replacements in each were made between a
+pair of `undo-boundary', so they form a single undo step there."
+  (interactive)
+  (with-current-buffer (my/sar--panel-buffer)
+    (unless my/sar--touched
+      (user-error "No replacement to undo"))
+    (let ((undone 0))
+      (dolist (buffer my/sar--touched)
+        (when (buffer-live-p buffer)
+          (with-current-buffer buffer
+            ;; `undo' and not `undo-fu-only-undo': this is a fresh, isolated
+            ;; step, and `last-command' is nil so `undo' starts a new sequence
+            ;; rather than continuing whatever the user last did.
+            (let ((last-command nil)
+                  (pending-undo-list nil))
+              (condition-case nil
+                  (progn (undo) (setq undone (1+ undone)))
+                (error nil))))))
+      (setq my/sar--touched nil
+            my/sar--report (format "undid the replacement in %d file%s"
+                                   undone (if (= undone 1) "" "s")))
+      (setq my/sar--status my/sar--report)
+      (my/sar-search))))
 
 ;;;###autoload
 (defun my/sar-save-all ()
@@ -1342,7 +1515,9 @@ FOCUS-REPLACEMENT puts the point in the replacement field rather than the query.
       (setq my/sar--origin origin
             my/sar--scope scope)
       (when query (setq my/sar--query query))
-      ;; A region means "search in here", which is a buffer search whatever scope was asked.
+      ;; A region means "search in here", which is a buffer search whatever
+      ;; scope was asked for, confined to the region itself.
+      (setq my/sar--bounds region)
       (when region (setq my/sar--scope 'file))
       (my/sar--render))
     (sidepanel-show 'search 'select)

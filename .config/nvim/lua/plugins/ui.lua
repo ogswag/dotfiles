@@ -1,7 +1,29 @@
 return {
-	{ "bullets-vim/bullets.vim" },
+	{
+		"bullets-vim/bullets.vim",
+		init = function()
+			-- Keep Bullets' useful defaults without letting it replace Visual < and >.
+			vim.g.bullets_set_mappings = 0
+			vim.g.bullets_custom_mappings = {
+				{ "imap", "<cr>", "<Plug>(bullets-newline)" },
+				{ "inoremap", "<C-cr>", "<cr>" },
+				{ "nmap", "o", "<Plug>(bullets-newline)" },
+				{ "vmap", "gN", "<Plug>(bullets-renumber)" },
+				{ "nmap", "gN", "<Plug>(bullets-renumber)" },
+				{ "nmap", "<leader>x", "<Plug>(bullets-toggle-checkbox)" },
+				{ "imap", "<C-t>", "<Plug>(bullets-demote)" },
+				{ "nmap", ">>", "<Plug>(bullets-demote)" },
+				{ "imap", "<C-d>", "<Plug>(bullets-promote)" },
+				{ "nmap", "<<", "<Plug>(bullets-promote)" },
+			}
+		end,
+	},
 	{
 		"folke/zen-mode.nvim",
+		cmd = "ZenMode",
+		keys = {
+			{ "<leader>z", "<cmd>ZenMode<CR>", desc = "Zen mode" },
+		},
 		opts = {
 			window = {
 				-- backdrop = 0.95, -- shade the backdrop of the Zen window. Set to 1 to keep the same as Normal
@@ -42,7 +64,26 @@ return {
 				lualine_a = { "mode" },
 				lualine_b = { "branch", "diff", "diagnostics" },
 				lualine_c = { { "filename", path = 1 } }, -- show relative path
-				lualine_x = { "filetype" },
+				lualine_x = {
+					-- ConTeXt compile/watch status. package.loaded check means this
+					-- never pulls in lua/context/compile.lua outside ConTeXt work.
+					{
+						function()
+							local compile = package.loaded["context.compile"]
+							if not compile then
+								return ""
+							end
+							if compile.is_running() then
+								return "󰑓 typesetting"
+							end
+							if compile.is_watching() then
+								return "󰈈 watch"
+							end
+							return ""
+						end,
+					},
+					"filetype",
+				},
 				lualine_y = { "progress" },
 				lualine_z = { "location" },
 			},
@@ -77,6 +118,10 @@ return {
 				{ "<leader>f", group = "find/files" },
 				{ "<leader>g", group = "git" },
 				{ "<leader>b", group = "buffer" },
+				{ "<leader>r", group = "rename" },
+				-- vimtex (LaTeX) and lua/context/compile.lua (ConTeXt) share the
+				-- same <localleader>l* layout on purpose.
+				{ "<localleader>l", group = "TeX / ConTeXt" },
 			},
 		},
 	},
@@ -105,15 +150,6 @@ return {
 				separator_style = "thin",
 				show_buffer_close_icons = true,
 				show_close_icon = false,
-				-- Shift neo-tree offset so tabs don't overlap the file explorer
-				offsets = {
-					{
-						filetype = "neo-tree",
-						text = "Explorer",
-						highlight = "Directory",
-						separator = true,
-					},
-				},
 			},
 		},
 	},

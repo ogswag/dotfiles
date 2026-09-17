@@ -34,33 +34,58 @@
 (eval-when-compile (require 'icons))
 (declare-function icons--register "icons")
 
-(defvar tab-bar-button-margin)
-
+;; The close button is a character, and stock Emacs's is an image.
+;;
+;; Stock asks for `symbols/cross_16.svg' and leaves its size to the face the
+;; image lands in -- which is not one face.  `icon-string' stamps the icon's own
+;; `:face' on the button and `tab-bar-tab-name-format-face' then *appends* the
+;; tab's, so the button is drawn in `(... tab-bar-tab)' on the selected tab and
+;; `(... tab-bar-tab-inactive)' on every other one.  On this machine the
+;; unselected tabs came out with a cross scaled past the height of the bar and
+;; clipped to its top half.  Pinning the size on the icon's own face did not fix
+;; it; nor did an absolute pixel `:height', which should not have been
+;; negotiable at all.  The remaining suspect is the SVG itself -- it fills with
+;; `currentColor', so the face reaches the renderer no matter what the spec
+;; says -- but that is a guess, and two guesses have already been wrong.
+;;
+;; A character cannot have this problem.  It is laid out by the same font, at
+;; the same size, as the tab's own label, because it *is* part of the label --
+;; there is no second opinion for a tab to hold about how big it should be.
+;;
+;; U+00D7 rather than a dingbat cross: it is Latin-1, so the sans family the bar
+;; is set in has it, and no font fallback happens.  A fallback would put the
+;; glyph in some other font at some other size, which is the very thing being
+;; designed out.  `symbol' variants are dropped by `icon-string' when the glyph
+;; is not displayable, so the plain `x' below is what a terminal gets.
 
 (defface my/tab-bar-close '((t :inherit shadow))
   "Face the tab bar's close button is drawn in.
-Colour only -- the size is pixels, set by `my/tab-bar--refresh-close-button'."
+Colour only.  Size is not set here and must not be: the button takes the tab
+label's font, which is what keeps it in proportion on every tab."
   :group 'tab-bar-faces)
 
-(defun my/tab-bar--close-button-height ()
-  "Pixel height for the close button, from the height of a line in the bar."
-  (max 8 (- (frame-char-height) (* 2 (or tab-bar-button-margin 1)))))
-
-(defun my/tab-bar--refresh-close-button (&rest _)
-  "Re-cut the close button at `my/tab-bar--close-button-height' pixels."
+(defun my/tab-bar--install-close-button ()
+  "Make the close button a character, and rebuild the cached button string.
+`tab-bar-close-button' is built once, when `tab-bar-mode' turns on, from
+whichever icon was registered then -- the stock image one, since that happens
+before this file gets here.  So the icon has to be replaced *and* the string
+re-cut."
   (require 'icons)
+  ;; Stock guards its own definition with `unless (iconp ...)', so redefining
+  ;; is the supported way to have one's own.  No `image' variant at all: an
+  ;; entry that is merely last in the list would still win the moment it
+  ;; resolved, and `icon-preference' puts images first.
   (define-icon tab-bar-close nil
-    `((image "symbols/cross_16.svg" "tabs/close.xpm"
-             :face my/tab-bar-close
-             :height ,(my/tab-bar--close-button-height)
-             :margin ,tab-bar-button-margin
-             :ascent center)
+    '((symbol " ×" :face my/tab-bar-close)
       (text " x"))
-    "Icon for closing the clicked tab, at a fixed pixel height."
+    "Icon for closing the clicked tab.  A character, so it cannot be out of
+scale with the tab it sits on."
     :version "29.1"
     :help-echo "Click to close tab")
   (setq tab-bar-close-button
         (propertize (icon-string 'tab-bar-close) 'close-tab t)))
+
+(my/tab-bar--install-close-button)
 
 (defconst my/tab-bar--shades '(8 14 20)
   "How far the tabs, the strip, and a hovered tab sit off the page.")
@@ -95,8 +120,10 @@ Colour only -- the size is pixels, set by `my/tab-bar--refresh-close-button'."
                         :inherit 'tab-bar :inverse-video nil
                         :background hover :foreground foreground
                         :weight 'normal :underline nil :box raised)
-    ;; Sized in pixels off the character cell, so it takes no argument and cares about none of the.
-    (my/tab-bar--refresh-close-button))
+    ;; Nothing to do for the close button here: it is a character in
+    ;; `my/tab-bar-close', which inherits `shadow', so the theme reaches it on
+    ;; its own and there is no size to recompute.
+    )
   ;; The family just changed, so every width measured under the old one is wrong -- see below.
   (my/tab--remeasure))
 

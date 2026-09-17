@@ -27,7 +27,14 @@ return {
 				},
 			}
 
-			-- Let treesitter handle syntax highlighting; disable vimtex's own
+			-- Let treesitter handle syntax highlighting; disable vimtex's own.
+			-- NOTE: this was set long before it was true -- nvim-treesitter was on its
+			-- `main` branch with an opts table it never read, so no `latex` parser was
+			-- installed and .tex fell back to Neovim's bundled regex syntax/tex.vim.
+			-- lua/plugins/treesitter.lua now installs the parser and starts it.
+			-- Trade-off to know about: with vimtex syntax off, vimtex's own
+			-- syntax-based math-zone detection (vimtex#syntax#in_mathzone) returns
+			-- nothing; flip this to 1 if you ever wire math snippets for LaTeX.
 			vim.g.vimtex_syntax_enabled = 0
 
 			-- Suppress cosmetic warnings from quickfix

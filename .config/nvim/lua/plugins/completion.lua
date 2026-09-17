@@ -1,20 +1,62 @@
--- blink.cmp: completion engine written in Rust — faster than nvim-cmp.
+-- blink.cmp: completion engine written in Rust -- faster than nvim-cmp.
 -- Ships pre-built binaries on GitHub releases so you don't need Rust installed.
 return {
+	-- Snippet engine. LuaSnip rather than mini.snippets because only LuaSnip can
+	-- auto-expand: the ConTeXt math abbreviations in snippets/context.lua fire on
+	-- a regex match as you type, with no Tab press.
+	{
+		"L3MON4D3/LuaSnip",
+		version = "v2.*",
+		build = "make install_jsregexp",
+		dependencies = { "rafamadriz/friendly-snippets" },
+		event = "InsertEnter",
+		config = function()
+			local ls = require("luasnip")
+			ls.setup({
+				enable_autosnippets = true,
+				-- Autosnippets need to re-evaluate as the buffer changes, not just
+				-- on InsertLeave.
+				update_events = { "TextChanged", "TextChangedI" },
+				delete_check_events = "TextChanged",
+			})
+
+			-- friendly-snippets (VSCode-style JSON), lazily per filetype.
+			require("luasnip.loaders.from_vscode").lazy_load()
+			-- Our own Lua snippets: ~/.config/nvim/snippets/<ft>.lua
+			require("luasnip.loaders.from_lua").lazy_load({
+				paths = vim.fn.stdpath("config") .. "/snippets",
+			})
+
+			-- Cycle choice nodes. NOT <C-l>: that's already <Right> in insert mode
+			-- (see lua/config/keymaps.lua).
+			vim.keymap.set({ "i", "s" }, "<C-u>", function()
+				if ls.choice_active() then
+					ls.change_choice(1)
+				end
+			end, { desc = "LuaSnip: next choice" })
+		end,
+	},
+
 	{
 		"saghen/blink.cmp",
 		version = "1.*", -- pin to stable v1.x; check docs if upgrading breaks things
-		dependencies = { "echasnovski/mini.snippets" },
+		dependencies = { "L3MON4D3/LuaSnip" },
 		---@module 'blink.cmp'
 		---@type blink.cmp.Config
 		opts = {
-			-- Use mini.snippets as the snippet engine; the "snippets" source
-			-- below then surfaces them (incl. friendly-snippets) in the popup.
-			snippets = { preset = "mini_snippets" },
+			snippets = { preset = "luasnip" },
 
 			keymap = {
 				preset = "super-tab", -- Tab accepts/jumps; C-n/C-p navigates
-				-- ["<CR>"] = { "accept", "fallback" }, -- Enter also accepts (VS Code feel)
+
+				-- The super-tab preset claims <C-k> (signature) and <C-e> (cancel),
+				-- which collide with the insert-mode readline cluster in
+				-- lua/config/keymaps.lua (<C-k> = Up, <C-e> = end-of-line). Blink
+				-- treats an empty table as "disabled", so those keys stay ours.
+				["<C-k>"] = {},
+				["<C-e>"] = {},
+				["<C-g>"] = { "show_signature", "hide_signature", "fallback" },
+				["<C-q>"] = { "cancel", "fallback" },
 			},
 
 			appearance = {
@@ -44,8 +86,29 @@ return {
 			},
 
 			sources = {
-				-- Order matters: LSP → path → snippets → buffer words
-				default = { "lsp", "path", "snippets" },
+				-- Order matters: LSP -> path -> snippets -> buffer words.
+				-- `buffer` was missing here despite the comment claiming otherwise.
+				default = { "lsp", "path", "snippets", "buffer" },
+
+				per_filetype = {
+					-- Prose filetypes: snippets first so a 2-char prefix like `st`
+					-- resolves to \starttext rather than losing to one of the ~5,600
+					-- entries in the generated ConTeXt command list.
+					context = { "snippets", "context_cmds", "lsp", "buffer", "path" },
+					tex = { "snippets", "lsp", "buffer", "path" },
+					plaintex = { "snippets", "lsp", "buffer", "path" },
+					markdown = { "snippets", "lsp", "buffer", "path" },
+				},
+
+				providers = {
+					-- Generated from ConTeXt's own interface definition; see
+					-- scripts/gen-context-data.lua. Pure in-memory table, no process.
+					context_cmds = {
+						name = "ConTeXt",
+						module = "blink_context",
+						score_offset = 2,
+					},
+				},
 			},
 
 			-- Rust-based fuzzy matcher (blink's default and fastest option)

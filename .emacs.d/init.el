@@ -69,7 +69,7 @@
         "task"          ; run/build per language - after term, which runs it
         "py"            ; which Python a Python file runs in - after task, whose :env hook it answers
         "sar"           ; search and replace - after proj, before bar and k, whose buttons and keys call it
-        "bar"           ; window-tool-bar - after task, tree and term, whose commands its buttons are
+        "bar"           ; tool-bar - after task, tree and term, whose commands its buttons are
         "k"))           ; keybindings - last, so every command exists
 
 (load custom-file 'noerror 'nomessage)

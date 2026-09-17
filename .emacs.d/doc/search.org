@@ -23,7 +23,31 @@ In the panel: ~TAB~ / ~S-TAB~ between fields, ~RET~ in a field runs the search,
 rows, ~M-n~ / ~M-p~ between files, ~g~ re-runs, ~q~ hides. ~C-c C-c~ search,
 ~C-c C-r~ replace all, ~C-c C-s~ save all, ~C-c C-k~ revert all.
 
-Single letters work only over the results - in a field they type.
+Single letters work only over the results - in a field they type. ~RET~ or ~SPC~
+on a button presses it.
+
+* Controls
+
+The two input fields are ~widget.el~ editable fields. Everything else - the
+toggles, the style picker, the action buttons, the scope and the ~more~
+disclosure - is drawn by hand with the *tool bar's* own faces and icons, so the
+panel and the tool bar look like one thing. A toggle that is on, and the
+chosen scope, are drawn pressed in, the way a ~:toggle~ button is in the bar.
+
+Icons come from ~my/tool-bar-icons~ / ~my/tool-bar-emacs-icons~ in ~m/bar.el~
+and follow ~my/tool-bar-icon-source~. Under the default ~emacs~ source they
+are SF Symbol SVGs in ~icons/~; a button with no icon file just shows its label.
+
+| Button   | What                                          |
+|----------+-----------------------------------------------|
+| ~Aa~     | match case                                    |
+| ~ab\vert~ | whole words only                             |
+| ~style~  | menu of plain / wildcard / regex              |
+| ~Find~   | run the search                                |
+| ~Repl~   | replace every match shown                     |
+| ~Undo~   | take back the last replacement, in every file |
+| ~Save~   | save every buffer the replacement changed     |
+| ~Revert~ | discard the replacement everywhere            |
 
 * Styles
 

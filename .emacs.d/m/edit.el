@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(setq sentence-end-double-space nil)
+
 ;; Smart C-a / C-e
 (use-package mwim :ensure t
   :commands (mwim-beginning mwim-end))

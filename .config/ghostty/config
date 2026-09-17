@@ -1,13 +1,15 @@
-font-family = "Fira Code"
+font-family = "Hack"
 # font-feature = ss05, cv10, ss01, ss03, cv14, cv15, cv31, cv26, cv32, ss08, ss10 # Fira Code
 # font-feature = zero, cv13, cv15, ss02, ss04 # Lilex
 # font-feature = zero, cv01, cv03, cv19, cv20, ss19 # JetBrains Mono
 
-theme = light:Xcode Light, dark:Gruber Darker
+theme = light:Pro Light,dark: Kitty Default
 
-font-size = 13
+macos-titlebar-style = tabs
+
+font-size = 11
 font-thicken = true
-# font-thicken-strength = 122
+font-thicken-strength = 50
 
 # cursor-style = block
 # cursor-color = #3B86F7

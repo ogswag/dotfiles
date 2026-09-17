@@ -9,13 +9,37 @@
 
 (setq which-func-update-delay 1.0)
 
+(defconst my/prog-number-regexp
+  (rx symbol-start
+      (or (seq (or "0x" "0X") (+ (any "0-9a-fA-F_")))
+          (seq (or "0b" "0B") (+ (any "01_")))
+          (seq (or "0o" "0O") (+ (any "0-7_")))
+          (seq (any "0-9") (* (any "0-9_"))
+               (? "." (* (any "0-9_")))
+               (? (any "eE") (? (any "+-")) (+ (any "0-9")))))
+      (? (or (seq (any "uU") (? (any "lL")) (? (any "lL")))
+             (seq (any "lL") (? (any "lL")) (? (any "uU")))
+             (any "fFdD")))
+      symbol-end))
+
+(defvar-local my/prog-number--keywords nil)
+
+(defun my/prog-number-setup ()
+  "Highlight numbers with `font-lock-number-face'."
+  (unless my/prog-number--keywords
+    (setq my/prog-number--keywords
+          `((,my/prog-number-regexp 0 'font-lock-number-face)))
+    (font-lock-add-keywords nil my/prog-number--keywords 'append)))
+
+(add-hook 'prog-mode-hook #'my/prog-number-setup)
+
 ;; `TeX-mode', not `LaTeX-mode': plain TeX is the common case here (m/l.el).
 (use-package rainbow-delimiters :ensure t
   :hook ((prog-mode . rainbow-delimiters-mode)))
 
 ;;;; Parens
 
-(setq show-paren-style 'expression)
+(setq show-paren-style 'mixed)
 (setq show-paren-when-point-inside-paren t)
 (setq show-paren-when-point-in-periphery t)
 (setq show-paren-context-when-offscreen 'overlay)
@@ -93,5 +117,47 @@
 ;;;; Zig
 
 (use-package zig-mode :ensure t)
+
+;;;; Objective-C
+
+(defface my/objc-pragma-mark-overline
+  '((t :overline "light gray" :extend t))
+  "Dim gray overline across a `#pragma mark -' line.")
+
+(defconst my/objc-pragma-mark-regexp
+  "^[ \t]*\\(#pragma mark\\)\\([ \t]+-.*\\)\\(\n\\)?"
+  "Line that starts with `#pragma mark -'.")
+
+(defun my/objc-in-body-p (pos)
+  "Non-nil if POS is inside @interface/@implementation/@protocol ... @end."
+  (save-excursion
+    (save-match-data
+      (goto-char pos)
+      (and (re-search-backward
+            "^[ \t]*@\\(implementation\\|interface\\|protocol\\|end\\)\\>"
+            nil t)
+           (not (looking-at "[ \t]*@end\\>"))))))
+
+(defun my/objc-pragma-mark-matcher (limit)
+  "Find the next `#pragma mark -' line in an ObjC body before LIMIT."
+  (catch 'found
+    (while (re-search-forward my/objc-pragma-mark-regexp limit t)
+      (when (my/objc-in-body-p (match-beginning 0))
+        (throw 'found t)))
+    nil))
+
+(defvar-local my/objc-pragma-mark--keywords nil)
+
+(defun my/objc-pragma-mark-setup ()
+  "Highlight `#pragma mark -' section headers in this ObjC buffer."
+  (unless my/objc-pragma-mark--keywords
+    (setq my/objc-pragma-mark--keywords
+          '((my/objc-pragma-mark-matcher
+             (1 'font-lock-preprocessor-face t)
+             (2 'default t)
+             (0 'my/objc-pragma-mark-overline prepend))))
+    (font-lock-add-keywords nil my/objc-pragma-mark--keywords 'append)))
+
+(add-hook 'objc-mode-hook #'my/objc-pragma-mark-setup)
 
 ;;; prog.el ends here

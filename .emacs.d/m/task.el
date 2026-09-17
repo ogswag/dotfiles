@@ -272,24 +272,48 @@
     (setf (alist-get key my/task-selection nil nil #'equal) per-mode)
     (run-hooks 'my/task-state-change-hook)))
 
+(defun my/task--pick (kind label)
+  "Remember LABEL as KIND's pick in this buffer."
+  (with-current-buffer (or (my/task--source-buffer) (current-buffer))
+    (my/task--remember kind (car (my/task--entry)) label)
+    (message "%s: %s" (capitalize (symbol-name kind)) label)))
+
+(defun my/task--menu-map (kind)
+  "A keymap of KIND tasks for a GUI menu."
+  (let ((map (make-sparse-keymap
+              (format "%s command" (capitalize (symbol-name kind)))))
+        (i 0))
+    (dolist (task (with-current-buffer (or (my/task--source-buffer)
+                                           (current-buffer))
+                    (my/task-tasks kind)))
+      (let* ((label (car task))
+             (command (nth 1 task))
+             (help (if (symbolp command) (symbol-name command) command)))
+        (define-key-after map (vector (intern (format "task-%d" i)))
+          `(menu-item ,label
+                      (lambda ()
+                        (interactive)
+                        (my/task--pick ',kind ,label))
+                      :help ,help
+                      :button (:radio . (equal (my/task-label ',kind) ,label))))
+        (setq i (1+ i))))
+    (define-key-after map [sep] '(menu-item "--"))
+    (define-key-after map [new]
+      `(menu-item ,my/task-new-label
+                  (lambda ()
+                    (interactive)
+                    (my/task-add ',kind))
+                  :help "Add a command"))
+    map))
+
 (defun my/task-select (kind)
   "Pick which task of KIND -- `run' or `build' -- this mode's button starts."
   (interactive (list (intern (completing-read "Which button: "
                                               '("run" "build") nil t))))
   (with-current-buffer (or (my/task--source-buffer) (current-buffer))
-    (let* ((entry (my/task--entry))
-           (tasks (my/task-tasks kind entry)))
-      (if (null tasks)
-          (my/task-add kind)
-        (let ((label (completing-read
-                      (format "%s command: " (capitalize (symbol-name kind)))
-                      (my/task--completion-table
-                       tasks (cons my/task-new-label "add one"))
-                      nil t nil nil (my/task-label kind))))
-          (if (equal label my/task-new-label)
-              (my/task-add kind)
-            (my/task--remember kind (car entry) label)
-            (message "%s: %s" (capitalize (symbol-name kind)) label)))))))
+    (if (null (my/task-tasks kind))
+        (my/task-add kind)
+      (popup-menu (my/task--menu-map kind)))))
 
 (defun my/task-add (kind &optional ask-directory)
   "Add a command of KIND -- `run' or `build' -- for this mode, and pick it."

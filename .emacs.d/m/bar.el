@@ -1,7 +1,7 @@
-;;; bar.el --- A tool bar inside the window -*- lexical-binding: t; -*-
+;;; bar.el --- Frame tool bar -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-;; per-window tool bar (emacs 31 window-tool-bar). run/build come from task.el.
+;; frame tool bar. run/build come from task.el.
 
 ;;; Code:
 
@@ -10,6 +10,7 @@
 (declare-function my/theme-rgb "theme" (colour))
 (declare-function my/theme-hex "theme" (colour))
 (declare-function my/theme-dark-p "theme" ())
+(declare-function my/system-dark-p "theme" ())
 (declare-function my/theme-shade "theme" (percent))
 (declare-function my/speedbar-toggle "tree" ())
 (declare-function my/term-toggle "term" ())
@@ -48,7 +49,6 @@
 (defvar my-config-directory)
 (defvar my/task-state-change-hook)
 (defvar speedbar-buffer)
-(defvar window-tool-bar-string--cache)
 (defvar isearch-tool-bar-map)
 (defvar isearch-string)
 (defvar isearch-success)
@@ -56,13 +56,13 @@
 ;;;; Icons
 
 (defcustom my/tool-bar-icon-source 'emacs
-  "Where the button icons come from: `emacs', `nerd', or `text'. See the commentary above this variable for what each."
-  :type '(choice (const :tag "The images Emacs ships in etc/images" emacs)
+  "Where the button icons come from: `emacs', `nerd', or `text'."
+  :type '(choice (const :tag "SF Symbol SVGs in icons/" emacs)
                  (const :tag "Nerd Font glyphs, drawn into SVGs" nerd)
                  (const :tag "No images: a one-line text bar" text))
   :group 'my/task)
 
-(defcustom my/tool-bar-icon-size 18
+(defcustom my/tool-bar-icon-size 16
   "Pixel height every icon is drawn or scaled to, whatever it came as."
   :type 'natnum
   :group 'my/task)
@@ -70,13 +70,13 @@
 (defcustom my/tool-bar-icon-directory
   (expand-file-name "icons" (or (bound-and-true-p my-config-directory)
                                 user-emacs-directory))
-  "Directory searched for button icons ahead of Emacs's own etc/images."
+  "Directory of button icon files."
   :type 'directory
   :group 'my/task)
 
 (defcustom my/tool-bar-emacs-icons
   ;; Every button leads with its own name, so a file called after the button.
-  '((sidebar     "sidebar")
+  '((sidebar     "sidebar_left")
     (terminal    "terminal")
     (terminal+   "terminal+" "terminal-new" "new")
     (run         "run" "gud/go")
@@ -91,30 +91,81 @@
     (save        "save")
     (format      "format")
     (diagnostics "diagnostics")
-    (find        "find" "open")
-    (search      "search")
+    (find        "find_file" "open")
+    (search      "search_project")
     (project     "project" "diropen")
 
-    (isearch-repeat-backward "isearch-repeat-backward" "isearch-backward"
-                             "left-arrow")
-    (isearch-repeat-forward  "isearch-repeat-forward" "isearch-forward"
-                             "right-arrow")
+    (isearch-repeat-backward "isearch-repeat-backward" "isearch-backward" "left-arrow")
+    (isearch-repeat-forward  "isearch-repeat-forward" "isearch-forward" "right-arrow")
     (isearch-cancel          "isearch-cancel" "isearch-abort" "close")
     (isearch-exit            "isearch-exit" "isearch-finish" "exit")
     (isearch-delete-char     "isearch-delete-char" "isearch-undo" "undo")
-    (isearch-query-replace   "isearch-query-replace" "isearch-replace"
-                             "search-replace")
+    (isearch-query-replace   "isearch-query-replace" "isearch-replace" "search-replace")
     (isearch-occur           "isearch-occur" "isearch-show-hits" "index")
     (isearch-describe-mode   "isearch-describe-mode" "isearch-help" "help")
     ;; m/sar.el's additions.
-    (sar-case                "sar-case")
-    (sar-word                "sar-word")
-    (sar-style               "sar-style")
-    (sar-panel               "sar-panel" "index"))
+    (sar-case                "text_case")
+    (sar-word                "whole_word")
+    (sar-style               "paintbrush")
+    (sar-panel               "sidebar_right")
+    ;; The search panel draws its own buttons with these.  Each falls back to
+    ;; an icon this directory already has, so they resolve without new artwork.
+    (sar-find                "search_magnifier" "search")
+    (sar-replace             "isearch-replace" "search-replace")
+    (sar-undo                "isearch-undo" "undo")
+    (sar-save                "save")
+    (sar-revert              "sar-revert" "isearch-undo" "undo")
+    ;; (sar-more                "show_detail")
+    (sar-close               "close")
+    (sar-file                "search_in_file")
+    (sar-folder              "find_file")
+    (sar-project             "search_project"))
   "Image file names for each button, best first, without directory or extension."
   :type '(alist :key-type symbol
                 :value-type (choice string (repeat string)))
   :group 'my/task)
+
+(defconst my/tool-bar-sf-symbols
+  '(("sidebar_left"            . "sidebar.left")
+    ("sidebar_right"           . "sidebar.right")
+    ("terminal"                . "terminal")
+    ("terminal+"               . "plus")
+    ("run"                     . "play.fill")
+    ("run-menu"                . "chevron.down")
+    ("build"                   . "hammer.fill")
+    ("build-menu"              . "chevron.down")
+    ("stop"                    . "stop.fill")
+    ("env"                     . "cube")
+    ("live"                    . "eye")
+    ("pdf"                     . "doc.richtext")
+    ("clean"                   . "trash")
+    ("save"                    . "square.and.arrow.down")
+    ("format"                  . "text.alignleft")
+    ("diagnostics"             . "exclamationmark.triangle")
+    ("find_file"               . "doc.text.magnifyingglass")
+    ("search_project"          . "magnifyingglass")
+    ("project"                 . "folder")
+    ("isearch-repeat-backward" . "chevron.backward")
+    ("isearch-repeat-forward"  . "chevron.forward")
+    ("isearch-cancel"          . "xmark")
+    ("isearch-exit"            . "checkmark")
+    ("isearch-undo"            . "arrow.uturn.backward")
+    ("isearch-replace"         . "text.magnifyingglass")
+    ("isearch-occur"           . "list.bullet.rectangle")
+    ("isearch-help"            . "questionmark.circle")
+    ("text_case"               . "textformat")
+    ("whole_word"              . "textformat.abc")
+    ("paintbrush"              . "paintbrush")
+    ("close"                   . "xmark")
+    ("search_magnifier"        . "magnifyingglass")
+    ("search_in_file"          . "doc.text")
+    ("sar-revert"              . "arrow.counterclockwise"))
+  "SF Symbol for each file in `my/tool-bar-icon-directory', sans extension.
+emacs-mac maps the image `:file' through `mac-icon-map-list' and draws these
+as system symbols, which follow light/dark on their own.")
+
+(defvar my/tool-bar-mac-icon-map nil
+  "Alist for `mac-icon-map-list', keys as `mac-map-system-symbol' wants them.")
 
 (defconst my/tool-bar-icons
   '((sidebar     . "nf-cod-layout_sidebar_left")
@@ -147,7 +198,17 @@
     (sar-case                . "nf-md-format_letter_case")
     (sar-word                . "nf-md-format_letter_matches")
     (sar-style               . "nf-md-regex")
-    (sar-panel               . "nf-md-dock_right"))
+    (sar-panel               . "nf-md-dock_right")
+    (sar-find                . "nf-md-magnify")
+    (sar-replace             . "nf-md-find_replace")
+    (sar-undo                . "nf-md-undo")
+    (sar-save                . "nf-md-content_save")
+    (sar-revert              . "nf-md-backup_restore")
+    (sar-more                . "nf-md-chevron_down")
+    (sar-close               . "nf-md-close")
+    (sar-file                . "nf-md-file_outline")
+    (sar-folder              . "nf-md-folder_outline")
+    (sar-project             . "nf-md-source_repository"))
   "Nerd Font glyph names for the buttons, keyed by what they are for.")
 
 (defconst my/tool-bar-pick-glyph "▾"
@@ -173,7 +234,6 @@
       my/nerd-mono-font
       (face-attribute 'default :family nil t)))
 
-
 (defun my/tool-bar--icon-colour ()
   "The colour to draw the glyphs in: one that reads on the button."
   (cond ((my/theme-dark-p) "#ffffff")
@@ -195,20 +255,35 @@
                  size size size size
                  (/ size 2.0) (/ size 2.0)
                  (my/tool-bar--icon-font)
-                 (* size 0.9)
-                 (my/tool-bar--icon-colour)
-                 glyph)
-         'svg t)))))
+                  (* size 0.9)
+                   (my/tool-bar--icon-colour)
+                   glyph)
+          'svg t :ascent 'center)))))
+
+(defun my/tool-bar--dark-icons-p ()
+  "Non-nil when the dark icon variants should be used."
+  (if (fboundp 'my/system-dark-p)
+      (my/system-dark-p)
+    (my/theme-dark-p)))
 
 (defun my/tool-bar--stock (name)
   "The icon file called NAME, or nil when there is none."
   (when (stringp name)
-    (let ((size my/tool-bar-icon-size))
-      (find-image
-       (list (list :type 'svg :file (concat name ".svg") :height size)
-             (list :type 'png :file (concat name ".png") :height size)
-             (list :type 'xpm :file (concat name ".xpm") :height size)
-             (list :type 'pbm :file (concat name ".pbm") :height size))))))
+    (let ((size my/tool-bar-icon-size)
+          (try (if (my/tool-bar--dark-icons-p)
+                   (list (concat name "-dark") name)
+                 (list name))))
+      (seq-some
+       (lambda (n)
+         (seq-some
+          (lambda (ext)
+            (let ((file (expand-file-name (concat n ext)
+                                          my/tool-bar-icon-directory)))
+              (when (file-readable-p file)
+                (create-image file nil nil
+                              :height size :ascent 'center))))
+           '(".svg" ".png" ".xpm" ".pbm")))
+        try))))
 
 (defun my/tool-bar--icon-file (names)
   "The first of NAMES that answers to a file, or nil."
@@ -243,11 +318,26 @@
                               (cons (car cell) image)))
                           my/tool-bar--icons))))))
 
-(defun my/tool-bar--flush-icon-images ()
-  "Drop the cached renderings of the icons that came from files."
-  (dolist (cell my/tool-bar--images)
-    (when-let* ((file (plist-get (cddr cell) :file)))
-      (clear-image-cache file))))
+(defun my/tool-bar--mac-icon-key (name)
+  "NAME as the last three path components of its file in the icon directory."
+  (let ((sans (expand-file-name name my/tool-bar-icon-directory)))
+    (and (string-match "/\\([^/]+/[^/]+/[^/]+$\\)" sans)
+         (match-string 1 sans))))
+
+(defun my/tool-bar--install-mac-icons ()
+  "Teach emacs-mac to draw our tool-bar files as SF Symbols."
+  (when (boundp 'mac-icon-map-list)
+    (let (map)
+      (dolist (cell my/tool-bar-sf-symbols)
+        (let ((symbol (cdr cell)))
+          (dolist (name (list (car cell) (concat (car cell) "-dark")))
+            (when-let* ((key (my/tool-bar--mac-icon-key name)))
+              (push (cons key symbol) map)))))
+      (setq my/tool-bar-mac-icon-map (nreverse map)))
+    (add-to-list 'mac-icon-map-list 'my/tool-bar-mac-icon-map)
+    (when (and (boundp 'mac-system-symbol-cache)
+               (hash-table-p mac-system-symbol-cache))
+      (clrhash mac-system-symbol-cache))))
 
 (defun my/tool-bar--icon (key)
   "The character for KEY, or the empty string."
@@ -355,14 +445,13 @@
          (when run
            (list (my/tool-bar--button 'run "Run" #'my/task-run nil
                                       :help "Run this file")
-                 ;; No `:help' on the menus, deliberately: `window-tool-bar' falls back to the name, and the name.
-                 (my/tool-bar--button 'run-menu '(my/tool-bar-pick-label 'run)
-                                      #'my/task-select-run t)))
-         (when build
-           (list (my/tool-bar--button 'build "Build" #'my/task-build t
-                                      :help "Build this file")
-                 (my/tool-bar--button 'build-menu '(my/tool-bar-pick-label 'build)
-                                      #'my/task-select-build t)))
+                  (my/tool-bar--button 'run-menu '(my/tool-bar-pick-label 'run)
+                                       #'my/task-select-run nil)))
+          (when build
+            (list (my/tool-bar--button 'build "Build" #'my/task-build t
+                                       :help "Build this file")
+                  (my/tool-bar--button 'build-menu '(my/tool-bar-pick-label 'build)
+                                       #'my/task-select-build nil)))
          (list (my/tool-bar--button 'stop "Stop" #'my/task-stop t
                                     :help "Interrupt it; press again to kill it"
                                     :enable '(my/task-running-p))))))
@@ -481,6 +570,31 @@
 (defconst my/tool-bar--shades '(8 14 20)
   "How far the button, its hover, and its pressed state sit off the page.")
 
+(defface my/tool-bar-button
+  '((t :box (:line-width -1 :style released-button)))
+  "A tool-bar-styled button."
+  :group 'my/task)
+
+(defface my/tool-bar-button-hover
+  '((t :box (:line-width -1 :style released-button)))
+  "A tool-bar-styled button under the mouse."
+  :group 'my/task)
+
+(defface my/tool-bar-button-disabled
+  '((t :inherit shadow :box (:line-width -1 :style released-button)))
+  "A tool-bar-styled button that cannot be pressed."
+  :group 'my/task)
+
+(defface my/tool-bar-button-checked
+  '((t :box (:line-width -1 :style pressed-button)))
+  "A tool-bar-styled button that is on."
+  :group 'my/task)
+
+(defface my/tool-bar-button-checked-hover
+  '((t :box (:line-width -1 :style pressed-button)))
+  "A tool-bar-styled button that is on, under the mouse."
+  :group 'my/task)
+
 (defun my/tool-bar--label-family ()
   "The family the labels are set in."
   (or (if (my/tool-bar--images-p)
@@ -490,34 +604,28 @@
 
 (defun my/tool-bar--refresh-faces (&rest _)
   "Derive the tool bar's colours from the theme now in force."
-  (let ((background (face-attribute 'default :background nil t))
-        (foreground (face-attribute 'default :foreground nil t))
+  (let ((foreground (face-attribute 'default :foreground nil t))
+        (family (my/tool-bar--label-family))
         (raised '(:line-width -1 :style released-button))
         (pressed '(:line-width -1 :style pressed-button)))
-    (set-face-attribute 'tab-line nil
-                        :background background :foreground foreground
-                        :family (my/tool-bar--label-family)
-                        :height 1.0 :box nil :underline nil :overline nil
-                        :inherit 'unspecified)
-    (set-face-attribute 'window-tool-bar-button nil
-                        :inherit 'tab-line :inverse-video nil
+    (set-face-attribute 'my/tool-bar-button nil
+                        :inherit 'default :inverse-video nil :family family
                         :background (my/theme-shade (nth 0 my/tool-bar--shades))
                         :foreground foreground :box raised)
-    (set-face-attribute 'window-tool-bar-button-hover nil
-                        :inherit 'tab-line :inverse-video nil
+    (set-face-attribute 'my/tool-bar-button-hover nil
+                        :inherit 'default :inverse-video nil :family family
                         :background (my/theme-shade (nth 1 my/tool-bar--shades))
                         :foreground foreground :box raised)
-    (set-face-attribute 'window-tool-bar-button-checked nil
-                        :inherit 'tab-line :inverse-video nil
+    (set-face-attribute 'my/tool-bar-button-checked nil
+                        :inherit 'default :inverse-video nil :family family
                         :background (my/theme-shade (nth 2 my/tool-bar--shades))
                         :foreground foreground :box pressed)
-    (set-face-attribute 'window-tool-bar-button-checked-hover nil
-                        :inherit 'tab-line :inverse-video nil
+    (set-face-attribute 'my/tool-bar-button-checked-hover nil
+                        :inherit 'default :inverse-video nil :family family
                         :background (my/theme-shade (nth 2 my/tool-bar--shades))
                         :foreground foreground :box pressed)
-    ;; Disabled keeps the button's own background.
-    (set-face-attribute 'window-tool-bar-button-disabled nil
-                        :inherit 'tab-line :inverse-video nil
+    (set-face-attribute 'my/tool-bar-button-disabled nil
+                        :inherit 'default :inverse-video nil :family family
                         :background (my/theme-shade (nth 0 my/tool-bar--shades))
                         :foreground (face-attribute 'shadow :foreground nil t)
                         :box raised)))
@@ -547,51 +655,55 @@
                      (require 'project nil t)
                      (when-let* ((project (project-current nil default-directory)))
                        (project-name project))))
-    (setq-local tool-bar-map (my/tool-bar--make-map))
-    (window-tool-bar-mode 1)))
+    (setq-local tool-bar-map (my/tool-bar--make-map))))
 
 (defun my/tool-bar-toggle ()
-  "Show or hide the tool bar in this buffer."
+  "Show or hide the tool bar."
   (interactive)
-  (if (bound-and-true-p window-tool-bar-mode)
-      (window-tool-bar-mode -1)
-    (my/tool-bar-setup 'force)))
+  (tool-bar-mode 'toggle))
 
 ;;;; Keeping it current
 
+(defun my/tool-bar--active-p ()
+  "Non-nil when this buffer has a local tool bar map."
+  (local-variable-p 'tool-bar-map))
+
 (defun my/tool-bar-refresh ()
   "Rebuild the tool bar wherever one is showing."
-  (walk-windows
-   (lambda (window)
-     (with-current-buffer (window-buffer window)
-       (when (bound-and-true-p window-tool-bar-mode)
-         (kill-local-variable 'window-tool-bar-string--cache))))
-   'no-minibuf t)
-  (force-mode-line-update t))
-
-(defun my/tool-bar--rethemed (&rest _)
-  "Redraw the icons, and every bar carrying them, for the theme now in force."
-  (my/tool-bar--refresh-faces)
-  (my/tool-bar--resolve-icons)
-  ;; After resolving, which is what says where the icons came from.
-  (my/tool-bar--flush-icon-images)
   (dolist (buffer (buffer-list))
     (with-current-buffer buffer
-      (when (bound-and-true-p window-tool-bar-mode)
+      (when (my/tool-bar--active-p)
         (setq-local tool-bar-map (my/tool-bar--make-map)))))
-  ;; Isearch's map is one global keymap rather than one per buffer.
+  (force-mode-line-update t))
+
+(defvar my/tool-bar--retheme-timer nil)
+
+(defun my/tool-bar--rethemed-1 ()
+  "Rebuild faces, icon specs and maps for the theme now in force."
+  (setq my/tool-bar--retheme-timer nil)
+  (my/tool-bar--refresh-faces)
+  (my/tool-bar--resolve-icons)
   (my/tool-bar-isearch-setup)
   (my/tool-bar-refresh))
 
+(defun my/tool-bar--rethemed (&rest _)
+  "Redraw the bar after a theme change, once AppKit has settled."
+  (when (timerp my/tool-bar--retheme-timer)
+    (cancel-timer my/tool-bar--retheme-timer))
+  (setq my/tool-bar--retheme-timer
+        (run-at-time 0 nil #'my/tool-bar--rethemed-1)))
+
 ;;;; Setup
 
-(use-package window-tool-bar :ensure nil
+(use-package tool-bar :ensure nil
   :demand t
   :config
-  ;; `both-horiz' is what gives a button an icon *and* words.
-  (setopt window-tool-bar-style (if (my/tool-bar--images-p) 'both-horiz 'text))
+  (setopt tool-bar-style (if (my/tool-bar--images-p) 'both 'text))
+  (setq tool-bar-map (make-sparse-keymap))
+  (when (fboundp 'global-window-tool-bar-mode)
+    (global-window-tool-bar-mode -1))
   (require 'image)
-  (add-to-list 'image-load-path my/tool-bar-icon-directory)
+  (my/tool-bar--install-mac-icons)
   (my/tool-bar--refresh-faces)
   (my/tool-bar--resolve-icons)
   ;; After the icons are resolved: the map holds the images, not the names.
@@ -599,6 +711,7 @@
   (add-hook 'enable-theme-functions #'my/tool-bar--rethemed)
   (add-hook 'my/task-state-change-hook #'my/tool-bar-refresh)
   (dolist (hook my/tool-bar-hooks)
-    (add-hook hook #'my/tool-bar-setup)))
+    (add-hook hook #'my/tool-bar-setup))
+  (tool-bar-mode 1))
 
 ;;; bar.el ends here

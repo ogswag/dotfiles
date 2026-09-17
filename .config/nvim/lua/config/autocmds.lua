@@ -9,9 +9,12 @@ autocmd("BufWritePre", {
 	group = augroup("TrimTrailingWhitespace"),
 	callback = function()
 		if vim.bo.filetype ~= "markdown" then
-			local pos = vim.api.nvim_win_get_cursor(0)
-			vim.cmd([[%s/\s\+$//e]])
-			vim.api.nvim_win_set_cursor(0, pos) -- restore cursor after substitution
+			-- winsaveview/winrestview restores topline too, not just the cursor, so a
+			-- scrolled buffer does not jump on save. keeppatterns stops the trim regex
+			-- from becoming your last search-history entry.
+			local view = vim.fn.winsaveview()
+			vim.cmd([[keeppatterns %s/\s\+$//e]])
+			vim.fn.winrestview(view)
 		end
 	end,
 })
@@ -20,7 +23,7 @@ autocmd("BufWritePre", {
 autocmd("TextYankPost", {
 	group = augroup("YankHighlight"),
 	callback = function()
-		vim.highlight.on_yank({ higroup = "Visual", timeout = 200 })
+		vim.hl.on_yank({ higroup = "Visual", timeout = 200 })
 	end,
 })
 
@@ -29,6 +32,24 @@ autocmd("VimResized", {
 	group = augroup("ResizeSplits"),
 	callback = function()
 		vim.cmd("wincmd =")
+	end,
+})
+
+-- Window-local 'autochdir': cd each window into its file's directory.
+-- Only real file buffers (buftype == "") trigger it, so entering terminals,
+-- help or quickfix never moves the cwd. Scope is "window" (:lcd), so the tab
+-- cwd stays the project root (set with <leader>cr).
+autocmd("BufEnter", {
+	group = augroup("AutoLcd"),
+	callback = function(ev)
+		local name = vim.api.nvim_buf_get_name(ev.buf)
+		if vim.bo[ev.buf].buftype ~= "" or name == "" then
+			return
+		end
+		local dir = vim.fs.dirname(name)
+		if dir ~= vim.fn.getcwd(0) and vim.fn.isdirectory(dir) == 1 then
+			vim.fn.chdir(dir, "window")
+		end
 	end,
 })
 
@@ -55,7 +76,9 @@ autocmd("FileType", {
 	end,
 })
 
--- LaTeX: sensible editing defaults
+-- LaTeX: sensible editing defaults.
+-- NOTE: filetype `context` is deliberately NOT handled here; ConTeXt buffers
+-- are set up in after/ftplugin/context.lua with their compile/view mappings.
 autocmd("FileType", {
 	group = augroup("LaTeXSettings"),
 	pattern = { "tex", "latex", "plaintex" },

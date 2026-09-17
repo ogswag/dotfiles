@@ -34,7 +34,10 @@ opt.list = true
 -- Extend listchars with off-screen markers
 opt.listchars = { tab = "› ", trail = "·", nbsp = "␣", extends = "…", precedes = "…" }
 opt.fillchars = "eob: ,fold: ,foldopen:,foldsep: ,foldinner: ,foldclose:"
-opt.autochdir = true
+-- NOTE: 'autochdir' is deliberately OFF. It changes the global cwd and also
+-- fires for terminal and other non-file buffers. The "AutoLcd" autocmd in
+-- lua/config/autocmds.lua does the same job with :lcd on file buffers only,
+-- leaving the tab cwd (set with <leader>cr) alone.
 opt.showmode = false -- lualine shows mode; don't duplicate in cmdline
 
 -- Splits
@@ -58,6 +61,7 @@ opt.foldmethod = "expr"
 opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldenable = true -- was false
 opt.foldlevel = 99
+opt.foldlevelstart = 99 -- nvim-ufo needs this; without it folds close on file open
 
 -- Language
 opt.langmap =
@@ -73,7 +77,7 @@ opt.virtualedit = "block" -- let cursor go past EOL in visual-block
 opt.title = true -- set terminal title
 opt.showmatch = true -- briefly jump to matching bracket
 opt.sidescroll = 1
-opt.sidescrolloff = 3 -- (overrides the 8 above if you want vim parity)
+opt.sidescrolloff = 3 -- horizontal counterpart of scrolloff; independent of it
 
 -- Wrapping niceties (active wherever wrap is on, e.g. LaTeX)
 opt.breakindent = true
@@ -85,6 +89,19 @@ opt.showbreak = "↪"
 opt.wildoptions = "pum,fuzzy"
 opt.pumheight = 20
 opt.wildignore = "*.o,*.obj,*.bak,*.exe,*.swp,tags,*.out"
+
+-- ConTeXt source extensions Neovim does not map on its own. `.mkiv` and a
+-- `.tex` file containing \start... are already detected as filetype `context`;
+-- these are the ones that fall through.
+vim.filetype.add({
+	extension = {
+		mkxl = "context", -- LMTX source
+		mklx = "context",
+		mkvi = "context",
+		mkxi = "context",
+		cld = "context", -- ConTeXt Lua Document
+	},
+})
 
 -- Misc parity
 opt.fileformats = "unix,mac"

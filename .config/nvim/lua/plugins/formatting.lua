@@ -7,7 +7,7 @@ return {
 			{
 				"<leader>cf",
 				function()
-					require("conform").format({ async = true, lsp_fallback = true })
+					require("conform").format({ async = true, lsp_format = "fallback" })
 				end,
 				desc = "Format file",
 			},
@@ -18,7 +18,7 @@ return {
 				-- zigfmt is bundled with the Zig compiler; no separate install needed
 				zig = { "zigfmt" },
 				-- Gleam: no stdin-based formatter available in conform.
-				-- Falls through to lsp_fallback, which calls gleam LSP's textDocument/formatting.
+				-- Falls through to lsp_format="fallback", which calls gleam LSP's textDocument/formatting.
 				gleam = {},
 				-- latexindent ships with MacTeX; for BasicTeX: sudo tlmgr install latexindent
 				tex = { "latexindent" },
@@ -31,7 +31,7 @@ return {
 				end
 				return {
 					timeout_ms = 1000,
-					lsp_fallback = true, -- used for gleam and any ft without a formatter
+					lsp_format = "fallback", -- used for gleam and any ft without a formatter
 				}
 			end,
 		},

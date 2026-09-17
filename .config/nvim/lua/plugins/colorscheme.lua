@@ -1,9 +1,32 @@
+-- Only the ACTIVE colorscheme loads at startup. Everything else is lazy.
+--
+-- Previously all ten were `lazy = false, priority = 1000`, so every one of them
+-- was sourced on every launch while only mfd-lumon was ever applied. lazy.nvim
+-- hooks ColorSchemePre and searches lazy plugins' colors/ directories, so
+-- `:colorscheme tokyonight` (or Telescope's colorscheme picker) still loads the
+-- right plugin on demand -- including running its config/setup() first.
 return {
+	-- Active theme. Eager + highest priority so it paints before the UI draws.
+	{
+		"kungfusheep/mfd.nvim",
+		lazy = false,
+		priority = 1000,
+		config = function()
+			require("mfd").setup({
+				accessibility_contrast = 4, -- 0 (default) to 10 (max WCAG compliance)
+				no_italic = true, -- disable italic highlighting (default: false)
+				-- bright_comments = true, -- legacy: equivalent to accessibility_contrast = 4
+			})
+			-- vim.cmd.colorscheme("mfd-lumon")
+		end,
+	},
+
+	-- Available on demand via :colorscheme <name>
+	{ "panjakub/cobaltnext.nvim", name = "cobaltnext", lazy = false },
 	{ "lunacookies/vim-colors-xcode", lazy = false },
 	{
 		"ogswag/valve-olive.nvim",
 		lazy = false,
-		priority = 1000,
 		opts = {
 			darker_bg = true,
 			transparent = false,
@@ -17,22 +40,23 @@ return {
 	{
 		"ogswag/envy.nvim",
 		lazy = false,
-		priority = 1000,
 		config = function(_, opts)
 			require("envy").setup(opts)
 		end,
 	},
-	{ "NLKNguyen/papercolor-theme", lazy = false, priority = 1000 },
-	{ "jonathanfilip/vim-lucius", lazy = false, priority = 1000 },
-	{ "forest-nvim/sequoia.nvim", lazy = false, priority = 1000 },
-	{ "folke/tokyonight.nvim", lazy = false, priority = 1000 },
-	{ "kungfusheep/mfd.nvim", lazy = false },
+	{ "NLKNguyen/papercolor-theme", lazy = false },
+	{ "jonathanfilip/vim-lucius", lazy = false },
+	{ "forest-nvim/sequoia.nvim", lazy = false },
+	{ "folke/tokyonight.nvim", lazy = false },
 	{
 		"IroncladDev/osmium",
 		lazy = false,
 		config = function()
 			require("osmium").setup({
 				integrations = {
+					-- gitsigns is currently disabled (lua/plugins/git.lua is fully
+					-- commented out); harmless, but this flag does nothing until
+					-- it's re-enabled.
 					gitsigns = true,
 					telescope = true,
 				},
@@ -46,13 +70,13 @@ return {
 		opts = {
 			set_dark_mode = function()
 				vim.api.nvim_set_option_value("background", "dark", {})
-				vim.cmd.colorscheme("habamax")
-				require("lualine").setup({ options = { theme = "codedark" } })
+				vim.cmd.colorscheme("mfd-lumon")
+				require("lualine").setup({ options = { theme = "auto" } })
 			end,
 			set_light_mode = function()
-				vim.api.nvim_set_option_value("background", "light", {})
-				vim.cmd.colorscheme("envy")
-				require("lualine").setup({ options = { theme = "envy" } })
+				-- vim.api.nvim_set_option_value("background", "light", {})
+				vim.cmd.colorscheme("mfd-paper")
+				require("lualine").setup({ options = { theme = "auto" } })
 			end,
 			update_interval = 3000,
 			fallback = "dark",

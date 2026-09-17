@@ -1,6 +1,6 @@
 function plugin-load {
     local repo plugdir initfile initfiles=()
-    : ${ZPLUGINDIR:=${ZDOTDIR:-~/.config/zsh}/.zsh_plugins}
+    : ${ZPLUGINDIR:=${ZDOTDIR:-~/.local}/zsh_plugins}
     for repo in $@; do
 	plugdir=$ZPLUGINDIR/${repo:t}
 	initfile=$plugdir/${repo:t}.plugin.zsh
@@ -19,7 +19,7 @@ function plugin-load {
 done
 }
 
-ZPLUGINDIR=${ZPLUGINDIR:-${ZDOTDIR:-$HOME/.config/zsh}/.zsh_plugins}
+ZPLUGINDIR=${ZPLUGINDIR:-${ZDOTDIR:-$HOME/.local}/zsh_plugins}
 
 if [[ ! -d $ZPLUGINDIR/zsh_unplugged ]]; then
     git clone --quiet https://github.com/mattmc3/zsh_unplugged $ZPLUGINDIR/zsh_unplugged

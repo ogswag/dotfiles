@@ -8,10 +8,7 @@
 (require 'seq)
 
 (defconst my/mono-fonts
-  '("IoskeleyMono Nerd Font"
-    "Inconsolata LGC Nerd Font"
-    "Inconsolata LGC"
-    "Lilex Nerd Font"
+  '("Lilex Nerd Font"
     "Lilex"
     "Liga Mononoki"
     "mononoki"
@@ -22,21 +19,20 @@
     "Consolas"))
 
 (defconst my/nerd-mono-fonts
-  '("IoskeleyMono Nerd Font"
-    "Inconsolata LGC Nerd Font Mono"
-    "Lilex Nerd Font Mono"
+  '("Lilex Nerd Font Mono"
     "Hack Nerd Font Mono"
     "Mononoki Nerd Font Mono"
     "Symbols Nerd Font Mono"))
 
 (defconst my/sans-fonts
-  '("Open Sans"
+  '("SF Pro"
+    "Open Sans"
     "Source Sans 3"
     "Verdana"
     "DejaVu Sans"
     "Noto Sans"))
 
-(defconst my/font-size 15)
+(defconst my/font-size 12)
 
 (defun my/first-available-font (candidates)
   "Return the first family in CANDIDATES installed on this system, or nil."
