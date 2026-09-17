@@ -11,10 +11,10 @@ return {
 				{ "vmap", "gN", "<Plug>(bullets-renumber)" },
 				{ "nmap", "gN", "<Plug>(bullets-renumber)" },
 				{ "nmap", "<leader>x", "<Plug>(bullets-toggle-checkbox)" },
-				{ "imap", "<C-t>", "<Plug>(bullets-demote)" },
-				{ "nmap", ">>", "<Plug>(bullets-demote)" },
-				{ "imap", "<C-d>", "<Plug>(bullets-promote)" },
-				{ "nmap", "<<", "<Plug>(bullets-promote)" },
+				{ "imap", "<C-,>", "<Plug>(bullets-demote)" },
+				{ "imap", "<C-.>", "<Plug>(bullets-promote)" },
+				-- { "nmap", ">>", "<Plug>(bullets-demote)" },
+				-- { "nmap", "<<", "<Plug>(bullets-promote)" },
 			}
 		end,
 	},
@@ -64,26 +64,7 @@ return {
 				lualine_a = { "mode" },
 				lualine_b = { "branch", "diff", "diagnostics" },
 				lualine_c = { { "filename", path = 1 } }, -- show relative path
-				lualine_x = {
-					-- ConTeXt compile/watch status. package.loaded check means this
-					-- never pulls in lua/context/compile.lua outside ConTeXt work.
-					{
-						function()
-							local compile = package.loaded["context.compile"]
-							if not compile then
-								return ""
-							end
-							if compile.is_running() then
-								return "󰑓 typesetting"
-							end
-							if compile.is_watching() then
-								return "󰈈 watch"
-							end
-							return ""
-						end,
-					},
-					"filetype",
-				},
+				lualine_x = { "filetype" },
 				lualine_y = { "progress" },
 				lualine_z = { "location" },
 			},
@@ -119,38 +100,63 @@ return {
 				{ "<leader>g", group = "git" },
 				{ "<leader>b", group = "buffer" },
 				{ "<leader>r", group = "rename" },
-				-- vimtex (LaTeX) and lua/context/compile.lua (ConTeXt) share the
-				-- same <localleader>l* layout on purpose.
-				{ "<localleader>l", group = "TeX / ConTeXt" },
+				{ "<localleader>l", group = "LaTeX" },
 			},
 		},
 	},
 
 	-- tabs
 	{
-		"akinsho/bufferline.nvim",
-		version = "*",
-		dependencies = { "echasnovski/mini.icons" },
-		event = "VimEnter",
-		keys = {
-			{ "<leader>bp", "<cmd>BufferLinePick<CR>", desc = "Pick buffer" },
-			{ "<leader>bx", "<cmd>BufferLinePickClose<CR>", desc = "Pick buffer to close" },
+		"nanozuki/tabby.nvim",
+		lazy = false,
+		dependencies = {
+			"nvim-tree/nvim-web-devicons",
 		},
-		opts = {
-			options = {
-				mode = "buffers",
-				close_command = function(n)
-					require("mini.bufremove").delete(n, false)
-				end,
-				right_mouse_command = function(n)
-					require("mini.bufremove").delete(n, false)
-				end,
-				left_mouse_command = "buffer %d", -- left-click tab switches to it
-				indicator = { style = "icon", icon = "▎" },
-				separator_style = "thin",
-				show_buffer_close_icons = true,
-				show_close_icon = false,
-			},
+
+		config = function()
+			vim.o.showtabline = 2
+
+			-- Preserve real tab layouts + Tabby tab names in sessions.
+			vim.opt.sessionoptions:append("tabpages")
+			vim.opt.sessionoptions:append("globals")
+
+			require("tabby").setup({
+				preset = "tab_only",
+
+				option = {
+					nerdfont = true,
+
+					-- If you use lualine, you can optionally inherit its theme:
+					-- lualine_theme = "auto",
+
+					tab_name = {
+						-- Fallback name when you haven't manually renamed a tab.
+						name_fallback = function(tabid)
+							return "Tab " .. tabid
+						end,
+					},
+				},
+			})
+		end,
+
+		keys = {
+			-- Create / close tabs
+			{ "<leader>tn", "<cmd>tabnew<CR>", desc = "New tab" },
+			{ "<leader>tc", "<cmd>tabclose<CR>", desc = "Close tab" },
+			{ "<leader>to", "<cmd>tabonly<CR>", desc = "Close other tabs" },
+
+			-- Navigate tabs
+			{ "<leader>tl", "<cmd>tabnext<CR>", desc = "Next tab" },
+			{ "<leader>th", "<cmd>tabprevious<CR>", desc = "Previous tab" },
+
+			-- Move tabs
+			{ "<leader>tL", "<cmd>+tabmove<CR>", desc = "Move tab right" },
+			{ "<leader>tH", "<cmd>-tabmove<CR>", desc = "Move tab left" },
+
+			-- Tabby features
+			{ "<leader>tr", "<cmd>Tabby rename_tab<CR>", desc = "Rename tab" },
+			{ "<leader>tj", "<cmd>Tabby jump_to_tab<CR>", desc = "Jump to tab" },
+			{ "<leader>tw", "<cmd>Tabby pick_window<CR>", desc = "Pick window" },
 		},
 	},
 

@@ -2,9 +2,10 @@ return {
 	{
 		"nvim-telescope/telescope.nvim",
 		branch = "master",
+
 		dependencies = {
 			"nvim-lua/plenary.nvim",
-			-- Native fzf sorter: dramatically faster for large repos
+
 			{
 				"nvim-telescope/telescope-fzf-native.nvim",
 				build = "make",
@@ -12,53 +13,230 @@ return {
 					return vim.fn.executable("make") == 1
 				end,
 			},
+
+			"nvim-telescope/telescope-file-browser.nvim",
 		},
+
+		-- This runs at startup, even though Telescope itself is lazy-loaded.
+		--
+		-- Make:
+		--   :e file
+		--   :edit file
+		--
+		-- behave like:
+		--   :tabedit file
+		init = function()
+			vim.cmd([[
+				cnoreabbrev <expr> e
+					\ getcmdtype() ==# ':' && getcmdline() ==# 'e'
+					\ ? 'tabedit'
+					\ : 'e'
+
+				cnoreabbrev <expr> edit
+					\ getcmdtype() ==# ':' && getcmdline() ==# 'edit'
+					\ ? 'tabedit'
+					\ : 'edit'
+			]])
+		end,
+
 		cmd = "Telescope",
+
 		keys = {
-			{ "<leader>ff", "<cmd>Telescope find_files<CR>", desc = "Find files" },
-			{ "<leader>fg", "<cmd>Telescope live_grep<CR>", desc = "Live grep" },
-			{ "<leader>fb", "<cmd>Telescope buffers<CR>", desc = "Buffers" },
+			-- Navigable filesystem browser.
+			{
+				"<leader>e",
+				"<cmd>Telescope file_browser path=%:p:h select_buffer=true<CR>",
+				desc = "Browse files",
+			},
+
+			-- Flat fuzzy file search.
+			{
+				"<leader>ff",
+				"<cmd>Telescope find_files<CR>",
+				desc = "Find files",
+			},
+
 			{ "<leader>fr", "<cmd>Telescope oldfiles<CR>", desc = "Recent files" },
-			{ "<leader>fh", "<cmd>Telescope help_tags<CR>", desc = "Help tags" },
+			{ "<leader>g", "<cmd>Telescope live_grep<CR>", desc = "Live grep" },
+			{ "<leader>b", "<cmd>Telescope buffers<CR>", desc = "Buffers" },
+			{ "<leader>h", "<cmd>Telescope help_tags<CR>", desc = "Help tags" },
 			{ "<leader>fd", "<cmd>Telescope diagnostics<CR>", desc = "Diagnostics" },
-			{ "<leader>/", "<cmd>Telescope current_buffer_fuzzy_find<CR>", desc = "Search in buffer" },
+
+			{
+				"<leader>/",
+				"<cmd>Telescope current_buffer_fuzzy_find<CR>",
+				desc = "Search in buffer",
+			},
+
+			{
+				"<leader>o",
+				function()
+					require("outline").open()
+				end,
+				desc = "Outline",
+			},
 		},
+
 		config = function()
 			local telescope = require("telescope")
 			local actions = require("telescope.actions")
+			local action_state = require("telescope.actions.state")
+			local fb_actions = require("telescope._extensions.file_browser.actions")
+
+			-------------------------------------------------------------------
+			-- File-browser selection
+			--
+			-- Directory + <CR> → enter directory
+			-- File      + <CR> → open in a real Neovim tabpage
+			-------------------------------------------------------------------
+
+			local function file_browser_select(prompt_bufnr)
+				local entry = action_state.get_selected_entry()
+
+				if not entry then
+					return
+				end
+
+				-- telescope-file-browser entries expose a plenary Path.
+				--
+				-- For directories, retain the browser's normal selection
+				-- behavior so <CR> descends into them.
+				if entry.Path and entry.Path:is_dir() then
+					actions.select_default(prompt_bufnr)
+					return
+				end
+
+				-- Files open in a real Neovim tabpage.
+				actions.select_tab(prompt_bufnr)
+			end
 
 			telescope.setup({
 				defaults = {
 					prompt_prefix = " ",
 					selection_caret = " ",
+					entry_prefix = " ",
+
 					path_display = { "smart" },
+
 					sorting_strategy = "ascending",
+
 					layout_config = {
-						horizontal = { prompt_position = "top", preview_width = 0.55 },
+						horizontal = {
+							prompt_position = "top",
+							preview_width = 0.55,
+						},
 					},
+
 					mappings = {
 						i = {
 							["<C-j>"] = actions.move_selection_next,
 							["<C-k>"] = actions.move_selection_previous,
+
 							["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
+
 							["<Esc>"] = actions.close,
 						},
 					},
 				},
+
+				-----------------------------------------------------------------
+				-- Built-in pickers
+				-----------------------------------------------------------------
+
 				pickers = {
 					find_files = {
-						hidden = true, -- show dotfiles
+						hidden = true,
+
 						file_ignore_patterns = {
 							"^%.git/",
 							"^node_modules/",
 							"^%.zig%-cache/",
 							"^_minted",
 						},
+
+						-- Open selected files in real Neovim tabpages.
+						mappings = {
+							i = {
+								["<CR>"] = actions.select_tab,
+							},
+
+							n = {
+								["<CR>"] = actions.select_tab,
+							},
+						},
+					},
+					oldfiles = {
+						-- Open selected files in real Neovim tabpages.
+						mappings = {
+							i = {
+								["<CR>"] = actions.select_tab,
+							},
+
+							n = {
+								["<CR>"] = actions.select_tab,
+							},
+						},
+					},
+				},
+
+				-----------------------------------------------------------------
+				-- Extensions
+				-----------------------------------------------------------------
+
+				extensions = {
+					file_browser = {
+						-- Folder-browser searches start from wherever we've
+						-- navigated instead of jumping back to the original cwd.
+						cwd_to_path = true,
+
+						-- Group directories together.
+						grouped = true,
+
+						-- Show dotfiles.
+						hidden = {
+							file_browser = true,
+							folder_browser = true,
+						},
+
+						-- Honour .gitignore.
+						respect_gitignore = true,
+
+						-- Use telescope-file-browser in place of netrw.
+						hijack_netrw = true,
+
+						mappings = {
+							i = {
+								-- Vertico-directory-like backspace:
+								--
+								-- prompt non-empty → delete character
+								-- prompt empty     → parent directory
+								["<BS>"] = fb_actions.backspace,
+
+								-- Explicitly go to parent directory.
+								["<C-g>"] = fb_actions.goto_parent_dir,
+
+								-- Directory → descend
+								-- File      → new tabpage
+								["<CR>"] = file_browser_select,
+							},
+
+							n = {
+								["<CR>"] = file_browser_select,
+
+								-- Convenient normal-mode parent directory.
+								["-"] = fb_actions.goto_parent_dir,
+							},
+						},
 					},
 				},
 			})
 
+			-------------------------------------------------------------------
+			-- Extensions
+			-------------------------------------------------------------------
+
 			pcall(telescope.load_extension, "fzf")
+			pcall(telescope.load_extension, "file_browser")
 		end,
 	},
 }

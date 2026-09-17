@@ -2,8 +2,7 @@
 -- Ships pre-built binaries on GitHub releases so you don't need Rust installed.
 return {
 	-- Snippet engine. LuaSnip rather than mini.snippets because only LuaSnip can
-	-- auto-expand: the ConTeXt math abbreviations in snippets/context.lua fire on
-	-- a regex match as you type, with no Tab press.
+	-- auto-expand on a regex match as you type, with no Tab press.
 	{
 		"L3MON4D3/LuaSnip",
 		version = "v2.*",
@@ -91,23 +90,9 @@ return {
 				default = { "lsp", "path", "snippets", "buffer" },
 
 				per_filetype = {
-					-- Prose filetypes: snippets first so a 2-char prefix like `st`
-					-- resolves to \starttext rather than losing to one of the ~5,600
-					-- entries in the generated ConTeXt command list.
-					context = { "snippets", "context_cmds", "lsp", "buffer", "path" },
 					tex = { "snippets", "lsp", "buffer", "path" },
 					plaintex = { "snippets", "lsp", "buffer", "path" },
 					markdown = { "snippets", "lsp", "buffer", "path" },
-				},
-
-				providers = {
-					-- Generated from ConTeXt's own interface definition; see
-					-- scripts/gen-context-data.lua. Pure in-memory table, no process.
-					context_cmds = {
-						name = "ConTeXt",
-						module = "blink_context",
-						score_offset = 2,
-					},
 				},
 			},
 

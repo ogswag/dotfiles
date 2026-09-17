@@ -17,6 +17,7 @@ local ensure = {
 	"bibtex",
 	"markdown",
 	"markdown_inline",
+	"html",
 	"bash",
 	"json",
 	"toml",
@@ -24,9 +25,6 @@ local ensure = {
 	"vim",
 	"vimdoc",
 	"query",
-	-- NOTE: there is no tree-sitter grammar for ConTeXt (checked the full
-	-- 326-parser registry), so `context` buffers stay regex-highlighted.
-	-- See after/syntax/context.vim for the math-zone additions.
 }
 
 return {

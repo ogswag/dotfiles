@@ -85,3 +85,15 @@ map("i", "<C-k>", "<Up>", { silent = true })
 map("i", "<C-j>", "<Down>", { silent = true })
 map("i", "<C-h>", "<Left>", { silent = true })
 map("i", "<C-l>", "<Right>", { silent = true })
+
+vim.cmd([[
+	cnoreabbrev <expr> e
+		\ getcmdtype() ==# ':' && getcmdline() ==# 'e'
+		\ ? 'tabedit'
+		\ : 'e'
+
+	cnoreabbrev <expr> edit
+		\ getcmdtype() ==# ':' && getcmdline() ==# 'edit'
+		\ ? 'tabedit'
+		\ : 'edit'
+]])

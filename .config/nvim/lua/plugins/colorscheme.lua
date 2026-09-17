@@ -74,8 +74,9 @@ return {
 				require("lualine").setup({ options = { theme = "auto" } })
 			end,
 			set_light_mode = function()
-				-- vim.api.nvim_set_option_value("background", "light", {})
-				vim.cmd.colorscheme("mfd-paper")
+				vim.api.nvim_set_option_value("background", "light", {})
+				-- vim.g.green_grass_mode = "soft" -- "soft" or "vivid"
+				vim.cmd.colorscheme("PaperColor")
 				require("lualine").setup({ options = { theme = "auto" } })
 			end,
 			update_interval = 3000,

@@ -22,6 +22,11 @@ return {
 				gleam = {},
 				-- latexindent ships with MacTeX; for BasicTeX: sudo tlmgr install latexindent
 				tex = { "latexindent" },
+				-- :MasonInstall mdformat. --wrap keep: don't reflow prose.
+				markdown = { "mdformat" },
+			},
+			formatters = {
+				mdformat = { prepend_args = { "--wrap", "keep" } },
 			},
 
 			-- Format on save (respects per-buffer opt-out via :lua vim.b.disable_autoformat=true)

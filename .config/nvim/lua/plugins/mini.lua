@@ -32,9 +32,7 @@ return {
 	},
 
 	-- NOTE: the snippet engine is LuaSnip, not mini.snippets -- see
-	-- lua/plugins/completion.lua. mini.snippets cannot auto-expand (its own docs:
-	-- "'LuaSnip' can autoexpand snippets, while this module always requires" a
-	-- keypress), which rules out the regex math abbreviations used for ConTeXt.
+	-- lua/plugins/completion.lua.
 
 	{
 		"echasnovski/mini.bufremove",

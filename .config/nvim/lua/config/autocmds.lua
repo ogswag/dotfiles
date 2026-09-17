@@ -9,9 +9,6 @@ autocmd("BufWritePre", {
 	group = augroup("TrimTrailingWhitespace"),
 	callback = function()
 		if vim.bo.filetype ~= "markdown" then
-			-- winsaveview/winrestview restores topline too, not just the cursor, so a
-			-- scrolled buffer does not jump on save. keeppatterns stops the trim regex
-			-- from becoming your last search-history entry.
 			local view = vim.fn.winsaveview()
 			vim.cmd([[keeppatterns %s/\s\+$//e]])
 			vim.fn.winrestview(view)
@@ -32,24 +29,6 @@ autocmd("VimResized", {
 	group = augroup("ResizeSplits"),
 	callback = function()
 		vim.cmd("wincmd =")
-	end,
-})
-
--- Window-local 'autochdir': cd each window into its file's directory.
--- Only real file buffers (buftype == "") trigger it, so entering terminals,
--- help or quickfix never moves the cwd. Scope is "window" (:lcd), so the tab
--- cwd stays the project root (set with <leader>cr).
-autocmd("BufEnter", {
-	group = augroup("AutoLcd"),
-	callback = function(ev)
-		local name = vim.api.nvim_buf_get_name(ev.buf)
-		if vim.bo[ev.buf].buftype ~= "" or name == "" then
-			return
-		end
-		local dir = vim.fs.dirname(name)
-		if dir ~= vim.fn.getcwd(0) and vim.fn.isdirectory(dir) == 1 then
-			vim.fn.chdir(dir, "window")
-		end
 	end,
 })
 
@@ -77,8 +56,6 @@ autocmd("FileType", {
 })
 
 -- LaTeX: sensible editing defaults.
--- NOTE: filetype `context` is deliberately NOT handled here; ConTeXt buffers
--- are set up in after/ftplugin/context.lua with their compile/view mappings.
 autocmd("FileType", {
 	group = augroup("LaTeXSettings"),
 	pattern = { "tex", "latex", "plaintex" },
@@ -86,9 +63,6 @@ autocmd("FileType", {
 		vim.opt_local.wrap = true
 		vim.opt_local.spell = true
 		vim.opt_local.spelllang = "en_us,ru_yo"
-		-- Don't trim LaTeX trailing whitespace at the file level;
-		-- trailing whitespace in tex sources is usually harmless and
-		-- latexindent will clean it up on format anyway.
 	end,
 })
 

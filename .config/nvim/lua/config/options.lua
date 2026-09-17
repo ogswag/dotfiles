@@ -34,10 +34,7 @@ opt.list = true
 -- Extend listchars with off-screen markers
 opt.listchars = { tab = "› ", trail = "·", nbsp = "␣", extends = "…", precedes = "…" }
 opt.fillchars = "eob: ,fold: ,foldopen:,foldsep: ,foldinner: ,foldclose:"
--- NOTE: 'autochdir' is deliberately OFF. It changes the global cwd and also
--- fires for terminal and other non-file buffers. The "AutoLcd" autocmd in
--- lua/config/autocmds.lua does the same job with :lcd on file buffers only,
--- leaving the tab cwd (set with <leader>cr) alone.
+opt.autochdir = true
 opt.showmode = false -- lualine shows mode; don't duplicate in cmdline
 
 -- Splits
@@ -89,19 +86,6 @@ opt.showbreak = "↪"
 opt.wildoptions = "pum,fuzzy"
 opt.pumheight = 20
 opt.wildignore = "*.o,*.obj,*.bak,*.exe,*.swp,tags,*.out"
-
--- ConTeXt source extensions Neovim does not map on its own. `.mkiv` and a
--- `.tex` file containing \start... are already detected as filetype `context`;
--- these are the ones that fall through.
-vim.filetype.add({
-	extension = {
-		mkxl = "context", -- LMTX source
-		mklx = "context",
-		mkvi = "context",
-		mkxi = "context",
-		cld = "context", -- ConTeXt Lua Document
-	},
-})
 
 -- Misc parity
 opt.fileformats = "unix,mac"

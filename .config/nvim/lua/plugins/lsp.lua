@@ -15,12 +15,9 @@ return {
 			ensure_installed = {
 				"zls", -- Zig Language Server
 				"lua_ls", -- Lua (for editing this config)
-				"texlab", -- LaTeX (ConTeXt is handled by digestif, below)
+				"texlab", -- LaTeX
+				"markdown_oxide",
 				-- gleam is NOT in Mason; must be installed via `brew install gleam`
-				-- digestif is NOT installed here: mason's luarocks installer needs
-				-- `luarocks` on PATH anyway, and its registry pin lags the release
-				-- that reads ConTeXt's interface files at runtime. Install with:
-				--   brew install luarocks && luarocks install --local digestif
 			},
 			-- NOTE: `automatic_installation` was a mason-lspconfig v1 key and is
 			-- silently ignored by v2 (installed here: v2.2.0). v2's equivalent is
@@ -105,73 +102,19 @@ return {
 				},
 			})
 
-			-- digestif: language server for TeX "and friends", and the only one
-			-- that understands ConTeXt. It reads ConTeXt's own interface files at
-			-- runtime, so it tracks the installed distribution (including
-			-- third-party modules) rather than a bundled snapshot.
-			--
-			-- nvim-lspconfig ships lsp/digestif.lua with
-			--   filetypes = { "tex", "plaintex", "context" }
-			-- which would attach it to LaTeX buffers alongside texlab and give you
-			-- every completion twice. Narrow it to the filetypes texlab can't do.
-			--
-			-- The `cmd` is resolved rather than left as bare "digestif": TeX Live
-			-- ships its own digestif wrapper in /Library/TeX/texbin that is earlier
-			-- on PATH and, on this machine, fails with "Can't find 'digestif.zip'
-			-- archive". Prefer the luarocks build when it's there.
-			local digestif = vim.fn.expand("~/.luarocks/bin/digestif")
-			if vim.fn.executable(digestif) == 0 then
-				digestif = "digestif"
-			end
-
-			-- digestif finds ConTeXt's interface definition (context-en.xml) by
-			-- indexing the texmf trees that `kpsewhich` reports -- which are TeX
-			-- Live's. Your ConTeXt is a standalone LMTX install outside that tree,
-			-- so out of the box digestif attaches, finds no ConTeXt data, and
-			-- answers every completion request with nil. DIGESTIF_TEXMF fixes that,
-			-- but it REPLACES the search list, so TeX Live's dirs are appended too.
-			local function digestif_texmf()
-				local dirs = {}
-				local ctx_bin = vim.fn.exepath("context")
-				if ctx_bin ~= "" then
-					-- .../tex/texmf-osx-arm64/bin/context -> .../tex/texmf-context
-					local tex_root = vim.fn.fnamemodify(vim.fn.resolve(ctx_bin), ":h:h:h")
-					local ctx_tree = tex_root .. "/texmf-context"
-					if vim.uv.fs_stat(ctx_tree) then
-						table.insert(dirs, ctx_tree)
-					end
-				end
-				local kpse = vim.system({ "kpsewhich", "-var-brace-value=TEXMF" }, { text = true }):wait()
-				if kpse.code == 0 then
-					for dir in vim.trim(kpse.stdout):gmatch("[^:]+") do
-						table.insert(dirs, (dir:gsub("^!!", "")))
-					end
-				end
-				return table.concat(dirs, ":")
-			end
-
-			vim.lsp.config("digestif", {
-				-- `cmd` as a function runs only when the client actually starts,
-				-- i.e. in a ConTeXt buffer. As a plain table + cmd_env, the
-				-- kpsewhich lookup above (~50 ms) would run at lspconfig load --
-				-- the first file open of EVERY session, Zig and Lua included.
-				cmd = function(dispatchers, config)
-					return vim.lsp.rpc.start({ digestif }, dispatchers, {
-						cwd = config.root_dir,
-						env = { DIGESTIF_TEXMF = digestif_texmf() },
-					})
-				end,
-				filetypes = { "context" },
-				root_markers = { ".git", "*.mkxl", "*.mkiv" },
+			-- markdown-oxide: PKM LSP for any markdown buffer. Wiki-link
+			-- completions need dynamic watched-files registration.
+			vim.lsp.config("markdown_oxide", {
+				capabilities = {
+					workspace = {
+						didChangeWatchedFiles = { dynamicRegistration = true },
+					},
+				},
 			})
 
 			-- ── Activate servers ─────────────────────────────────────────────────
 			-- Explicit, because mason-lspconfig's automatic_enable is off above.
-			local servers = { "zls", "gleam", "texlab", "lua_ls" }
-			if vim.fn.executable(digestif) == 1 then
-				table.insert(servers, "digestif")
-			end
-			vim.lsp.enable(servers)
+			vim.lsp.enable({ "zls", "gleam", "texlab", "lua_ls", "markdown_oxide" })
 
 			-- ── Diagnostic display ───────────────────────────────────────────────
 			vim.diagnostic.config({
