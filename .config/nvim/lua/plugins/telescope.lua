@@ -17,28 +17,6 @@ return {
 			"nvim-telescope/telescope-file-browser.nvim",
 		},
 
-		-- This runs at startup, even though Telescope itself is lazy-loaded.
-		--
-		-- Make:
-		--   :e file
-		--   :edit file
-		--
-		-- behave like:
-		--   :tabedit file
-		init = function()
-			vim.cmd([[
-				cnoreabbrev <expr> e
-					\ getcmdtype() ==# ':' && getcmdline() ==# 'e'
-					\ ? 'tabedit'
-					\ : 'e'
-
-				cnoreabbrev <expr> edit
-					\ getcmdtype() ==# ':' && getcmdline() ==# 'edit'
-					\ ? 'tabedit'
-					\ : 'edit'
-			]])
-		end,
-
 		cmd = "Telescope",
 
 		keys = {
@@ -49,10 +27,16 @@ return {
 				desc = "Browse files",
 			},
 
-			-- Flat fuzzy file search.
+			-- Flat fuzzy file search from the tab/project root, not the
+			-- window-local lcd (AutoLcd), so sibling dirs stay reachable.
 			{
 				"<leader>ff",
-				"<cmd>Telescope find_files<CR>",
+				function()
+					local root = vim.fs.root(0, { ".git", "build.zig", "gleam.toml", ".luarc.json", "Makefile" })
+					require("telescope.builtin").find_files({
+						cwd = root or vim.fn.getcwd(-1, 0),
+					})
+				end,
 				desc = "Find files",
 			},
 
@@ -90,6 +74,25 @@ return {
 			-- File      + <CR> → open in a real Neovim tabpage
 			-------------------------------------------------------------------
 
+			-- Resolve to an absolute path before tabedit. Relative paths plus
+			-- window-local lcd otherwise create empty buffers in the wrong dir.
+			local function select_tab(prompt_bufnr)
+				local entry = action_state.get_selected_entry()
+				if entry then
+					local p = entry.path or entry.filename
+					if p and p ~= "" then
+						if p:sub(1, 1) ~= "/" then
+							local picker = action_state.get_current_picker(prompt_bufnr)
+							p = vim.fs.joinpath(picker.cwd or vim.uv.cwd(), p)
+						end
+						local abs = vim.fn.fnamemodify(p, ":p")
+						entry.path = abs
+						entry.filename = abs
+					end
+				end
+				actions.select_tab(prompt_bufnr)
+			end
+
 			local function file_browser_select(prompt_bufnr)
 				local entry = action_state.get_selected_entry()
 
@@ -107,7 +110,7 @@ return {
 				end
 
 				-- Files open in a real Neovim tabpage.
-				actions.select_tab(prompt_bufnr)
+				select_tab(prompt_bufnr)
 			end
 
 			telescope.setup({
@@ -157,11 +160,11 @@ return {
 						-- Open selected files in real Neovim tabpages.
 						mappings = {
 							i = {
-								["<CR>"] = actions.select_tab,
+								["<CR>"] = select_tab,
 							},
 
 							n = {
-								["<CR>"] = actions.select_tab,
+								["<CR>"] = select_tab,
 							},
 						},
 					},
@@ -169,11 +172,11 @@ return {
 						-- Open selected files in real Neovim tabpages.
 						mappings = {
 							i = {
-								["<CR>"] = actions.select_tab,
+								["<CR>"] = select_tab,
 							},
 
 							n = {
-								["<CR>"] = actions.select_tab,
+								["<CR>"] = select_tab,
 							},
 						},
 					},

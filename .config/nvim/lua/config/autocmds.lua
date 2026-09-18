@@ -32,6 +32,26 @@ autocmd("VimResized", {
 	end,
 })
 
+-- Window-local cwd follows the file (replaces 'autochdir', which is global
+-- and makes :tabedit / Telescope resolve basenames against the wrong dir).
+-- Tab-local tcd (<leader>cr) still applies to new tabs that have no lcd.
+autocmd("BufEnter", {
+	group = augroup("AutoLcd"),
+	callback = function()
+		if vim.bo.buftype ~= "" then
+			return
+		end
+		local path = vim.api.nvim_buf_get_name(0)
+		if path == "" then
+			return
+		end
+		local dir = vim.fn.fnamemodify(path, ":p:h")
+		if vim.fn.isdirectory(dir) == 1 then
+			vim.cmd.lcd(vim.fn.fnameescape(dir))
+		end
+	end,
+})
+
 -- Return to last cursor position when reopening a file
 autocmd("BufReadPost", {
 	group = augroup("LastCursorPos"),

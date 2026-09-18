@@ -34,7 +34,6 @@ opt.list = true
 -- Extend listchars with off-screen markers
 opt.listchars = { tab = "› ", trail = "·", nbsp = "␣", extends = "…", precedes = "…" }
 opt.fillchars = "eob: ,fold: ,foldopen:,foldsep: ,foldinner: ,foldclose:"
-opt.autochdir = true
 opt.showmode = false -- lualine shows mode; don't duplicate in cmdline
 
 -- Splits
