@@ -17,7 +17,6 @@
 (declare-function markdown-insert-inline-image "markdown-mode"
                   (text url &optional title))
 (declare-function vertico--candidate "vertico" (&optional hl))
-(defvar optex--russian)
 
 ;;;; Customization
 
@@ -55,8 +54,6 @@
 (defcustom imgdrop-insert-functions
   '((LaTeX-mode     . imgdrop-insert-latex)
     (latex-mode     . imgdrop-insert-latex)
-    (plain-TeX-mode . imgdrop-insert-optex)
-    (plain-tex-mode . imgdrop-insert-optex)
     (TeX-mode       . imgdrop-insert-latex)
     (tex-mode       . imgdrop-insert-latex)
     (markdown-mode  . imgdrop-insert-markdown)
@@ -72,21 +69,9 @@
   :type 'boolean
   :group 'imgdrop)
 
-(defcustom imgdrop-tex-width ".8\\hsize"
-  "Width given to OpTeX's \\picw."
-  :type 'string
-  :group 'imgdrop)
-
 (defcustom imgdrop-latex-width "0.8\\linewidth"
   "Width given to \\includegraphics."
   :type 'string
-  :group 'imgdrop)
-
-(defcustom imgdrop-optex-russian 'auto
-  "Whether OpTeX markup uses the Cyrillic macro names from rutex.tex."
-  :type '(choice (const :tag "Follow the buffer" auto)
-                 (const :tag "Always" t)
-                 (const :tag "Never" nil))
   :group 'imgdrop)
 
 (defcustom imgdrop-preview t
@@ -225,25 +210,9 @@
 
 ;;;; Markup
 
-(defun imgdrop--optex-russian-p ()
-  "Return non-nil when OpTeX markup should use the Cyrillic macro names."
-  (if (eq imgdrop-optex-russian 'auto)
-      (bound-and-true-p optex--russian)
-    imgdrop-optex-russian))
-
 (defun imgdrop--tex-wrap (body)
   "Return BODY centred, or as it stands, per `imgdrop-tex-centered'."
   (if imgdrop-tex-centered (format "\\centerline{%s}" body) body))
-
-(defun imgdrop-insert-optex (link)
-  "Insert OpTeX markup for LINK at point."
-  (let ((russian (imgdrop--optex-russian-p)))
-    (insert (imgdrop--tex-wrap
-             (format "%s=%s %s{%s}"
-                     (if russian "\\ширинакартинки" "\\picw")
-                     imgdrop-tex-width
-                     (if russian "\\картинка" "\\inspic")
-                     link)))))
 
 (defun imgdrop-insert-latex (link)
   "Insert LaTeX markup for LINK at point."

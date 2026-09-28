@@ -57,19 +57,11 @@
         "lig"           ; ligature table
         "math"          ; maths detection, macro face, the $ cycle - before l
         "l"             ; TeX: modes, building, viewing
-        "optex"         ; Russian OpTeX keywords - after l, it layers onto AUCTeX
-        "tex-symbols"   ; C-c s symbol picker, C-c w surround - after l/optex
+        "tex-symbols"   ; C-c s symbol picker, C-c w surround - after l
         "tbl"           ; C-c t org tables -> \table / \pmatrix / tabular
         "spell"         ; jinx
-        "tree"          ; speedbar sidebar
-        "modeline"      ; mode-line
         "org"           ; org-mode config
-        "tabs"          ; tab-bar as a buffer bar - one tab per buffer
-        "term"          ; terminal panel - after proj, tree and tabs, whose project detection, side windows and tab rules it builds on
-        "task"          ; run/build per language - after term, which runs it
-        "py"            ; which Python a Python file runs in - after task, whose :env hook it answers
-        "sar"           ; search and replace - after proj, before bar and k, whose buttons and keys call it
-        "bar"           ; tool-bar - after task, tree and term, whose commands its buttons are
+        "markdown"      ; markdown-mode related configs
         "k"))           ; keybindings - last, so every command exists
 
 (load custom-file 'noerror 'nomessage)

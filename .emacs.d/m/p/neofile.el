@@ -393,7 +393,11 @@
       (setq default-directory dir)
       (neofile--set-mode name)
       (setq buffer-offer-save t))
-    (switch-to-buffer buffer)
+    (if (and (fboundp 'mac-tab-strip-display-buffer)
+             (bound-and-true-p mac-tab-strip-mode)
+             (eq (framep (selected-frame)) 'mac))
+        (mac-tab-strip-display-buffer buffer t)
+      (switch-to-buffer buffer))
     buffer))
 
 ;;;###autoload

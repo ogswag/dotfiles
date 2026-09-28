@@ -85,14 +85,12 @@ return {
 			},
 
 			sources = {
-				-- Order matters: LSP -> path -> snippets -> buffer words.
-				-- `buffer` was missing here despite the comment claiming otherwise.
-				default = { "lsp", "path", "snippets", "buffer" },
+				default = { "lsp", "path", "snippets" },
 
 				per_filetype = {
-					tex = { "snippets", "lsp", "buffer", "path" },
-					plaintex = { "snippets", "lsp", "buffer", "path" },
-					markdown = { "snippets", "lsp", "buffer", "path" },
+					tex = { "snippets", "lsp", "path" },
+					plaintex = { "snippets", "lsp", "path" },
+					markdown = { "snippets", "lsp", "path" },
 				},
 			},
 

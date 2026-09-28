@@ -6,6 +6,17 @@ return {
 		build = ":MasonUpdate",
 		opts = {},
 	},
+	{
+		"WhoIsSethDaniel/mason-tool-installer.nvim",
+		dependencies = { "mason-org/mason.nvim" },
+		opts = {
+			-- Keep Markdown tools available to Conform and nvim-lint on every machine.
+			ensure_installed = {
+				"mdformat",
+				"markdownlint-cli2",
+			},
+		},
+	},
 
 	-- Bridges mason ↔ lspconfig: auto-installs the servers listed below
 	{
@@ -16,7 +27,6 @@ return {
 				"zls", -- Zig Language Server
 				"lua_ls", -- Lua (for editing this config)
 				"texlab", -- LaTeX
-				"markdown_oxide",
 				-- gleam is NOT in Mason; must be installed via `brew install gleam`
 			},
 			-- NOTE: `automatic_installation` was a mason-lspconfig v1 key and is
@@ -102,19 +112,9 @@ return {
 				},
 			})
 
-			-- markdown-oxide: PKM LSP for any markdown buffer. Wiki-link
-			-- completions need dynamic watched-files registration.
-			vim.lsp.config("markdown_oxide", {
-				capabilities = {
-					workspace = {
-						didChangeWatchedFiles = { dynamicRegistration = true },
-					},
-				},
-			})
-
 			-- ── Activate servers ─────────────────────────────────────────────────
 			-- Explicit, because mason-lspconfig's automatic_enable is off above.
-			vim.lsp.enable({ "zls", "gleam", "texlab", "lua_ls", "markdown_oxide" })
+			vim.lsp.enable({ "zls", "gleam", "texlab", "lua_ls" })
 
 			-- ── Diagnostic display ───────────────────────────────────────────────
 			vim.diagnostic.config({

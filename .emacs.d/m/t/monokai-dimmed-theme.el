@@ -188,17 +188,6 @@
    ;; `(tab-line-tab-inactive ((t (:foreground ,tab-fg :background ,tab-inact))))
    ;; `(tab-line-highlight   ((t (:foreground ,fg :background ,list-hover))))
 
-    `(my/tool-bar-button ((t (:foreground ,fg :background ,button
-                                         :box (:line-width -1 :style released-button)))))
-    `(my/tool-bar-button-hover ((t (:foreground ,fg :background ,list-hover
-                                               :box (:line-width -1 :style released-button)))))
-    `(my/tool-bar-button-disabled ((t (:foreground ,comment :background ,button
-                                                  :box (:line-width -1 :style released-button)))))
-    `(my/tool-bar-button-checked ((t (:foreground ,fg :background ,list-sel
-                                                 :box (:line-width -1 :style pressed-button)))))
-    `(my/tool-bar-button-checked-hover ((t (:foreground ,fg :background ,list-sel
-                                                       :box (:line-width -1 :style pressed-button)))))
-
    `(widget-field        ((t (:foreground ,fg :background ,dropdown
                                           :box (:line-width 1 :color ,hl)))))
    `(widget-button       ((t (:inherit button))))

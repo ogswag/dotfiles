@@ -42,6 +42,12 @@
   ;; Tidy shadowed file names
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
+(use-package consult :ensure t
+  :bind (("C-s" . consult-line))
+  :custom
+  ;; Preview the candidate as you move through results.
+  (consult-preview-key 'any))
+
 ;; fzf/fzy-style scoring for every completing-read and completion-at-point UI.
 (use-package fzf-native
   :vc (:url "https://github.com/dangduc/fzf-native" :rev :newest))

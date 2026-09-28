@@ -1,7 +1,7 @@
 ;;; tex-symbols.el --- Math symbol picker and TeX surround -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-;; pick tex/optex math symbols (fzf) and wrap region helpers.
+;; Pick TeX math symbols and wrap region helpers.
 
 ;;; Code:
 
@@ -172,7 +172,7 @@
 
 ;;;###autoload
 (defun my/tex-insert-symbol ()
-  "Pick a TeX/OpTeX math symbol (fzf-style) and insert it at point."
+  "Pick a TeX math symbol (fzf-style) and insert it at point."
   (interactive)
   (let* ((cands (mapcar #'car (my/tex-symbol--cache)))
          (table (lambda (string pred action)
@@ -205,7 +205,7 @@
          (existing (or (my/tex-symbol--load-extras) '()))
          (updated (append existing (list entry))))
     (with-temp-file my/tex-symbol-extra-file
-      (insert ";;; tex-symbols-extra.el --- User TeX/OpTeX symbols -*- lexical-binding: t; -*-\n\n")
+      (insert ";;; tex-symbols-extra.el --- User TeX symbols -*- lexical-binding: t; -*-\n\n")
       (insert ";; Entries: (CATEGORY COMMAND &optional UNICODE)\n")
       (insert ";; Edited by `my/tex-symbol-add' or by hand.  Then M-x my/tex-symbol-rebuild.\n\n")
       (pp updated (current-buffer))
@@ -260,22 +260,7 @@
     ("\\left|...\\right|" . ("\\left|" . "\\right|"))
     ("$...$"             . ("$" . "$"))
     ("$$...$$"           . ("$$" . "$$"))
-    ;; OpTeX environments.
-    ("\\теор ...\\конец"  . ("\\теор[] " . "\n\\конец\n"))
-    ("\\лем ...\\конец"   . ("\\лем[] " . "\n\\конец\n"))
-    ("\\опр ...\\конец"   . ("\\опр[] " . "\n\\конец\n"))
-    ("\\прим ...\\конец"  . ("\\прим[] " . "\n\\конец\n"))
-    ("\\предл ...\\конец" . ("\\предл[] " . "\n\\конец\n"))
-    ("\\след ...\\конец"  . ("\\след[] " . "\n\\конец\n"))
-    ("\\зам ...\\конец"   . ("\\зам[] " . "\n\\конец\n"))
-    ("\\док ...\\конец"   . ("\\док\n" . "\n\\конец\n"))
-    ("\\список \\стиль ...\\консписка" . my/tex-surround-optex-items)
-    ("\\подпись/р ...\\отбивка" . ("\\подпись/р [] " . "\n\\отбивка\n"))
-    ("\\подпись/т ...\\отбивка" . ("\\подпись/т [] " . "\n\\отбивка\n"))
-    ("\\proof ...\\endthm" . ("\\proof\n" . "\n\\endthm\n"))
-    ("\\begitems \\style ...\\enditems" . my/tex-surround-optex-begitems)
-    ("\\caption/f ...\\cskip" . ("\\caption/f [] " . "\n\\cskip\n"))
-    ("\\caption/t ...\\cskip" . ("\\caption/t [] " . "\n\\cskip\n")))
+     ("\\proof ...\\endproof" . ("\\begin{proof}\n" . "\n\\end{proof}\n")))
   "Wrappers offered by `my/tex-surround'. Each entry is (DISPLAY . WRAPPER): WRAPPER is (LEFT . RIGHT) or a niladic."
   :type '(alist :key-type string
                 :value-type (choice (cons (string :tag "Left")
@@ -285,24 +270,6 @@
 
 (defvar my/tex-surround-history nil
   "Recently used surround display labels.")
-
-(declare-function optex-read-item-style "optex" ())
-
-(defun my/tex-surround--item-style ()
-  "Read an OpTeX list-item style letter."
-  (if (fboundp 'optex-read-item-style)
-      (or (optex-read-item-style) "o")
-    (read-string "Style letter: " "o")))
-
-(defun my/tex-surround-optex-items ()
-  "Wrapper pair for a Russian OpTeX item list."
-  (cons (format "\\список \\стиль %s\n* " (my/tex-surround--item-style))
-        "\n\\консписка\n"))
-
-(defun my/tex-surround-optex-begitems ()
-  "Wrapper pair for an OpTeX item list."
-  (cons (format "\\begitems \\style %s\n* " (my/tex-surround--item-style))
-        "\n\\enditems\n"))
 
 (defun my/tex-surround--apply (left right beg end)
   "Insert LEFT at BEG and RIGHT at END; leave point after RIGHT."

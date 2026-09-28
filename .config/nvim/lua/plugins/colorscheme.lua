@@ -49,6 +49,12 @@ return {
 	{ "forest-nvim/sequoia.nvim", lazy = false },
 	{ "folke/tokyonight.nvim", lazy = false },
 	{
+		dir = "~/.config/nvim/lua/plugins/harlequin.nvim",
+		name = "harlequin",
+		lazy = false,
+		priority = 1000,
+	},
+	{
 		"IroncladDev/osmium",
 		lazy = false,
 		config = function()
@@ -70,8 +76,8 @@ return {
 		opts = {
 			set_dark_mode = function()
 				vim.api.nvim_set_option_value("background", "dark", {})
-				vim.cmd.colorscheme("mfd-lumon")
-				require("lualine").setup({ options = { theme = "auto" } })
+				vim.cmd.colorscheme("harlequin")
+				require("lualine").setup({ options = { theme = "harlequin" } })
 			end,
 			set_light_mode = function()
 				vim.api.nvim_set_option_value("background", "light", {})

@@ -13,12 +13,10 @@
 
 | Where        | Result                          |
 |--------------+---------------------------------|
-| optex, text  | ~\table{SPEC}{...}~             |
 | latex, text  | ~\begin{tabular}{SPEC}...~      |
-| optex, math  | ~\pmatrix~ etc                  |
 | latex, math  | ~\begin{pmatrix}...~            |
 
-Math check is ~my/math-in-math-p~. Force dialect with ~my/tex-table-dialect~.
+Math check is ~my/math-in-math-p~.
 
 * Keys
 

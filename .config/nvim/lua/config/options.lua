@@ -28,7 +28,7 @@ opt.cursorlineopt = "number" -- highlight only the line number
 opt.mouse = "a" -- enables mouse clicks everywhere, including the fold column
 opt.foldcolumn = "1" -- shows ▶/▼ markers to the left of line numbers; click to fold/unfold
 opt.signcolumn = "yes" -- always show; avoids layout jitter on LSP load
-opt.scrolloff = 8
+opt.scrolloff = 2
 opt.wrap = false
 opt.list = true
 -- Extend listchars with off-screen markers

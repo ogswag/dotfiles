@@ -11,21 +11,11 @@
 ;; Bound below but defined in packages that load earlier; named here so.
 (declare-function my/speedbar-detach "tree" ())
 (declare-function my/speedbar-toggle "tree" ())
-(declare-function my/sar-find "sar" (&optional backward))
-(declare-function my/sar-replace "sar" ())
-(declare-function my/sar-panel-project "sar" ())
-(declare-function my/sar-panel-folder "sar" ())
-(declare-function my/sar-panel-file "sar" ())
-(declare-function my/sar-panel-replace "sar" ())
-(declare-function my/sar-panel-toggle "sar" ())
 (declare-function my/speedbar-reveal "tree" ())
 (declare-function which-key-add-keymap-based-replacements "which-key"
                   (keymap key replacement &rest more))
 (declare-function my/open-curdir "mac" ())
 (declare-function homebrew-dispatch "homebrew" ())
-(declare-function my/tab-prev "tabs" (&optional n))
-(declare-function my/tab-next "tabs" (&optional n))
-(declare-function my/tab-select "tabs" ())
 (declare-function flymake-show-buffer-diagnostics "flymake" ())
 (declare-function flymake-show-diagnostic "flymake" (pos &optional other-window))
 (declare-function my/format-dwim "fmt" ())
@@ -33,24 +23,6 @@
 (declare-function my/delete-project "proj" (root))
 (declare-function my/project-discover "proj" (&optional quiet))
 (declare-function my/edit-projects "proj" (&optional generated))
-(declare-function my/term-toggle "term" ())
-(declare-function my/term-new "term" (&optional force-ask))
-(declare-function my/term-new-here "term" ())
-(declare-function my/term-close "term" (&optional session))
-(declare-function my/term-rename "term" (session new-name))
-(declare-function my/term-next "term" (&optional n))
-(declare-function my/term-prev "term" (&optional n))
-(declare-function my/term-select "term" (session))
-(declare-function my/term-focus-list "term" ())
-(declare-function my/term-set-backend "term" (backend))
-(declare-function my/term-cd "term" (directory))
-(declare-function my/task-run "task" (&optional pick))
-(declare-function my/task-build "task" (&optional pick))
-(declare-function my/task-stop "task" ())
-(declare-function my/task-select "task" (kind))
-(declare-function my/task-add "task" (kind &optional ask-directory))
-(declare-function my/task-env-select "task" ())
-(declare-function my/tool-bar-toggle "bar" ())
 (declare-function neofile-new-file-fast "neofile" ())
 (declare-function neofile-new-file-with-type "neofile" ())
 (declare-function imgdrop-insert-image "imgdrop" ())
@@ -101,18 +73,16 @@
 (keymap-global-set "s-S" #'write-file)
 (keymap-global-set "s-l" #'my/mark-line)
 (keymap-global-set "s-L" #'goto-line)
-(keymap-global-set "s-f" #'my/sar-find)            ; isearch, with m/sar.el's styles
-(keymap-global-set "s-F" #'my/sar-panel-project)   ; the side panel, over the project
+(keymap-global-set "s-f" #'isearch-forward)
 (keymap-global-set "s-g" #'isearch-repeat-forward)
-(keymap-global-set "s-r" #'my/sar-replace)         ; the side panel, over this buffer
-(keymap-global-set "s-R" #'my/sar-panel-replace)   ; the side panel, replacement focused
+(keymap-global-set "s-r" #'query-replace)
 (keymap-global-set "s-t" #'neofile-new-file-fast)
 (keymap-global-set "s-w" #'tab-close)
 (keymap-global-set "s-W" #'delete-frame)
 (keymap-global-set "s-q" #'save-buffers-kill-emacs)
 (keymap-global-set "s-Q" #'restart-emacs)
 (keymap-global-set "s-n" #'neofile-new-file-fast)
-(keymap-global-set "s-N" #'neofile-new-file-with-type)
+(keymap-global-set "s-N" #'mac-new-window)
 (keymap-global-set "s-m" #'iconify-frame)
 (keymap-global-set "s-`" #'other-frame)
 (keymap-global-set "C-s-f" #'toggle-frame-fullscreen)
@@ -121,12 +91,6 @@
 
 (keymap-global-set "<remap> <undo>" #'undo-fu-only-undo)
 (keymap-global-set "<remap> <undo-redo>" #'undo-fu-only-redo)
-
-(dotimes (i 9)
-  (keymap-global-set (format "s-%d" (1+ i)) #'my/tab-select))
-
-(keymap-global-set "C-<tab>" #'my/tab-next)
-(keymap-global-set "C-S-<tab>" #'my/tab-prev)
 
 (keymap-global-set "C-=" #'text-scale-increase)
 (keymap-global-set "C--" #'text-scale-decrease)
@@ -289,23 +253,10 @@
 (keymap-set my-leader-map "c d" #'flymake-show-diagnostic)
 (keymap-set my-leader-map "c a" #'xref-find-apropos)
 
-;; Run/build per language (m/task.el).  `c c' and `c r' above stay what they
-(keymap-set my-leader-map "c R" #'my/task-run)
-(keymap-set my-leader-map "c b" #'my/task-build)
-(keymap-set my-leader-map "c s" #'my/task-stop)
-(keymap-set my-leader-map "c t" #'my/task-select)
-(keymap-set my-leader-map "c n" #'my/task-add)      ; new command
-(keymap-set my-leader-map "c e" #'my/task-env-select) ; m/py.el answers this
-
 ;;;; Replace / rename
 (keymap-set my-leader-map "r r" #'replace-regexp)
 (keymap-set my-leader-map "r s" #'replace-string)
 (keymap-set my-leader-map "r n" #'xref-find-references)
-;; m/sar.el's panel: p over the project.
-(keymap-set my-leader-map "r p" #'my/sar-panel-project)
-(keymap-set my-leader-map "r f" #'my/sar-panel-folder)
-(keymap-set my-leader-map "r b" #'my/sar-panel-file)
-(keymap-set my-leader-map "r t" #'my/sar-panel-toggle)
 
 ;;;; Mark and bookmarks
 (keymap-set my-leader-map "m m" #'set-mark-command)
@@ -317,27 +268,11 @@
 (keymap-set my-leader-map "w d o" #'delete-other-windows)
 (keymap-set my-leader-map "w s" #'split-window-below)
 (keymap-set my-leader-map "w v" #'split-window-right)
-(keymap-set my-leader-map "w t" #'my/tool-bar-toggle)  ; m/bar.el
 
 ;;;; Shell
 (keymap-set my-leader-map "1" #'shell-command)
 (keymap-set my-leader-map "2" #'async-shell-command)
 (keymap-set my-leader-map "3" #'my/open-curdir)  ; defined in m/mac.el
-
-;;;; Terminal panel (m/term.el)
-(keymap-set my-leader-map "t t" #'my/term-toggle)
-(keymap-set my-leader-map "t n" #'my/term-new)
-(keymap-set my-leader-map "t N" #'my/term-new-here)  ; no project question
-(keymap-set my-leader-map "t k" #'my/term-close)
-(keymap-set my-leader-map "t r" #'my/term-rename)
-(keymap-set my-leader-map "t s" #'my/term-select)
-(keymap-set my-leader-map "t l" #'my/term-focus-list)
-(keymap-set my-leader-map "t ]" #'my/term-next)
-(keymap-set my-leader-map "t [" #'my/term-prev)
-(keymap-set my-leader-map "t b" #'my/term-set-backend)
-(keymap-set my-leader-map "t d" #'my/term-cd)
-
-(keymap-global-set "C-`" #'my/term-toggle)
 
 ;;;; Homebrew (macOS)
 (keymap-set my-leader-map "o h" #'homebrew-dispatch)
@@ -353,7 +288,6 @@
     "o h" "Homebrew menu"
     "p" "project"
     "r" "replace"
-    "t" "terminal"
     "w" "window"))
 
 ;;; k.el ends here

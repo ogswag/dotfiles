@@ -8,15 +8,19 @@
 (require 'seq)
 
 (defconst my/mono-fonts
-  '("Lilex Nerd Font"
-    "Lilex"
-    "Liga Mononoki"
-    "mononoki"
+  '("Iosevka PP"
     "Hack Nerd Font"
     "Hack"
+    "Liga Mononoki"
+    "mononoki"
     "Menlo"
     "DejaVu Sans Mono"
     "Consolas"))
+
+(defconst my/mono-widths
+  '(
+    ;; ("Iosevka PP" . semi-expanded)
+    ))
 
 (defconst my/nerd-mono-fonts
   '("Lilex Nerd Font Mono"
@@ -32,7 +36,7 @@
     "DejaVu Sans"
     "Noto Sans"))
 
-(defconst my/font-size 12)
+(defconst my/font-size 14)
 
 (defun my/first-available-font (candidates)
   "Return the first family in CANDIDATES installed on this system, or nil."
@@ -41,18 +45,31 @@
 
 (defvar my/nerd-mono-font (my/first-available-font my/nerd-mono-fonts))
 
-(defun my/font-applied-p (family size)
-  "Non-nil when the default face is already FAMILY at SIZE points."
+(defun my/mono-width (family)
+  "Installed width for FAMILY, or nil."
+  (let ((width (cdr (assoc family my/mono-widths))))
+    (and width (find-font (font-spec :family family :width width)) width)))
+
+(defun my/font-applied-p (family size width)
+  "Non-nil when the default face is already FAMILY at SIZE points and WIDTH."
   (and (equal (face-attribute 'default :family nil t) family)
-       (equal (face-attribute 'default :height nil t) (* 10 size))))
+       (equal (face-attribute 'default :height nil t) (* 10 size))
+       (or (null width)
+           (equal (face-attribute 'default :width nil t) width))))
 
 
-(let ((mono (my/first-available-font my/mono-fonts))
-      (sans (my/first-available-font my/sans-fonts)))
-  (when (and mono (not (my/font-applied-p mono my/font-size)))
-    (set-frame-font (format "%s %d" mono my/font-size) nil t))
+(let* ((mono (my/first-available-font my/mono-fonts))
+       (width (and mono (my/mono-width mono)))
+       (sans (my/first-available-font my/sans-fonts)))
+  (when (and mono (not (my/font-applied-p mono my/font-size width)))
+    (set-frame-font (if width
+                        (format "%s-%d:width=%s" mono my/font-size width)
+                      (format "%s %d" mono my/font-size))
+                    nil t))
   (when mono
-    (set-face-attribute 'fixed-pitch nil :family mono))
+    (set-face-attribute 'fixed-pitch nil
+                        :family mono
+                        :width (or width 'normal)))
   (when sans
     (set-face-attribute 'variable-pitch nil :family sans :height 0.98)))
 

@@ -49,14 +49,20 @@
 
 ;;;; Frames
 
-;; Position the initial frame near the top of the screen.
-(push '(top . 25) initial-frame-alist)
-(push '(left . 100) initial-frame-alist)
+;; Numeric left/top are offsets from the primary display, so they always
+;; land on the MacBook.  Let the port open on the active display, then
+;; nudge to that display's top-left.  workarea origin is already below
+;; the menu bar, in the same coordinates as `set-frame-position'.
+(defun my/place-initial-frame ()
+  "Put the initial frame near the top-left of the display it opened on."
+  (when-let* ((work (alist-get 'workarea (frame-monitor-attributes))))
+    (set-frame-position nil (+ (nth 0 work) 100) (nth 1 work))))
+
+(add-hook 'window-setup-hook #'my/place-initial-frame)
 
 ;; Size and chrome for every frame.
 (push '(width . 120) default-frame-alist)
 (push '(height . 40) default-frame-alist)
-(push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
 (push '(horizontal-scroll-bars) default-frame-alist)
 
@@ -75,6 +81,7 @@
               (concat "Emacs - [p] " (project-name project))
             (concat "Emacs - " (buffer-name))))))
 
+(tool-bar-mode -1)
 
 ;;;; Misc
 

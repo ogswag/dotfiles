@@ -1,7 +1,7 @@
 ;;; l.el --- TeX: which mode, how it builds, where it is viewed -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-;; tex defaults: mode, compile, output dir, skim sync. optex stuff is m/optex.el.
+;; TeX defaults: mode, compile, output dir, and Skim sync.
 
 ;;; Code:
 
@@ -31,48 +31,16 @@
 
 (setq TeX-force-default-mode nil)
 
-;; Only reached for a file with no content to judge: a new, empty one.  Those are OpTeX here.
+;; Only reached for a file with no content to judge: a new, empty one.
 (setq TeX-default-mode #'plain-TeX-mode)
 
 ;; Same choice for the built-in dispatcher, for the paths where AUCTeX's remap
 (setq tex-default-mode #'plain-tex-mode)
 
 
-;;;; Plain TeX here means OpTeX
-
-(with-eval-after-load 'tex
-  (add-to-list 'TeX-engine-alist '(optex "OpTeX" "optex" "optex" "optex")))
-
-(defun my/tex-use-optex-engine ()
-  "Compile this buffer with optex rather than with plain pdftex."
-  (setq-local TeX-engine 'optex))
-
-(add-hook 'plain-TeX-mode-hook #'my/tex-use-optex-engine)
-
-(defconst my/optex-rerun-regexp "TeX me again"
-  "OpTeX's way of saying the run must be repeated.")
-
-(defun my/optex-rerun-if-asked (_process name)
-  "Offer NAME again when OpTeX reported that a further pass is needed."
-  (when (and (string= name "TeX")
-             (buffer-live-p TeX-command-buffer)
-             (with-current-buffer TeX-command-buffer (eq TeX-engine 'optex))
-             (save-excursion
-               (goto-char (point-min))
-               (re-search-forward my/optex-rerun-regexp nil t)))
-    (setq TeX-command-next name)))
-
-(with-eval-after-load 'tex
-  (advice-add 'TeX-TeX-sentinel :after #'my/optex-rerun-if-asked))
-
-
 ;;;; Where the build files go
 
 (setq-default TeX-output-dir "out")
-
-;; OpTeX's cross-reference file.
-(with-eval-after-load 'plain-tex
-  (add-to-list 'plain-TeX-clean-intermediate-suffixes "\\.ref"))
 
 (setq TeX-auto-save nil
       TeX-parse-self nil)

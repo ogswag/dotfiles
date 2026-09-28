@@ -1,13 +1,12 @@
 ;;; tbl.el --- Tables typed as org tables, emitted as TeX -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-;; orgtbl in tex buffers, then convert to optex/latex. see doc/tables.org.
+;; Org tables in LaTeX buffers, converted to LaTeX.  See doc/tables.org.
 
 ;;; Code:
 
 (eval-when-compile
   (require 'tex nil t)
-  (require 'tex-mode nil t)         ; the built-in one, for `tex-mode-map'
   (require 'latex nil t)            ; AUCTeX, for `LaTeX-current-environment'
   (require 'org-table nil t))
 
@@ -31,13 +30,6 @@
 
 ;;;; Options
 
-(defcustom my/tex-table-dialect 'auto
-  "Which TeX the generators target."
-  :type '(choice (const :tag "From the major mode" auto)
-                 (const :tag "LaTeX" latex)
-                 (const :tag "OpTeX / plain TeX" optex))
-  :group 'my-tex-table)
-
 (defcustom my/tex-table-default-spec "ll"
   "Default alignment spec, offered as the default of the spec prompt."
   :type 'string
@@ -60,7 +52,7 @@
 
 (defcustom my/tex-table-math-macros
   '("pmatrix" "matrix" "bmatrix" "vmatrix" "Vmatrix" "smallmatrix"
-    "cases" "eqalign" "eqalignno" "displaylines" "array" "aligned" "align")
+    "cases" "array" "aligned" "align")
   "Extra macro and environment names that already provide rows and columns."
   :type '(repeat string)
   :group 'my-tex-table)
@@ -68,26 +60,26 @@
 (defcustom my/tex-table-matrix-types
   '(("pmatrix"
      :glyph "( )" :desc "the usual matrix"
-     :latex "pmatrix" :optex ("\\pmatrix{" . "}"))
+      :latex "pmatrix")
     ("bmatrix"
      :glyph "[ ]" :desc "square brackets"
-     :latex "bmatrix" :optex ("\\left[\\matrix{" . "}\\right]"))
+      :latex "bmatrix")
     ("Bmatrix"
      :glyph "{ }" :desc "curly brackets"
-     :latex "Bmatrix" :optex ("\\left\\{\\matrix{" . "}\\right\\}"))
+      :latex "Bmatrix")
     ("vmatrix"
      :glyph "| |" :desc "determinant"
-     :latex "vmatrix" :optex ("\\left|\\matrix{" . "}\\right|"))
+      :latex "vmatrix")
     ("Vmatrix"
      :glyph "‖ ‖" :desc "norm"
-     :latex "Vmatrix" :optex ("\\left\\Vert\\matrix{" . "}\\right\\Vert"))
+      :latex "Vmatrix")
     ("matrix"
      :glyph "   " :desc "no delimiters"
-     :latex "matrix" :optex ("\\matrix{" . "}"))
+      :latex "matrix")
     ("cases"
      :glyph "{  " :desc "case distinction"
      :max-cols 2
-     :latex "cases" :optex ("\\cases{" . "}"))
+      :latex "cases")
     ("array"
      :glyph "   " :desc "explicit column spec -- asks for one"
      :latex "array" :spec t)
@@ -97,16 +89,6 @@
     ("aligned"
      :glyph "   " :desc "aligned equations inside a display (amsmath)"
      :latex "aligned")
-    ("eqalign"
-     :glyph "   " :desc "aligned equations, r/l column pairs"
-     :optex ("\\eqalign{" . "}"))
-    ("displaylines"
-     :glyph "   " :desc "one centred formula per row"
-     :max-cols 1
-     :optex ("\\displaylines{" . "}"))
-    ("bordermatrix"
-     :glyph "( )" :desc "labelled first row and column"
-     :optex ("\\bordermatrix{" . "}"))
     ("none"
      :glyph "   " :desc "no wrapper -- splice into a surrounding matrix"
      :splice t))
@@ -116,17 +98,13 @@
 
 (defcustom my/tex-table-spec-presets
   ;; (SPEC DIALECTS DESCRIPTION).
-  '(("ll"                (optex latex) "two columns, flush left")
-    ("lr"                (optex latex) "label and value")
-    ("lcr"               (optex latex) "left, centred, right")
-    ("ccc"               (optex latex) "three centred")
-    ("|l|c|r|"           (optex latex) "ruled on every boundary")
-    ("l||l"              (optex latex) "double rule between the columns")
-    ("lp{5cm}"           (optex latex) "label plus a wrapping paragraph column")
-    ("3c"                (optex)       "digit prefix repeats a declarator")
-    ("c:(\\bf)c"         (optex)       "(...) sets a column, : places the boundary")
-    ("c(\\tabskip=5pt)r" (optex)       "individual gap between two columns")
-    ("|c|p{\\tsize}|"    (optex)       "for \\table pxto: p{} takes up the slack")
+   '(("ll"                (latex) "two columns, flush left")
+     ("lr"                (latex) "label and value")
+     ("lcr"               (latex) "left, centred, right")
+     ("ccc"               (latex) "three centred")
+     ("|l|c|r|"           (latex) "ruled on every boundary")
+     ("l||l"              (latex) "double rule between the columns")
+     ("lp{5cm}"           (latex) "label plus a wrapping paragraph column")
     ("*{3}{c}"           (latex)       "*{n}{...} repeats a group")
     ("l@{}r"             (latex)       "@{} removes the inter-column space")
     ("l>{\\bfseries}l"   (latex)       ">{...} prefixes a column (array)")
@@ -146,9 +124,6 @@
 (defvar-local my/tex-table--type nil
   "Matrix type for the table currently being typed.")
 
-(defvar-local my/tex-table--dialect nil
-  "Dialect captured when the current table was started.")
-
 (defvar-local my/tex-table--context nil
   "`math' or `text', captured when the current table was started.")
 
@@ -162,13 +137,7 @@
   "Recently used matrix sizes.")
 
 
-;;;; Dialect and context
-
-(defun my/tex-table--dialect ()
-  "Return `latex' or `optex' for the current buffer."
-  (if (eq my/tex-table-dialect 'auto)
-      (if (derived-mode-p 'LaTeX-mode 'latex-mode) 'latex 'optex)
-    my/tex-table-dialect))
+;;;; Context
 
 (defun my/tex-table--context ()
   "Return `math' when point is in maths, else `text'."
@@ -197,10 +166,9 @@
     (when (> end i)
       (cons (substring spec (1+ i) (1- end)) end))))
 
-(defun my/tex-table--scan-columns (spec dialect)
-  "Count the columns SPEC declares in DIALECT.  May return zero."
-  (let ((latexp (eq dialect 'latex))
-        (len (length spec))
+(defun my/tex-table--scan-columns (spec)
+  "Count the columns SPEC declares.  May return zero."
+  (let ((len (length spec))
         (i 0) (n 0) (repeat 1))
     (while (< i len)
       (let ((c (aref spec i)))
@@ -208,33 +176,21 @@
          ((memq c '(?\s ?\t ?\n)) (setq i (1+ i)))
          ;; Rules and boundaries: no column, and they consume the repeat.
          ((eq c ?|) (setq repeat 1 i (1+ i)))
-         ((and (not latexp) (eq c ?:)) (setq repeat 1 i (1+ i)))
-         ;; OpTeX per-column setting, e.g. (\Red) or (\tabskip=5pt).
-         ((and (not latexp) (eq c ?\())
-          (let ((j (1+ i)))
-            (while (and (< j len) (/= (aref spec j) ?\))) (setq j (1+ j)))
-            (setq i (min len (1+ j)))))
-         ((and latexp (memq c '(?@ ?! ?> ?<)))
+          ((memq c '(?@ ?! ?> ?<))
           (setq i (my/tex-table--skip-group spec (1+ i))))
          ;; LaTeX *{n}{decls}.
-         ((and latexp (eq c ?*))
+          ((eq c ?*)
           (let* ((count (my/tex-table--group-at spec (1+ i)))
                  (inner (and count (my/tex-table--group-at spec (cdr count)))))
             (if (not inner)
                 (setq i (1+ i))
               (setq n (+ n (* repeat
                               (max 0 (truncate (string-to-number (car count))))
-                              (my/tex-table--scan-columns (car inner) dialect)))
+                               (my/tex-table--scan-columns (car inner))))
                     repeat 1
                     i (cdr inner)))))
-         ;; OpTeX digit repeat: multiplies whatever the next token contributes.
-         ((and (not latexp) (<= ?1 c ?9))
-          (let ((j i))
-            (while (and (< j len) (<= ?0 (aref spec j) ?9)) (setq j (1+ j)))
-            (setq repeat (truncate (string-to-number (substring spec i j)))
-                  i j)))
-         ;; array's w{align}{width} and W{align}{width} take two groups.
-         ((and latexp (memq c '(?w ?W)))
+          ;; array's w{align}{width} and W{align}{width} take two groups.
+          ((memq c '(?w ?W))
           (setq n (+ n repeat) repeat 1
                 i (my/tex-table--skip-group
                    spec (my/tex-table--skip-group spec (1+ i)))))
@@ -245,23 +201,21 @@
          (t (setq i (1+ i))))))
     n))
 
-(defun my/tex-table--count-columns (spec &optional dialect)
-  "Number of columns SPEC declares in DIALECT.  Always at least one."
-  (max 1 (my/tex-table--scan-columns spec (or dialect (my/tex-table--dialect)))))
+(defun my/tex-table--count-columns (spec)
+  "Number of columns SPEC declares.  Always at least one."
+  (max 1 (my/tex-table--scan-columns spec)))
 
-(defun my/tex-table-read-spec (&optional dialect)
-  "Read an alignment spec for DIALECT, offering `my/tex-table-spec-presets'."
-  (let* ((dialect (or dialect (my/tex-table--dialect)))
-         (presets (seq-filter (lambda (p) (memq dialect (nth 1 p)))
-                              my/tex-table-spec-presets))
+(defun my/tex-table-read-spec ()
+  "Read an alignment spec, offering `my/tex-table-spec-presets'."
+  (let* ((presets my/tex-table-spec-presets)
          (cands (mapcar #'car presets))
-         ;; A closure rather than a named function with a global to read the dialect from, which is how.
+          ;; Keep the formatting metadata alongside the candidate list.
          (affix
           (lambda (cs)
             (mapcar
              (lambda (s)
                (list s
-                     (format "%2d  " (my/tex-table--count-columns s dialect))
+                      (format "%2d  " (my/tex-table--count-columns s))
                      (propertize (concat "  " (or (nth 2 (assoc s presets)) ""))
                                  'face 'completions-annotations)))
              cs)))
@@ -274,9 +228,7 @@
                   (display-sort-function . identity)
                   (cycle-sort-function . identity))
               (complete-with-action action cands string pred))))
-         (prompt (if (eq dialect 'latex)
-                     "Columns (tabular preamble): "
-                   "Columns (\\table alignment spec): "))
+          (prompt "Columns (tabular preamble): ")
          (vertico-preselect 'prompt)
          (choice (completing-read prompt table nil nil nil
                                   'my/tex-table-spec-history
@@ -290,32 +242,27 @@
   "Plist for matrix type NAME, or nil."
   (cdr (assoc name my/tex-table-matrix-types)))
 
-(defun my/tex-table--matrix-usable-p (entry dialect)
-  "Non-nil when ENTRY can be rendered in DIALECT."
+(defun my/tex-table--matrix-usable-p (entry)
+  "Non-nil when ENTRY can be rendered."
   (or (plist-get entry :splice)
-      (if (eq dialect 'latex)
-          (plist-get entry :latex)
-        (plist-get entry :optex))))
+      (plist-get entry :latex)))
 
-(defun my/tex-table--matrix-candidates (dialect)
-  "Names from `my/tex-table-matrix-types' that DIALECT can render."
+(defun my/tex-table--matrix-candidates ()
+  "Names from `my/tex-table-matrix-types' that can be rendered."
   (delq nil (mapcar (lambda (e)
-                      (and (my/tex-table--matrix-usable-p (cdr e) dialect)
+                       (and (my/tex-table--matrix-usable-p (cdr e))
                            (car e)))
                     my/tex-table-matrix-types)))
 
-(defun my/tex-table--matrix-form (entry dialect)
-  "A one-line picture of what ENTRY emits in DIALECT."
+(defun my/tex-table--matrix-form (entry)
+  "A one-line picture of what ENTRY emits."
   (cond
    ((plist-get entry :splice) "rows only")
-   ((eq dialect 'latex)
-    (format "\\begin{%s}%s" (plist-get entry :latex)
-            (if (plist-get entry :spec) "{spec}" "")))
-   (t (let ((w (plist-get entry :optex)))
-        (concat (car w) "..." (cdr w))))))
+    (t (format "\\begin{%s}%s" (plist-get entry :latex)
+               (if (plist-get entry :spec) "{spec}" "")))))
 
-(defun my/tex-table--matrix-affix (dialect)
-  "Affixation function for DIALECT: glyph | name | construction and description."
+(defun my/tex-table--matrix-affix ()
+  "Affixation function: glyph | name | construction and description."
   (lambda (cands)
     (mapcar
      (lambda (name)
@@ -325,7 +272,7 @@
                (concat (or (plist-get e :glyph) "   ") "  ")
                (propertize
                 (format "  %-32s %s%s"
-                        (my/tex-table--matrix-form e dialect)
+                         (my/tex-table--matrix-form e)
                         (or (plist-get e :desc) "")
                         (if max (format " (%d col%s)" max (if (= max 1) "" "s")) ""))
                 'face 'completions-annotations))))
@@ -349,11 +296,10 @@
                   (< ra rb)
                 (< (gethash a order 0) (gethash b order 0))))))))
 
-(defun my/tex-table-read-matrix-type (&optional dialect)
-  "Read a matrix type DIALECT can render, showing what each one emits."
-  (let* ((dialect (or dialect (my/tex-table--dialect)))
-         (cands (my/tex-table--matrix-candidates dialect))
-         (affix (my/tex-table--matrix-affix dialect))
+(defun my/tex-table-read-matrix-type ()
+  "Read a matrix type, showing what each one emits."
+  (let* ((cands (my/tex-table--matrix-candidates))
+         (affix (my/tex-table--matrix-affix))
          (table
           (lambda (string pred action)
             (if (eq action 'metadata)
@@ -405,17 +351,6 @@
 
 ;;;; Generators
 
-(defun my/tex-table--to-optex (table spec)
-  "Render TABLE as an OpTeX \\table with alignment SPEC."
-  (orgtbl-to-generic
-   table
-   (list :tstart (concat "\\table{" spec "}{")
-         :tend "}"
-         :lstart "  "
-         :lend " \\cr"
-         :sep " & "
-         :hline "  \\crl")))
-
 (defun my/tex-table--to-latex (table spec)
   "Render TABLE as a LaTeX tabular with alignment SPEC."
   (orgtbl-to-generic
@@ -427,38 +362,32 @@
          :sep " & "
          :hline "  \\hline")))
 
-(defun my/tex-table--matrix-wrap (rows type dialect &optional spec)
-  "Put the wrapper for matrix TYPE in DIALECT around ROWS."
+(defun my/tex-table--matrix-wrap (rows type &optional spec)
+  "Put the wrapper for matrix TYPE around ROWS."
   (let ((entry (my/tex-table--matrix-entry type)))
     (cond
      ((or (null entry) (plist-get entry :splice)) rows)
-     ((eq dialect 'latex)
-      (let ((env (plist-get entry :latex)))
-        (if (not env)
-            rows
-          (concat "\\begin{" env "}"
-                  (if (plist-get entry :spec)
-                      (concat "{" (or spec my/tex-table-default-spec) "}")
-                    "")
-                  "\n" rows "\n\\end{" env "}"))))
-     (t
-      (let ((wrap (plist-get entry :optex)))
-        (if (not wrap)
-            rows
-          (concat (car wrap) "\n" rows "\n" (cdr wrap))))))))
+      (t
+       (let ((env (plist-get entry :latex)))
+         (if (not env)
+             rows
+           (concat "\\begin{" env "}"
+                   (if (plist-get entry :spec)
+                       (concat "{" (or spec my/tex-table-default-spec) "}")
+                     "")
+                   "\n" rows "\n\\end{" env "}")))))))
 
-(defun my/tex-table--to-math (table type dialect &optional spec)
-  "Render TABLE as maths rows of matrix TYPE in DIALECT."
+(defun my/tex-table--to-math (table type &optional spec)
+  "Render TABLE as maths rows of matrix TYPE."
   (my/tex-table--matrix-wrap
    (orgtbl-to-generic
     table
     (list :splice t
           :lstart "  "
-          :lend (if (eq dialect 'latex) " \\\\" " \\cr")
+          :lend " \\\\"
           :sep " & "
-          ;; A rule only means anything in LaTeX's array.
-          :hline (and (eq dialect 'latex) (equal type "array") "  \\hline")))
-   type dialect spec))
+          :hline (and (equal type "array") "  \\hline")))
+    type spec))
 
 (defun my/tex-table--matrix-names ()
   "Every name that counts as an already-tabular construct."
@@ -485,17 +414,14 @@
             (setq name (match-string 2)))))
       name)))
 
-(defun my/tex-table--enclosing-matrix (&optional dialect)
+(defun my/tex-table--enclosing-matrix ()
   "Name of the matrix construct point sits inside, or nil."
-  (let* ((dialect (or dialect (my/tex-table--dialect)))
-         (names (my/tex-table--matrix-names)))
+  (let ((names (my/tex-table--matrix-names)))
     (or
-     (and (eq dialect 'latex)
-          (let ((env (if (fboundp 'LaTeX-current-environment)
-                         (ignore-errors (LaTeX-current-environment))
-                       (my/tex-table--enclosing-env))))
-            (car (member env names))))
-     ;; \pmatrix{ ...
+     (let ((env (if (fboundp 'LaTeX-current-environment)
+                    (ignore-errors (LaTeX-current-environment))
+                  (my/tex-table--enclosing-env))))
+       (car (member env names)))
      (when-let* ((open (nth 1 (syntax-ppss))))
        (save-excursion
          (goto-char open)
@@ -503,21 +429,19 @@
                             (max (point-min) (- open 64)))
               (match-string 1)))))))
 
-(defun my/tex-table--render (table spec &optional type dialect context)
-  "Render TABLE with alignment SPEC for the TeX at point."
-  (let ((dialect (or dialect (my/tex-table--dialect)))
-        (context (or context (my/tex-table--context))))
+(defun my/tex-table--render (table spec &optional type context)
+  "Render TABLE with alignment SPEC."
+  (let ((context (or context (my/tex-table--context))))
     (cond
      ((eq context 'math)
       (my/tex-table--to-math
        table
        (or type
-           (if (my/tex-table--enclosing-matrix dialect)
+            (if (my/tex-table--enclosing-matrix)
                "none"
              my/tex-table-default-matrix-type))
-       dialect spec))
-     ((eq dialect 'latex) (my/tex-table--to-latex table spec))
-     (t (my/tex-table--to-optex table spec)))))
+        spec))
+      (t (my/tex-table--to-latex table spec)))))
 
 
 ;;;; The mode
@@ -555,14 +479,13 @@
       (when rule (insert "|-\n"))
       (dotimes (_ (max 0 (1- rows))) (insert row "\n")))))
 
-(defun my/tex-table--start (rows cols spec type dialect context)
+(defun my/tex-table--start (rows cols spec type context)
   "Lay down a ROWS by COLS skeleton and start `my/tex-table-mode'."
   (require 'org-table)
   ;; A header rule outside maths, none inside it, where it is rarely wanted.
   (my/tex-table--skeleton rows cols (eq context 'text))
   (setq my/tex-table--spec spec
         my/tex-table--type type
-        my/tex-table--dialect dialect
         my/tex-table--context context)
   (my/tex-table-mode 1)
   (org-table-align)
@@ -572,32 +495,29 @@
 (defun my/tex-matrix (rows cols &optional type spec)
   "Start a ROWS by COLS org table to become a maths matrix of TYPE."
   (interactive
-   (let* ((dialect (my/tex-table--dialect))
-          (inside (my/tex-table--enclosing-matrix dialect))
-          (type (if inside "none" (my/tex-table-read-matrix-type dialect)))
+   (let* ((inside (my/tex-table--enclosing-matrix))
+          (type (if inside "none" (my/tex-table-read-matrix-type)))
           (entry (my/tex-table--matrix-entry type))
-          (spec (and (plist-get entry :spec) (my/tex-table-read-spec dialect)))
+          (spec (and (plist-get entry :spec) (my/tex-table-read-spec)))
           (size (my/tex-table-read-size (plist-get entry :max-cols))))
      (list (car size) (cdr size) type spec)))
-  (my/tex-table--start rows cols spec (or type "none")
-                       (my/tex-table--dialect) 'math))
+  (my/tex-table--start rows cols spec (or type "none") 'math))
 
 ;;;###autoload
 (defun my/tex-table (&optional spec rows)
   "Start an org table at point, to be converted to TeX by \\[my/tex-table-finish]."
   (interactive)
-  (let ((dialect (my/tex-table--dialect))
-        (context (my/tex-table--context)))
+  (let ((context (my/tex-table--context)))
     (if (and (null spec) (eq context 'math))
         (call-interactively #'my/tex-matrix)
-      (let* ((spec (or spec (my/tex-table-read-spec dialect)))
+       (let* ((spec (or spec (my/tex-table-read-spec)))
              (rows (or rows
                        (if current-prefix-arg
                            (prefix-numeric-value current-prefix-arg)
                          my/tex-table-rows))))
-        (my/tex-table--start (max 1 rows)
-                             (my/tex-table--count-columns spec dialect)
-                             spec nil dialect 'text)))))
+         (my/tex-table--start (max 1 rows)
+                              (my/tex-table--count-columns spec)
+                              spec nil 'text)))))
 
 (defun my/tex-table-finish ()
   "Replace the org table at point with its TeX rendering."
@@ -607,10 +527,9 @@
     (user-error "Point is not in a table"))
   (let* ((table (org-table-to-lisp))
          (spec (or my/tex-table--spec my/tex-table-default-spec))
-         (tex (my/tex-table--render table spec
-                                    my/tex-table--type
-                                    my/tex-table--dialect
-                                    my/tex-table--context))
+          (tex (my/tex-table--render table spec
+                                     my/tex-table--type
+                                     my/tex-table--context))
          (start (org-table-begin)))
     (delete-region start (org-table-end))
     (goto-char start)
@@ -620,19 +539,14 @@
         (align-regexp start (point) "\\(\\s-*\\)&" 1 1 t)))
     (setq my/tex-table--spec nil
           my/tex-table--type nil
-          my/tex-table--dialect nil
           my/tex-table--context nil)
     (my/tex-table-mode -1)))
 
 
 ;;;; Keys
 
-(with-eval-after-load 'tex
-  (keymap-set TeX-mode-map "C-c t" #'my/tex-table)
-  (keymap-set TeX-mode-map "C-c m" #'my/tex-matrix))
-
-(with-eval-after-load 'tex-mode
-  (keymap-set tex-mode-map "C-c t" #'my/tex-table)
-  (keymap-set tex-mode-map "C-c m" #'my/tex-matrix))
+(with-eval-after-load 'latex
+  (keymap-set LaTeX-mode-map "C-c t" #'my/tex-table)
+  (keymap-set LaTeX-mode-map "C-c m" #'my/tex-matrix))
 
 ;;; tbl.el ends here

@@ -6,7 +6,7 @@ return {
 	-- (lualine, bufferline, telescope) transparently use mini.icons.
 	{
 		"echasnovski/mini.icons",
-		lazy = false, -- needed early by statusline/tabline at startup
+		lazy = false, -- needed early by statusline at startup
 		opts = {},
 		config = function(_, opts)
 			require("mini.icons").setup(opts)
