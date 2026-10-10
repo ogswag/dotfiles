@@ -1,18 +1,31 @@
 fpath=(~/.zsh/completion $fpath)
-if command -v brew >/dev/null 2>&1
-then
-	FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
-	FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+if [[ -n $HOMEBREW_PREFIX ]]; then
+	fpath=($HOMEBREW_PREFIX/share/zsh/site-functions $HOMEBREW_PREFIX/share/zsh-completions $fpath)
+elif (( $+commands[brew] )); then
+	homebrew_prefix=$(brew --prefix)
+	fpath=($homebrew_prefix/share/zsh/site-functions $homebrew_prefix/share/zsh-completions $fpath)
+	unset homebrew_prefix
 fi
+[[ -d ~/.grok/completions/zsh ]] && fpath=(~/.grok/completions/zsh $fpath)
+typeset -U fpath
 
+setopt extendedglob
 autoload -Uz compinit
-
-if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
-	compinit -i  # only load completions if dump file is older than 24 hours
+if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
+	compinit
 else
-	compinit -C -i  # skip security check for faster load
+	compinit -C
 fi
 zmodload zsh/complist
+if (( $+functions[fzm] )); then
+	_fzm() {
+		local marks=${FZF_MARKS_FILE:-$HOME/.fzf-marks}
+		[[ -r $marks ]] || return
+		_arguments -C \
+			"1: :(($(sed "s/\\(.*\\) : \\(.*\\)/'\1'\\\\:'\2'/" < "$marks")))"
+	}
+	compdef _fzm fzm
+fi
 setopt auto_menu        # show completion menu on successive tab press
 setopt complete_in_word # allow completion from within a word
 setopt always_to_end    # move cursor to end if word had one match

@@ -4,10 +4,16 @@ host=$(hostname -s)
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
-export RUFF_CONFIG_FILE="$HOME/ruff.toml"
-
 # If not running interactively, don't do anything
 [[ -o interactive ]] || return
+
+if [[ $os == Darwin && -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+if (( $+commands[mise] )); then
+  eval "$(mise activate zsh)"
+fi
 
 if [ -f ~/.zsh/zsh_plugins ]; then
     source ~/.zsh/zsh_plugins
@@ -26,14 +32,13 @@ fi
 
 
 if [[ $os == "Linux" ]]; then
-    export EDITOR='nano'
-    export SUDO_EDITOR='nano'
-    export VISUAL='nano'
+    export EDITOR='vim'
+    export SUDO_EDITOR='vim'
+    export VISUAL='vim'
 elif [[ $os == "Darwin" ]]; then
-    export EDITOR='micro'
-    export SUDO_EDITOR='micro'
-    export VISUAL='micro'
-    export HOMEBREW_REQUIRE_TAP_TRUST=1
+    export EDITOR='vim'
+    export SUDO_EDITOR='vim'
+    export VISUAL='vim'
 fi
 
 mkcd () {
@@ -45,8 +50,7 @@ mkcd () {
 typeset -U PATH path
 if [[ $os == "Linux" ]]; then
     export LD_LIBRARY_PATH=/usr/local/lib
-elif [[ $os == "Darwin" ]]; then
-else
+elif [[ $os != "Darwin" ]]; then
     echo "Unknown operating system."
 fi
 
@@ -59,7 +63,6 @@ setopt extended_history       # record timestamp of command in HISTFILE
 setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
 setopt hist_verify            # show command with history expansion to user before running it
 setopt share_history          # share command history data
-setopt inc_append_history     # immediately append to history file, not just when a term is killed
 setopt hist_find_no_dups      # don't show duplicates when searching history
 
 # ===== Keybindings =====
@@ -78,7 +81,7 @@ setopt auto_pushd               # make cd push old dir to dir stack
 # ===== Globbing and Expansion =====
 setopt extended_glob            # enable extended globbing
 setopt numeric_glob_sort        # sort numbered files numerically
-unsetopt case_glob              # make globbing case-sensitive
+unsetopt case_glob              # case-insensitive globbing
 
 # ===== Keybindings =====
 bindkey -e
@@ -88,9 +91,7 @@ bindkey '^H' vi-backward-kill-word
 
 # >>> grok installer >>>
 export PATH="$HOME/.grok/bin:$PATH"
-fpath=(~/.grok/completions/zsh $fpath)
-autoload -Uz compinit && compinit -C
 # <<< grok installer <<<
 
 # opencode
-export PATH=/Users/az/.opencode/bin:$PATH
+export PATH="$HOME/.opencode/bin:$PATH"

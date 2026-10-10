@@ -9,10 +9,10 @@ if [[ -z ${_PURE_LOCAL_LOADED:-} ]]; then
     functions -c prompt_pure_preprompt_render pure_preset_upstream_render
 fi
 
-# Pure prints a spacer line in precmd. Keep it for the two-line preset only.
+# Spacer only for the two-line preset, and never from a zle widget (fzf-marks).
 prompt_pure_preprompt_render() {
-    if [[ $1 == precmd && $PURE_PRESET != pure ]]; then
-        pure_preset_upstream_render
+    if [[ $1 == precmd ]] && { [[ $PURE_PRESET != pure ]] || zle }; then
+        pure_preset_upstream_render precmd >/dev/null
     else
         pure_preset_upstream_render "$@"
     fi
