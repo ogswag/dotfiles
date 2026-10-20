@@ -76,8 +76,8 @@ return {
 		opts = {
 			set_dark_mode = function()
 				vim.api.nvim_set_option_value("background", "dark", {})
-				vim.cmd.colorscheme("harlequin")
-				require("lualine").setup({ options = { theme = "harlequin" } })
+				vim.cmd.colorscheme("PaperColor")
+				require("lualine").setup({ options = { theme = "PaperColor" } })
 			end,
 			set_light_mode = function()
 				vim.api.nvim_set_option_value("background", "light", {})
