@@ -7,13 +7,21 @@ source $ZPLUGINDIR/zsh_unplugged/zsh_unplugged.zsh
 
 repos=(
     # zdharma-continuum/fast-syntax-highlighting
-    # zsh-users/zsh-history-substring-search
+    zsh-users/zsh-history-substring-search
     ael-code/zsh-colored-man-pages
     urbainvaes/fzf-marks
     zsh-users/zsh-completions
     joshskidmore/zsh-fzf-history-search
 )
 plugin-load $repos
+
+bindkey '^[[A' history-substring-search-up # or '\eOA'
+bindkey '^[[B' history-substring-search-down # or '\eOB'
+bindkey '\eOA' history-substring-search-up # or '\eOA'
+bindkey '\eOB' history-substring-search-down # or '\eOB'
+HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
+HISTORY_SUBSTRING_SEARCH_PREFIXED=1
+HISTORY_SUBSTRING_SEARCH_FUZZY=1
 
 ZSH_FZF_HISTORY_SEARCH_BIND='^r'
 ZSH_FZF_HISTORY_SEARCH_EVENT_NUMBERS=0
